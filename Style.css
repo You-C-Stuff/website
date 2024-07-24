@@ -1649,13 +1649,13 @@ input, select, textarea {
 .overlay-image.left {
     height: auto;
     width: 11%;
-    left: calc(50% - 410px); /* Adjust positioning to overlap left side */
+    left: calc(50% - 370px); /* Adjust positioning to overlap left side */
 }
 
 .overlay-image.right {
     height: auto;
     width: 10%;
-    right: calc(49% - 410px); /* Adjust positioning to overlap right side */
+    right: calc(47% - 350px); /* Adjust positioning to overlap right side */
 }
 
 
