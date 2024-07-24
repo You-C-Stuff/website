@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compataible" content="IE=Edge">
+    <meta name="Keywords" content="2D Animator,YapCreations,Toontuber,Commissions">
+    <meta name="viewport" content="width=device-width,intial-scale=1.0">
+    <!--Website Tab-->
+    <title>About</title>
+    <link rel="icon" type="image/jpg" href="Images/favicon.png">
+    <!--Style Reference-->
+    <link rel="stylesheet" href="style.css">
+    <!--Icon Reference-->
+    <script src="https://kit.fontawesome.com/2ced1b2fda.js" crossorigin="anonymous"></script>
+    
+    <!--JavaScript-->
+    <script src="myScript.js" defer></script>
+    <!--JQuery-->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+<!--Top Header-->
+<header class="header">
+    <div class="logo-text">
+        <a href="index.html">
+            <img src="Images/Icon.png" alt="YapCreations" class="logo">
+            <span class="company-name">YAPCREATIONS</span>
+        </a>
+    </div>
+    <nav class="nav">
+        <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="commissions.html">Commissions</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="community.html" >Community</a></li>
+        <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+            
+        </div>
+    </nav>
+</header>
+
+<div class="overlay" id="overlay">
+    <ul class="overlay-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="commissions.html">Commissions</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="community.html" >Community</a></li>
+        <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
+    </ul>
+    <div class="overlay-social">
+        <a href="https://x.com/YapCreations" target="_blank"><i  class="fa-brands fa-twitter"></i></a>
+        <a href="https://www.instagram.com/yapcreations/" target="_blank"><i  class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.twitch.tv/yapcreations" target="_blank"><i  class="fa-brands fa-twitch"></i></a>
+        <a href="https://www.youtube.com/@Yap_Creations" target="_blank"><i  class="fa-brands fa-youtube" ></i></a>
+    </div>
+</div>
+
+
+<!--Main -->
+<main>
+<div class="about">
+    <div class="both-side">
+       <!-- Left Side: About Me -->
+       <div class="left-side">
+            <div class="about-me">
+                <!-- First Row: Image and Text -->
+                <div class="about-row image-text">
+                    <a href="https://linktr.ee/yapcreations" target="_blank" class="profile-link">
+                        <img src="Images/PFP.png" alt="Profile Picture" class="profile-img">
+                    </a>
+                    <div class="text-content">
+                        <h3>Animator | Illustrator</h3>
+                        <h2>YAP CHUNG SHING</h2>
+                        <h1>叶崇晟</h1>
+                        <div class="social-icons">
+                            <a href="https://x.com/YapCreations" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                            <a href="https://www.instagram.com/yapcreations/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                            <a href="https://www.twitch.tv/yapcreations" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                            <a href="https://www.youtube.com/@Yap_Creations" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Second Row: Centered Text -->
+                <div class="about-row centered-text">
+                    <p>Singapore based animator and illustrator. I love to make animation smoother than silk in my own unique style.<br>
+                        <br>
+                        I've done work for <a target="_blank" href="https://www.youtube.com/playlist?list=PL06e6JGoqxw2VTIoQmcTeDLdtJqcyaBWp">Starbarians</a> and <a target="_blank" href="https://www.youtube.com/playlist?list=PL06e6JGoqxw3isFtGD5zXKee9LTrQABsu">Dr Bees</a> , as well as stuff for <a target="_blank" href="https://www.youtube.com/playlist?list=PLoKCRV22r_x-For1zAUCNriAXxFbc-YUV">other clients, people and projects</a>! I'm interested in animated projects that focus on adventure, fantasy and action.</p>
+                </div>
+
+                <hr>
+                <!-- Third Row: Resume and Email -->
+                <div class="about-row resume-email">
+                    <p>Resume: <a href="Images/YapCreation's CV.pdf" download>Download</a></p>
+                    <p>Email: <a href="mailto:yapcommissions@gmail.com">yapcommissions@gmail.com</a></p>
+                </div>
+                <hr>
+            </div>
+        </div>  
+
+        <div class="right-side">
+            <h1>DROP ME AN EMAIL!</h1>
+            <div class="form-container">
+                <form id="contact" action="https://docs.google.com/forms/d/e/1FAIpQLSccsVz7_GqMpyJohqS_knGiJVbczEjfYebjxC03Gm2Ss1VMFQ/formResponse" method="POST" class="email-form" onsubmit="return postToGoogle();">
+                    <div class="form-group side-by-side">
+                        <div class="label-input">
+                            <label for="first-name">First Name*</label>
+                            <input type="text" id="first-name" name="entry.260652021" required>
+                        </div>
+                        <div class="label-input">
+                            <label for="last-name">Last Name</label>
+                            <input type="text" id="last-name" name="entry.796514769">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email*</label>
+                        <input type="email" id="e-mail" name="entry.956666418" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject*</label>
+                        <input type="text" id="subject" name="entry.1084731251" required>
+                    </div>
+                    <div class="form-group high-form">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="entry.957718632" rows="4" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="submit-btn">Submit</button>
+                    </div>
+                </form>
+                <div class="success-message">Form submitted successfully!</div>
+            </div>
+        
+        </div>
+    </div>
+</div>
+
+<div class="bottom-button button-container">
+    <a href="index.html">  <button class="white-button">Back</button></a>
+</div>
+</main>
+
+<!--Footer-->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-email">
+            <a href= "mailto: yapcommissions@gmail.com"> yapcommissions@gmail.com </a>
+        </div>
+        <div class="footer-social">
+            <a href="https://x.com/YapCreations" target="_blank"><i  class="fa-brands fa-twitter"></i></a>
+            <a href="https://www.instagram.com/yapcreations/" target="_blank"><i  class="fa-brands fa-instagram"></i></a>
+            <a href="https://www.twitch.tv/yapcreations" target="_blank"><i  class="fa-brands fa-twitch"></i></a>
+            <a href="https://www.youtube.com/@Yap_Creations" target="_blank"><i  class="fa-brands fa-youtube" ></i></a>
+        </div>
+        <div class="footer-copyright">
+            &copy; YAPCREATIONS
+        </div>
+    </div>
+</footer>
+
+</body>
+
+</html>

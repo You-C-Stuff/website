@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compataible" content="IE=Edge">
+    <meta name="Keywords" content="2D Animator,YapCreations,Toontuber,Commissions">
+    <meta name="viewport" content="width=device-width,intial-scale=1.0">
+    <!--Website Tab-->
+    <title>YapCreations</title>
+    <link rel="icon" type="image/jpg" href="Images/favicon.png">
+    <!--Style Reference-->
+    <link rel="stylesheet" href="style.css">
+    <!--Icon Reference-->
+    <script src="https://kit.fontawesome.com/2ced1b2fda.js" crossorigin="anonymous"></script>
+    <!--JavaScript-->
+    <script src="myScript.js" defer></script>
+    <!--JQuery-->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+  
+</head>
+
+<body>
+
+<!--Top Header-->
+<header class="header">
+    <div class="logo-text">
+        <a href="index.html">
+            <img src="Images/Icon.png" alt="YapCreations" class="logo">
+            <span class="company-name">YAPCREATIONS</span>
+        </a>
+    </div>
+    <nav class="nav">
+        <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="commissions.html">Commissions</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="community.html" >Community</a></li>
+        <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+            
+        </div>
+    </nav>
+</header>
+<div class="overlay" id="overlay">
+    <ul class="overlay-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="commissions.html">Commissions</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="community.html" >Community</a></li>
+        <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
+    </ul>
+    <div class="overlay-social">
+        <a href="https://x.com/YapCreations" target="_blank"><i  class="fa-brands fa-twitter"></i></a>
+        <a href="https://www.instagram.com/yapcreations/" target="_blank"><i  class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.twitch.tv/yapcreations" target="_blank"><i  class="fa-brands fa-twitch"></i></a>
+        <a href="https://www.youtube.com/@Yap_Creations" target="_blank"><i  class="fa-brands fa-youtube" ></i></a>
+    </div>
+</div>
+
+<!--Main-->
+
+
+<main> 
+<div class="home-page">
+<i onclick="topFunction()" id="myBtn" title="Go to top" class="fa-solid fa-angle-up"></i>
+    <div class="row" id="row1">
+        <div class="video-container">
+            <!-- Video background -->
+            <video autoplay muted loop class="video-bg">
+                <source src="Images/BG/Reelrow.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="hero-page"></div>
+            <div class="content">
+                <h1>ANIMATION REEL</h1>
+                <div class="video-wrapper">
+                    <!-- Embedded YouTube video -->
+                    <div class="video-responsive">
+                        <iframe width="1246" height="701" src="https://www.youtube.com/embed/EFAunYjtNbY" title="[2024] YapCreation&#39;s Animation Reel" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div class="buttons">
+                    <a href="past_works.html"> <button class="white-button">Past Works</button></a>
+                    <a href="personal_projects.html"><button class="white-button">Personal Projects</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="row2">
+        <div class="video-container">
+            <!-- Video background -->
+            <video autoplay muted loop class="video-bg">
+                <source src="Images/BG/Commissionrow.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="commission-page"></div>
+            <div class="content content-right">
+                <p>Want a custom artwork?</p>
+                <div class="button-container">
+                    <a href="commissions.html">  <button class="black-button">Heck Yeah!</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="row3">
+        <div class="video-container">
+            <!-- Video background -->
+            <video autoplay muted loop class="video-bg">
+                <source src="Images/BG/Illustrationrow.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="illustration-page"></div>
+            <div class="content content-left">
+                <h1>ILLUSTRATIONS</h1>
+                <div class="button-container">
+                    <a href="illustrations.html"><button class="white-button">View</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row static-background" id="row4">
+        <div class="image-container">
+            <div class='aos-item' data-aos='fadeInLeft'>  <img src="Images/BG/AboutTOP.png" alt="Description of Image"></div>
+          
+        </div>
+        <div class="text-container">
+            <div class="content content-right">
+                <h1>ABOUT</h1>
+                <div class="button-container">
+                    <a href="about.html"> <button class="black-button">Read More</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" id="row5">
+        <div class="video-container">
+            <!-- Video background -->
+            <video autoplay muted loop class="video-bg">
+                <source src="Images/BG/Communityrow.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            <div class="hero-page"></div>
+            <div class="content">
+                <p> Join the community!</p>
+                <div class="button-container">
+                    <a href="community.html"><button class="white-button">Join!</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!--Footer-->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-email">
+            <a href= "mailto: yapcommissions@gmail.com"> yapcommissions@gmail.com </a>
+        </div>
+        <div class="footer-social">
+            <a href="https://x.com/YapCreations" target="_blank"><i  class="fa-brands fa-twitter"></i></a>
+            <a href="https://www.instagram.com/yapcreations/" target="_blank"><i  class="fa-brands fa-instagram"></i></a>
+            <a href="https://www.twitch.tv/yapcreations" target="_blank"><i  class="fa-brands fa-twitch"></i></a>
+            <a href="https://www.youtube.com/@Yap_Creations" target="_blank"><i  class="fa-brands fa-youtube" ></i></a>
+        </div>
+        <div class="footer-copyright">
+            &copy; YAPCREATIONS
+        </div>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/gh/linuxguist/animation@main/aos.js"></script>
+<script>
+  if (!window.Cypress) AOS.init({
+    useClassNames: true,
+    initClassName: false,
+    animatedClassName: 'animated',
+    duration: 3000, // values from 0 to 3000, with step 50ms
+  });
+</script>
+</body>
+
+</html>
