@@ -1627,7 +1627,7 @@ input, select, textarea {
 .centered-content .iframe-container {
     position: relative;
     width: 100%;
-    max-width: 620px; /* Adjust maximum width as necessary */
+    max-width: 640px; /* Adjust maximum width as necessary */
     margin: 0 auto;
     overflow: hidden; /* Ensure iframe doesn't overflow */
 }
@@ -1649,13 +1649,13 @@ input, select, textarea {
 .overlay-image.left {
     height: auto;
     width: 11%;
-    left: calc(50% - 370px); /* Adjust positioning to overlap left side */
+    left: calc(48% - 350px); /* Adjust positioning to overlap left side */
 }
 
 .overlay-image.right {
     height: auto;
     width: 10%;
-    right: calc(47% - 350px); /* Adjust positioning to overlap right side */
+    right: calc(46% - 350px); /* Adjust positioning to overlap right side */
 }
 
 
