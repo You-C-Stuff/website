@@ -1655,7 +1655,7 @@ input, select, textarea {
 .overlay-image.right {
     height: auto;
     width: 14%;
-    right: calc(40% - 410px); /* Adjust positioning to overlap right side */
+    right: calc(42% - 410px); /* Adjust positioning to overlap right side */
 }
 
 
