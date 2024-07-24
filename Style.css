@@ -1627,7 +1627,7 @@ input, select, textarea {
 .centered-content .iframe-container {
     position: relative;
     width: 100%;
-    max-width: 600px; /* Adjust maximum width as necessary */
+    max-width: 620px; /* Adjust maximum width as necessary */
     margin: 0 auto;
     overflow: hidden; /* Ensure iframe doesn't overflow */
 }
