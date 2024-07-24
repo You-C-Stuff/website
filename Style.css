@@ -2018,7 +2018,7 @@ input, select, textarea {
         grid-template-columns: 1fr; /* Switch to a single column layout on smaller screens */
     }
     .artist-info h3 {
-        font-size: 0.9em; /* Adjust font size for smaller screens */
+        font-size: 0.8em; /* Adjust font size for smaller screens */
     }
     .artist-info a{
         font-size: 0.8em;
