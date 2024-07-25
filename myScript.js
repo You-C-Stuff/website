@@ -377,7 +377,7 @@ function updateFormVisibility() {
             $('#toontuberFields').addClass('hidden');
             $('#referenceLink').addClass('hidden');
             $('#additionalCharactersField').addClass('hidden');
-            $('#PackagePlan').addClass('hidden');
+            $('#packageplanfields').addClass('hidden');
           
             
 
@@ -398,7 +398,7 @@ function updateFormVisibility() {
             $('#toontuberFields').addClass('hidden');
             $('#referenceLink').addClass('hidden');
             $('#additionalCharactersField').addClass('hidden');
-            $('#PackagePlan').addClass('hidden');
+            $('#packageplanfields').addClass('hidden');
 
             // Display success message for 5 seconds
             $('.success-message').show();
