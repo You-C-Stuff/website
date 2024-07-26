@@ -317,11 +317,13 @@ function postToGoogle() {
     return false; // Ensure that the form submission is prevented
 }
 
+
 function updateFormVisibility() {
     var commissionType = document.getElementById("commissionType").value;
 
     var animationIllustrationFields = document.getElementById("animationIllustrationFields");
     var toontuberFields = document.getElementById("toontuberFields");
+    var toontuberAddOns = document.getElementById("toontuberAddOns");
     var commonFields = document.getElementById("referenceLink");
     var additionalCharactersField = document.getElementById("additionalCharactersField");
     var packageplanfields = document.getElementById("packageplanfields");
@@ -329,6 +331,7 @@ function updateFormVisibility() {
     // Hide all sections initially
     animationIllustrationFields.classList.add("hidden");
     toontuberFields.classList.add("hidden");
+    toontuberAddOns.classList.add("hidden");
     commonFields.classList.add("hidden");
     additionalCharactersField.classList.add("hidden");
     packageplanfields.classList.add("hidden");
@@ -339,9 +342,9 @@ function updateFormVisibility() {
         commonFields.classList.remove("hidden");
     } else if (commissionType === "Toontuber") {
         toontuberFields.classList.remove("hidden");
+        toontuberAddOns.classList.remove("hidden");
         commonFields.classList.remove("hidden");
         packageplanfields.classList.remove("hidden");
-
     }
 
     // Add event listener for the additional characters checkbox
@@ -354,8 +357,6 @@ function updateFormVisibility() {
         }
     });
 }
-
-
 
     function postToGoogleform() {
         // Collect form data
@@ -378,6 +379,7 @@ function updateFormVisibility() {
             $('#referenceLink').addClass('hidden');
             $('#additionalCharactersField').addClass('hidden');
             $('#packageplanfields').addClass('hidden');
+            $('#toontuberAddOns').addClass('hidden');
           
             
 
@@ -399,6 +401,7 @@ function updateFormVisibility() {
             $('#referenceLink').addClass('hidden');
             $('#additionalCharactersField').addClass('hidden');
             $('#packageplanfields').addClass('hidden');
+            $('#toontuberAddOns').addClass('hidden');
 
             // Display success message for 5 seconds
             $('.success-message').show();

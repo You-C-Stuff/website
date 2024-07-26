@@ -140,8 +140,8 @@
         </head>
         <body>
             <div class="form-box">
-                <form action="https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse" method="POST" id="form" onsubmit="return postToGoogleform();" >
-                    <div class="form-grp form-row">
+                <form action="https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse" method="POST" id="form" onsubmit="return postToGoogleform();">
+                <div class="form-grp form-row">
                         <div>
                             <label for="firstName">First Name*</label>
                             <input type="text" id="firstName" name="entry.325055882" required>
@@ -202,9 +202,16 @@
                             <label for="PackagePlan">Type*</label>
                             <select id="PackagePlan" name="entry.876376510">
                                 <option value="">Select</option>
-                                <option value="Full">Custom</option>
-                                <option value="Lite">Simple</option>
+                                <option value="Custom">Custom</option>
+                                <option value="Simple">Simple</option>
                             </select>
+                        </div>
+                    </div>
+                    <div id="toontuberAddOns" class="hidden">
+                        <div class="form-grp">
+                            <label>Add Ons</label>
+                            <label><input type="checkbox" id="ToonaddOns" name="entry.1015173148" value="Set"> "Set" Animation</label>
+                            <label><input type="checkbox" id="ToonaddOns" name="entry.1015173148" value="Mute/Deafen"> Mute/Deafen</label>
                         </div>
                     </div>
                     <div id="toontuberFields" class="hidden">
@@ -219,7 +226,6 @@
                             </select>
                         </div>
                     </div>
-
                     <div id="referenceLink" class="hidden">
                         <div class="form-grp">
                             <label for="referenceLink">Link to Reference</label>
@@ -233,9 +239,9 @@
                     <div class="form-grp submit-button">
                         <button type="submit">Submit</button>
                     </div>
+                    <div class="success-message">Form submitted successfully!</div>
                 </form>
-                <div class="success-message">Form submitted successfully!</div>
-            </div>      
+            </div>    
     </section>
     <div class="bottom-button button-container">
         <a href="commissions.html">  <button class="white-button">Back</button></a>
