@@ -77,60 +77,60 @@
     <section class="form-section">
         <div class="form-content">
             <h1>COMMISSION FORM</h1>
-            <h3>You can send a commission request by filling out this form or through Discord via <span style="text-decoration: underline;">yapcreations</span>. We will discuss more details, talk about image references, and a price will be negotiated. </h3>
+            <h3>You can send a commission request by filling out this form. Upon recieving the email, we will discuss more details, talk about image references, and a price will be negotiated. </h3>
+
+            <h3>Alternatively you can contact me through Discord via <span style="text-decoration: underline;">yapcreations</span>.</h3>
             <div class="content-wrapper">
-                <div class="pricing-box">
-                    <div class="base-pricing">
-                        <h2>SERVICES</h2>
-                        <div class="pricing-row">
-                            <div class="pricing-item">
-                                <h3>Animation</h3>
-                                <img src="Images/Commission/AnimationFull.gif" alt="Animation">
-                                <ul>
-                                 
-                                </ul>
+                    <div class="pricing-box">
+                        <div class="base-pricing">
+                            <h2>SERVICES</h2>
+                            <div class="pricing-row">
+                                <div class="pricing-item">
+                                    <h3>Animation</h3>
+                                    <img src="Images/Commission/AnimationFull.gif" alt="Animation">
+                                    <ul>
+                                     
+                                    </ul>
+                                </div>
+                                <div class="pricing-item">
+                                    <h3>Illustrations</h3>
+                                    <img src="Images/Commission/Double.png" alt="Illustrations">
+                                    <ul>
+                                      
+                                    </ul>
+                                </div>
+                                <div class="pricing-item">
+                                    <h3>Toontuber</h3>
+                                    <img src="Images/Commission/toontuberhearttalk.gif" alt="Toontuber Avatar">
+                                    <ul>
+                                       
+                                    </ul>
+                                </div>
                             </div>
-                            <div class="pricing-item">
-                                <h3>Illustrations</h3>
-                                <img src="Images/Commission/Double.png" alt="Illustrations">
-                                <ul>
-                                  
-                                </ul>
-                            </div>
-                            <div class="pricing-item">
-                                <h3>Toontuber</h3>
-                                <img src="Images/Commission/toontuberhearttalk.gif" alt="Toontuber Avatar">
-                                <ul>
-                                   
-                                </ul>
-                            </div>
+                            
                         </div>
-                    </div>
-                    <h2>ADD-ONs</h2>
-                    <div class="add-ons">
-                        <div class="addon-row">
-                            <div class="addon-item">
-                                <h3>Background</h3>
-                                <img src="Images/Portfolio/BG2.png" alt="Background">
-                                 <ul>
-                                   
-                                </ul>
+                        <div class="add-ons">
+                            <div class="addon-row">
+                                <div class="addon-item">
+                                    <h3>Emotes</h3>
+                                    <img src="Images/Commission/CarrinMoney.gif" alt="Emote">
+                                     <ul>
+                                       
+                                    </ul>
+                                </div>
+                                <div class="addon-item">
+                                    <h3>Graphic Assets</h3>
+                                    <img src="Images/Commission/Yap_Ref.png" alt="Graphic Assets">
+                                </div>
                             </div>
-                            <div class="addon-item">
-                                <h3>Additional Character</h3>
-                                <img src="Images/Commission/additionalcharacters.gif" alt="Additional Character">
-                                 <ul>
-                                   
-                                </ul>
-                            </div>
-                        </div>
                     </div>
+
                 </div>
             </style>
         </head>
         <body>
             <div class="form-box">
-                <form action="https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse" method="POST" id="form" onsubmit="return postToGoogleform();">
+                <form action="https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse" method="POST" id="form" onsubmit="return postToGoogleform();" >
                 <div class="form-grp form-row">
                         <div>
                             <label for="firstName">First Name*</label>
@@ -157,12 +157,13 @@
                             <option value="Animation">Animation</option>
                             <option value="Toontuber">Toontuber</option>
                             <option value="Illustration">Illustration</option>
+                            <option value="Character Design">Character Design</option>
                         </select>
                     </div>
                     <div id="animationIllustrationFields" class="hidden">
                         <div class="form-grp">
                             <label for="levelOfDetail">Level of Detail*</label>
-                            <select id="levelOfDetail" name="entry.92868536">
+                            <select id="levelOfDetail" name="entry.92868536" onchange="updateFormVisibility()">
                                 <option value="">Select</option>
                                 <option value="Sketch">Sketch</option>
                                 <option value="Flat Colours">Flat Colours</option>
@@ -171,7 +172,7 @@
                                 <option value="Emote">Emote</option>
                             </select>
                         </div>
-                        <div class="form-grp">
+                        <div id="addOns" class="form-grp hidden">
                             <label>Add Ons</label>
                             <label><input type="checkbox" id="addOns" name="entry.80710002" value="Background"> Background</label>
                             <label><input type="checkbox" id="addOns" name="entry.80710002" value="Additional Characters"> Additional Characters</label>
@@ -197,6 +198,16 @@
                             </select>
                         </div>
                     </div>
+                    <div id="Designtype" class="hidden">
+                        <div class="form-grp">
+                            <label for="DesignPlan">Type*</label>
+                            <select id="DesignPlan" name="entry.770066938">
+                                <option value="">Select</option>
+                                <option value="Reference Sheet">Reference Sheet</option>
+                                <option value="Turnaround">Character Turnaround</option>
+                            </select>
+                        </div>
+                    </div>
                     <div id="toontuberAddOns" class="hidden">
                         <div class="form-grp">
                             <label>Add Ons</label>
@@ -208,6 +219,18 @@
                         <div class="form-grp">
                             <label for="toontuberEmotes">No. of Toontuber Emotes*</label>
                             <select id="toontuberEmotes" name="entry.998077474">
+                                <option value="">Select</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4 or more">4 or more</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="emoteFields" class="hidden">
+                        <div class="form-grp">
+                            <label for="Emotes">No. of Emotes*</label>
+                            <select id="Emotes" name="entry.1228648293">
                                 <option value="">Select</option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>

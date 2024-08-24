@@ -317,9 +317,9 @@ function postToGoogle() {
     return false; // Ensure that the form submission is prevented
 }
 
-
 function updateFormVisibility() {
     var commissionType = document.getElementById("commissionType").value;
+    var levelOfDetail = document.getElementById("levelOfDetail").value;
 
     var animationIllustrationFields = document.getElementById("animationIllustrationFields");
     var toontuberFields = document.getElementById("toontuberFields");
@@ -327,6 +327,9 @@ function updateFormVisibility() {
     var commonFields = document.getElementById("referenceLink");
     var additionalCharactersField = document.getElementById("additionalCharactersField");
     var packageplanfields = document.getElementById("packageplanfields");
+    var designTypeFields = document.getElementById("Designtype");
+    var addOns = document.getElementById("addOns");
+    var emoteFields = document.getElementById("emoteFields");
 
     // Hide all sections initially
     animationIllustrationFields.classList.add("hidden");
@@ -335,16 +338,31 @@ function updateFormVisibility() {
     commonFields.classList.add("hidden");
     additionalCharactersField.classList.add("hidden");
     packageplanfields.classList.add("hidden");
+    designTypeFields.classList.add("hidden");
+    addOns.classList.add("hidden");
+    emoteFields.classList.add("hidden");
 
     // Show relevant fields based on the selected commission type
     if (commissionType === "Animation" || commissionType === "Illustration") {
         animationIllustrationFields.classList.remove("hidden");
         commonFields.classList.remove("hidden");
+
+        if (levelOfDetail === "Sketch" || levelOfDetail === "Flat Colours" || levelOfDetail === "Shaded" || levelOfDetail === "Chibi") {
+            addOns.classList.remove("hidden");
+        } else if (levelOfDetail === "Emote") {
+            emoteFields.classList.remove("hidden");
+            commonFields.classList.remove("hidden");
+        }
+
     } else if (commissionType === "Toontuber") {
         toontuberFields.classList.remove("hidden");
         toontuberAddOns.classList.remove("hidden");
         commonFields.classList.remove("hidden");
         packageplanfields.classList.remove("hidden");
+
+    } else if (commissionType === "Character Design") {
+        designTypeFields.classList.remove("hidden");
+        commonFields.classList.remove("hidden");
     }
 
     // Add event listener for the additional characters checkbox
@@ -380,6 +398,9 @@ function updateFormVisibility() {
             $('#additionalCharactersField').addClass('hidden');
             $('#packageplanfields').addClass('hidden');
             $('#toontuberAddOns').addClass('hidden');
+            $('#Designtype').addClass('hidden');
+            $('#emoteFields').addClass('hidden');
+            $('#AddOns').addClass('hidden');
           
             
 
@@ -402,6 +423,9 @@ function updateFormVisibility() {
             $('#additionalCharactersField').addClass('hidden');
             $('#packageplanfields').addClass('hidden');
             $('#toontuberAddOns').addClass('hidden');
+            $('#Designtype').addClass('hidden');
+            $('#emoteFields').addClass('hidden');
+            $('#AddOns').addClass('hidden');
 
             // Display success message for 5 seconds
             $('.success-message').show();
@@ -414,3 +438,9 @@ function updateFormVisibility() {
         // Prevent the default form submission
         return false;
     }
+
+
+    
+
+
+    
