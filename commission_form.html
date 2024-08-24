@@ -111,16 +111,19 @@
                         </div>
                         <div class="add-ons">
                             <div class="addon-row">
+                                 <div class="addon-item">
+                                    <h3>Character Design</h3>
+                                    <img src="Images/Commission/Yap_Ref.png" alt="Graphic Assets">
+                                </div>
                                 <div class="addon-item">
-                                    <h3>Emotes</h3>
+                                    <h3>Animated Assets</h3>
                                     <img src="Images/Commission/CarrinMoney.gif" alt="Emote">
-                                     <ul>
-                                       
-                                    </ul>
+                                     
                                 </div>
                                 <div class="addon-item">
                                     <h3>Graphic Assets</h3>
-                                    <img src="Images/Commission/Yap_Ref.png" alt="Graphic Assets">
+                                    <img src="Images/Commission/Profile & Banner.png" alt="Emote">
+                                     
                                 </div>
                             </div>
                     </div>
@@ -131,7 +134,7 @@
         <body>
             <div class="form-box">
                 <form action="https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse" method="POST" id="form" onsubmit="return postToGoogleform();" >
-                <div class="form-grp form-row">
+                    <div class="form-grp form-row">
                         <div>
                             <label for="firstName">First Name*</label>
                             <input type="text" id="firstName" name="entry.325055882" required>
@@ -155,9 +158,11 @@
                         <select id="commissionType" name="entry.1880220156" onchange="updateFormVisibility()">
                             <option value="">Select</option>
                             <option value="Animation">Animation</option>
-                            <option value="Toontuber">Toontuber</option>
                             <option value="Illustration">Illustration</option>
+                            <option value="Toontuber">Toontuber</option>
                             <option value="Character Design">Character Design</option>
+                            <option value="Animated Assets">Animated Assets</option>
+                            <option value="Graphic Assets">Graphic Assets</option>
                         </select>
                     </div>
                     <div id="animationIllustrationFields" class="hidden">
@@ -165,17 +170,20 @@
                             <label for="levelOfDetail">Level of Detail*</label>
                             <select id="levelOfDetail" name="entry.92868536" onchange="updateFormVisibility()">
                                 <option value="">Select</option>
-                                <option value="Sketch">Sketch</option>
-                                <option value="Flat Colours">Flat Colours</option>
-                                <option value="Shaded">Shaded</option>
-                                <option value="Chibi">Chibi</option>
-                                <option value="Emote">Emote</option>
+                                <option value="Sketch" id="common">Sketch</option>
+                                <option value="Flat Colours"  id="common1">Flat Colours</option>
+                                <option value="Shaded"  id="common2">Shaded</option>
+                                <option value="Chibi"  id="common3">Chibi</option>
+                                <option value="Emote"  id="uncommon">Emote</option>
+                                <option value="Profile Pic"  id="uncommon1">Profile Pic</option>
+                                <option value="Banner"  id="rare">Banner</option>
+                                <option value="Twitch Panel"  id="rare1">Twitch Panel</option>
                             </select>
                         </div>
                         <div id="addOns" class="form-grp hidden">
                             <label>Add Ons</label>
-                            <label><input type="checkbox" id="addOns" name="entry.80710002" value="Background"> Background</label>
-                            <label><input type="checkbox" id="addOns" name="entry.80710002" value="Additional Characters"> Additional Characters</label>
+                            <label><input type="checkbox" id="addOnsBackground" name="entry.80710002" value="Background"> Background</label>
+                            <label><input type="checkbox" id="addOnsAdditionalCharacters" name="entry.80710002" value="Additional Characters"> Additional Characters</label>
                         </div>
                         <div class="form-grp hidden" id="additionalCharactersField">
                             <label for="additionalCharacters">No. of Additional Characters*</label>
@@ -211,8 +219,8 @@
                     <div id="toontuberAddOns" class="hidden">
                         <div class="form-grp">
                             <label>Add Ons</label>
-                            <label><input type="checkbox" id="ToonaddOns" name="entry.1015173148" value="Set"> "Set" Animation</label>
-                            <label><input type="checkbox" id="ToonaddOns" name="entry.1015173148" value="Mute/Deafen"> Mute/Deafen</label>
+                            <label><input type="checkbox" id="ToonaddOnsSet" name="entry.1015173148" value="Set"> "Set" Animation</label>
+                            <label><input type="checkbox" id="ToonaddOnsMuteDeafen" name="entry.1015173148" value="Mute/Deafen"> Mute/Deafen</label>
                         </div>
                     </div>
                     <div id="toontuberFields" class="hidden">

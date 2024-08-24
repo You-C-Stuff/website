@@ -320,7 +320,6 @@ function postToGoogle() {
 function updateFormVisibility() {
     var commissionType = document.getElementById("commissionType").value;
     var levelOfDetail = document.getElementById("levelOfDetail").value;
-
     var animationIllustrationFields = document.getElementById("animationIllustrationFields");
     var toontuberFields = document.getElementById("toontuberFields");
     var toontuberAddOns = document.getElementById("toontuberAddOns");
@@ -330,6 +329,14 @@ function updateFormVisibility() {
     var designTypeFields = document.getElementById("Designtype");
     var addOns = document.getElementById("addOns");
     var emoteFields = document.getElementById("emoteFields");
+    var common = document.getElementById("common");
+    var common1 = document.getElementById("common1");
+    var common2 = document.getElementById("common2");
+    var common3 = document.getElementById("common3");
+    var uncommon = document.getElementById("uncommon");
+    var uncommon1 = document.getElementById("uncommon1");
+    var rare = document.getElementById("rare");
+    var rare1 = document.getElementById("rare1");
 
     // Hide all sections initially
     animationIllustrationFields.classList.add("hidden");
@@ -343,17 +350,42 @@ function updateFormVisibility() {
     emoteFields.classList.add("hidden");
 
     // Show relevant fields based on the selected commission type
-    if (commissionType === "Animation" || commissionType === "Illustration") {
+    if (commissionType === "Animated Assets") {
         animationIllustrationFields.classList.remove("hidden");
         commonFields.classList.remove("hidden");
+        common.classList.add("hidden");
+        common1.classList.add("hidden");
+        common2.classList.add("hidden");
+        common3.classList.add("hidden");
+        uncommon.classList.remove("hidden");
+        uncommon1.classList.remove("hidden");
+        rare1.classList.add("hidden");
+        rare.classList.add("hidden");
 
-        if (levelOfDetail === "Sketch" || levelOfDetail === "Flat Colours" || levelOfDetail === "Shaded" || levelOfDetail === "Chibi") {
-            addOns.classList.remove("hidden");
-        } else if (levelOfDetail === "Emote") {
+
+        // Manage visibility based on level of detail
+        if (levelOfDetail === "Emote" ) {
             emoteFields.classList.remove("hidden");
-            commonFields.classList.remove("hidden");
         }
+  
 
+    } else if (commissionType === "Graphic Assets") {
+        animationIllustrationFields.classList.remove("hidden");
+        commonFields.classList.remove("hidden");
+        common.classList.add("hidden");
+        common1.classList.add("hidden");
+        common2.classList.add("hidden");
+        common3.classList.add("hidden");
+        uncommon.classList.remove("hidden");
+        uncommon1.classList.remove("hidden");
+        rare1.classList.remove("hidden");
+        rare.classList.remove("hidden");
+
+        // Manage visibility based on level of detail
+        if (levelOfDetail === "Emote" ) {
+            emoteFields.classList.remove("hidden");
+        }
+        
     } else if (commissionType === "Toontuber") {
         toontuberFields.classList.remove("hidden");
         toontuberAddOns.classList.remove("hidden");
@@ -363,17 +395,33 @@ function updateFormVisibility() {
     } else if (commissionType === "Character Design") {
         designTypeFields.classList.remove("hidden");
         commonFields.classList.remove("hidden");
+    } else if (commissionType === "Animation" || commissionType === "Illustration") {
+        animationIllustrationFields.classList.remove("hidden");
+        commonFields.classList.remove("hidden");
+        addOns.classList.remove("hidden");
+        common.classList.remove("hidden");
+        common1.classList.remove("hidden");
+        common2.classList.remove("hidden");
+        common3.classList.remove("hidden");
+        uncommon.classList.add("hidden");
+        uncommon1.classList.add("hidden");
+        rare1.classList.add("hidden");
+        rare.classList.add("hidden");
+
+
     }
 
     // Add event listener for the additional characters checkbox
     var additionalCharactersCheckbox = document.querySelector('input[name="entry.80710002"][value="Additional Characters"]');
-    additionalCharactersCheckbox.addEventListener('change', function() {
-        if (this.checked) {
-            additionalCharactersField.classList.remove("hidden");
-        } else {
-            additionalCharactersField.classList.add("hidden");
-        }
-    });
+    if (additionalCharactersCheckbox) {
+        additionalCharactersCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                additionalCharactersField.classList.remove("hidden");
+            } else {
+                additionalCharactersField.classList.add("hidden");
+            }
+        });
+    }
 }
 
     function postToGoogleform() {
