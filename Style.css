@@ -317,8 +317,8 @@ color: #acacac;
 
 
 #row6 {
-    height: 20vh; /* Example height for row 5 */
-    min-height: 340px;
+    height: 25vh; /* Example height for row 5 */
+    min-height: 400px;
 }
 
 #row7 {
@@ -1931,8 +1931,8 @@ input, select, textarea {
     }
 
     #row6 {
-        height: 20vh; /* Example height for row 5 */
-        min-height: 180px;
+        height: 18vh; /* Example height for row 5 */
+        min-height: 280px;
     }
     
     #row7 {
