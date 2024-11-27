@@ -86,80 +86,447 @@
                 <img src="Images/Carrin.gif" alt="Carrin" id="overlay" class="overlay-image right">
             </div>
         </section>
-        <div class="wall-body">
-            <!-- Bottom Gallery Section -->
-            <section class="bottom-gallery">
-                <div class="gallery-header">
-                    <h1>APPRECIATION WALL</h1>
-                    <h2>Thank you all for the wonderful fanart!</h2>
+        <section class="bottom-gallery">
+            <div class="gallery-header">
+                <h1>APPRECIATION WALL</h1>
+                <h2>Thank you all for the wonderful fanart!</h2>
+            </div>
+            <div class="gallery-switcher">
+                <button class="gallery-btn"  onclick="switchGallery(0)">FANART</button>
+                <button class="gallery-btn" onclick="switchGallery(1)">BIRTHDAY</button>
+                <button class="gallery-btn" onclick="switchGallery(2)">MAID</button>
+                <button class="gallery-btn" onclick="switchGallery(3)">MISC</button>
+            </div>
+
+            <div class="wall-body">
+                <!-- Gallery containers -->
+                <div class="gallery-container active" id="gallery1">
+                    
+                    <div class="carousel-container">
+                        <div class="carousel">
+                            <button class="carousel-button prevbtn"  data-slide="prev">&#10094;</button>
+                            <div class="carousel-inner">
+
+                                <div class="artist active">
+                                    <div class="artist-info">
+                                        <h3>Lucielledream</h3>
+                                        <a href="https://lucielledream.carrd.co/" target="_blank"><i class="fa-solid fa-address-card"></i></a>
+                                        <a href="https://www.twitch.tv/lucielledream" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Luci.png" alt="Artist 1">
+                                </div>
+                                <div class="artist ">
+                                    <div class="artist-info">
+                                        <h3>Taronari</h3>
+                                        <a href="https://taronari.carrd.co/" target="_blank"><i class="fa-solid fa-address-card"></i></a>
+                                        <a href="https://www.twitch.tv/taronari" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Taronari.png" alt="Artist 1">
+                                </div>
+                                <div class="artist ">
+                                    <div class="artist-info">
+                                        <h3>Tsukima_Kurage</h3>
+                                        <a href="https://x.com/TsukimaVT" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                        <a href="https://www.twitch.tv/tsukima_kurage" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Tsukima Twerk.gif" alt="Artist 1">
+                                </div>
+                                <div class="artist">
+                                    <div class="artist-info">
+                                        <h3>EagleDL</h3>
+                                        <a href="https://www.instagram.com/eagledl" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                        <a href="https://www.twitch.tv/eaglelineartist" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Duke.png" alt="Artist 1">
+                                </div>
+                                <div class="artist ">
+                                    <div class="artist-info">
+                                        <h3>Yuskei_96</h3>
+                                        <a href="https://www.instagram.com/yuskei_fred/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                        <a href="https://www.twitch.tv/yuskei_96" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/YUSKEI.png" alt="Artist 1">
+                                </div>
+
+                                <div class="artist ">
+                                    <div class="artist-info">
+                                        <h3>OottyDK</h3>
+                                        <a href="https://twitter.com/axelootty" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                        <a href="https://www.twitch.tv/oottydk" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Ootty.png" alt="Artist 1">
+                                </div>
+                                <div class="artist ">
+                                    <div class="artist-info">
+                                        <h3>Braeburn</h3>
+                                        <a href="https://twitter.com/BraeburnTheBeef" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                        <a href="https://www.twitch.tv/braeburnthebeef" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Brae.jpeg" alt="Artist 2">
+                                </div>
+                                <div class="artist ">
+                                    <div class="artist-info">
+                                        <h3>GibbsiTentecles</h3>
+                                        <a href="https://www.twitch.tv/gibbsitentecles" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Gibbsi.png" alt="Artist 2">
+                                </div>
+                                <div class="artist ">
+                                    <div class="artist-info">
+                                        <h3>Airella_Nierling</h3>
+                                        <a href="https://www.instagram.com/airella.nierling" target="_blank"><i class="fa-brands  fa-instagram"></i></a>
+                                        <a href="https://www.twitch.tv/airella_nierling" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Kumiko.jpg" alt="Artist 2">
+                                </div>
+    
+                                </div>
+                                <div class="artist ">
+                                    <div class="artist-info">
+                                        <h3>A_Burn_Buck</h3>
+                                        <a href="https://www.instagram.com/_fuelborn_" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                        <a href="https://www.twitch.tv/a_burnt_buck" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Buck2.png" alt="Artist 1">
+                                </div>
+                                <div class="artist">
+                                    <div class="artist-info">
+                                        <h3>Makochivu</h3>
+                                        <a href="https://x.com/makochivu" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                        <a href="https://www.instagram.com/makochivu" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                        <a href="https://www.twitch.tv/makochivu" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Makochivu.png" alt="Artist 2">
+                                </div>
+                                <div class="artist">
+                                    <div class="artist-info">
+                                        <h3>Shiki_artscreen</h3>
+                                        <a href="https://twitter.com/ShikiPlays" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                        <a href="https://www.twitch.tv/shiki_artscreen" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Shikiartscreen.jpeg" alt="Artist 3">
+                                </div>
+                                <div class="artist">
+                                    <div class="artist-info">
+                                        <h3>Irah</h3>
+                                        <a href="https://www.instagram.com/ira_man27" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                        <a href="https://www.twitch.tv/irah_1" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/irah.png" alt="Artist 4">
+                                </div>
+                                <div class="artist">
+                                    <div class="artist-info">
+                                        <h3>Reesethatpuffs</h3>
+                                        <a href="https://twitter.com/reesethatpuffs" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                        <a href="https://www.instagram.com/reesethatpuffs/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                        <a href="https://www.twitch.tv/reesethatpuffs" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Reesethatpuffs.png" alt="Artist 6">
+                                </div>
+                                <div class="artist">
+                                    <div class="artist-info">
+                                        <h3>Lazyscots</h3>
+                                        <a href="https://twitter.com/lazyscots" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                        <a href="https://www.twitch.tv/lazyscots" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Lazyscots.png" alt="Artist 5">
+                                </div>
+                                <div class="artist">
+                                    <div class="artist-info">
+                                        <h3>Toruhoshino</h3>
+                                        <a href="https://twitter.com/hoshino_toru" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                        <a href="https://www.twitch.tv/toruhoshino" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Toruhoshino.jpg" alt="Artist 7">
+                                </div>
+                            <button class="carousel-button nextbtn" data-slide="next">&#10095;</button>
+                            </div>
+                        </div>
+
+                    <div class="thumbnails">
+                
+                        <div class="thumbnail active" onclick="goToSlide(0)"><img src="Images/Fanart/Luci.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(1)"><img src="Images/Fanart/Taronari.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(2)"><img src="Images/Fanart/Tsukima 2.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(3)"><img src="Images/Fanart/Duke.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(4)"><img src="Images/Fanart/YUSKEI.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(5)"><img src="Images/Fanart/Ootty.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(6)"><img src="Images/Fanart/Brae.jpeg" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(7)"><img src="Images/Fanart/Gibbsi.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(8)"><img src="Images/Fanart/Kumiko.jpg" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(9)"><img src="Images/Fanart/Buck2.png" alt="Thumbnail 2"></div>
+                        <div class="thumbnail" onclick="goToSlide(10)"><img src="Images/Fanart/Makochivu.png" alt="Thumbnail 3"></div>
+                        <div class="thumbnail" onclick="goToSlide(11)"><img src="Images/Fanart/Shikiartscreen.jpeg" alt="Thumbnail 4"></div>
+                        <div class="thumbnail" onclick="goToSlide(12)"><img src="Images/Fanart/irah.png" alt="Thumbnail 5"></div>
+                        <div class="thumbnail" onclick="goToSlide(13)"><img src="Images/Fanart/Reesethatpuffs.png" alt="Thumbnail 6"></div>
+                        <div class="thumbnail" onclick="goToSlide(14)"><img src="Images/Fanart/Lazyscots.png" alt="Thumbnail 7"></div>
+                        <div class="thumbnail" onclick="goToSlide(15)"><img src="Images/Fanart/Toruhoshino.jpg" alt="Thumbnail 7"></div>
+                    </div>
+                    
                 </div>
 
-                <div class="carousel-container">
-                    <div class="carousel">
-                        <button class="carousel-button prevbtn"  data-slide="prev">&#10094;</button>
-                        <div class="carousel-inner">
-                            <div class="artist active">
-                                <div class="artist-info">
-                                    <h3>EagleDL</h3>
-                                    <a href="https://x.com/Dragon9911" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                                    <a href="https://www.twitch.tv/eaglelineartist" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-                                </div>
-                                <img src="Images/Fanart/Duke.png" alt="Artist 1">
-                            </div>
-                            <div class="artist ">
-                                <div class="artist-info">
-                                    <h3>Yuskei_96</h3>
-                                    <a href="https://www.instagram.com/yuskei_fred/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-                                    <a href="https://www.twitch.tv/yuskei_96" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-                                </div>
-                                <img src="Images/Fanart/YUSKEI.png" alt="Artist 1">
-                            </div>
 
-                            <div class="artist ">
-                                <div class="artist-info">
-                                    <h3>OottyDK</h3>
-                                    <a href="https://twitter.com/axelootty" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                                    <a href="https://www.twitch.tv/oottydk" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-                                </div>
-                                <img src="Images/Fanart/Ootty.png" alt="Artist 1">
+                    <div class="gallery-container" id="gallery2">
+                        <div class="carousel-container">
+                            <div class="carousel">
+                                <button class="carousel-button prevbtn"  data-slide="prev">&#10094;</button>
+                                <div class="carousel-inner">
+                                    <div class="artist active">
+                                            <div class="artist-info">
+                                                <h3>Airella_Nierling</h3>
+                                                <a href="https://www.instagram.com/airella.nierling" target="_blank"><i class="fa-brands  fa-instagram"></i></a>
+                                                <a href="https://www.twitch.tv/airella_nierling" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                            </div>
+                                            <img src="Images/Fanart/Birthday/Airella.png" alt="Artist 2">
+                                    </div>
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>Bambs_Hajime</h3>
+                                            <a href="https://www.instagram.com/bambooart_/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                            <a href="https://www.twitch.tv/bambs_hajime" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Bambs Thumbnail.png" alt="Artist 1">
+                                    </div>
+
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>Blob</h3>
+                                            <a href="" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Blobbu 1.png" alt="Artist 1">
+                                    </div>
+
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>CrystalAura_606</h3>
+                                            <a href="https://x.com/error_606_exe" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                            <a href="https://www.twitch.tv/crystalaura_606" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Crystal.png" alt="Artist 1">
+                                    </div>
+
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>EagleDL</h3>
+                                            <a href="https://www.instagram.com/eagledl" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                            <a href="https://www.twitch.tv/eaglelineartist" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Duke.png" alt="Artist 1">
+                                    </div>
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>Zeedodobird</h3>
+                                            <a href="https://www.instagram.com/dodothebirdy/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                            <a href="https://www.twitch.tv/zeedodobird" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/furry_yap.jpg" alt="Artist 1">
+                                    </div>
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>GibbsiTentecles</h3>
+                                            <a href="https://www.twitch.tv/gibbsitentecles" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Gibbsi.png" alt="Artist 2">
+                                    </div>
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>Goobercheese33</h3>
+                                            <a href="https://www.twitch.tv/goobercheese33" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Goober.png" alt="Artist 2">
+                                    </div>
+
+                                    <div class="artist">
+                                        <div class="artist-info">
+                                            <h3>Irah</h3>
+                                            <a href="https://www.instagram.com/ira_man27" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                            <a href="https://www.twitch.tv/irah_1" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Irah.png" alt="Artist 4">
+                                    </div>
+
+                                    <div class="artist">
+                                        <div class="artist-info">
+                                            <h3>CaptJackHarlock</h3>
+                                            <a href="https://www.instagram.com/jackharlock_vinyl_corner/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                            <a href="https://www.twitch.tv/captjackharlock" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Jack.png" alt="Artist 4">
+                                    </div>
+
+                                    <div class="artist">
+                                        <div class="artist-info">
+                                            <h3>Reesethatpuffs</h3>
+                                            <a href="https://twitter.com/reesethatpuffs" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                            <a href="https://www.instagram.com/reesethatpuffs/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                            <a href="https://www.twitch.tv/reesethatpuffs" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Reese.png" alt="Artist 6">
+                                    </div>
+
+                                    <div class="artist">
+                                        <div class="artist-info">
+                                            <h3>Reqat</h3>
+                                            <a href="https://www.twitch.tv/reqat" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Reqat.png" alt="Artist 6">
+                                    </div>
+
+                                    <div class="artist">
+                                        <div class="artist-info">
+                                            <h3>Rhealinor</h3>
+                                            <a href="https://www.instagram.com/rhealinor/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Rhea.png" alt="Artist 6">
+                                    </div>
+
+
+                                    <div class="artist">
+                                        <div class="artist-info">
+                                            <h3>Lazyscots</h3>
+                                            <a href="https://twitter.com/lazyscots" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                            <a href="https://www.twitch.tv/lazyscots" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Scot.jpg" alt="Artist 5">
+                                    </div>
+
+                                    <div class="artist">
+                                        <div class="artist-info">
+                                            <h3>Shiki_artscreen</h3>
+                                            <a href="https://twitter.com/ShikiPlays" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                            <a href="https://www.twitch.tv/shiki_artscreen" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Shiki.png" alt="Artist 3">
+                                    </div>
+
+                                    <div class="artist">
+                                        <div class="artist-info">
+                                            <h3>TheTempuraFox & Friends</h3>
+                                            <a href="https://thetempurafox.carrd.co/" target="_blank"><i class="fa-solid fa-address-card"></i></a>
+                                            <a href="https://www.twitch.tv/thetempurafox" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Tempura.gif" alt="Artist 3">
+                                    </div>
+
+                                    <div class="artist">
+                                        <div class="artist-info">
+                                            <h3>Valkythemeow</h3>
+                                            <a href="https://www.instagram.com/valkythemeow/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                            <a href="https://www.twitch.tv/valkythemeow" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Valky.png" alt="Artist 3">
+                                    </div>
+
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>Yuskei_96</h3>
+                                            <a href="https://www.instagram.com/yuskei_fred/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                            <a href="https://www.twitch.tv/yuskei_96" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Birthday/Yuskei.png" alt="Artist 1">
+                                    </div>
+                                    <button class="carousel-button nextbtn" data-slide="next">&#10095;</button>
+                                </div>  
                             </div>
-                            <div class="artist ">
-                                <div class="artist-info">
-                                    <h3>Braeburn</h3>
-                                    <a href="https://twitter.com/BraeburnTheBeef" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                                    <a href="https://www.twitch.tv/braeburnthebeef" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                        </div>
+                            <div class="thumbnails">
+                
+                                <div class="thumbnail active" onclick="goToSlide(0)"><img src="Images/Fanart/Birthday/Airella.png" alt="Thumbnail 1"></div>
+                                <div class="thumbnail" onclick="goToSlide(1)"><img src="Images/Fanart/Birthday/Bambs Thumbnail.png" alt="Thumbnail 1"></div>
+                                <div class="thumbnail" onclick="goToSlide(2)"><img src="Images/Fanart/Birthday/Blobbu 1.png" alt="Thumbnail 1"></div>
+                                <div class="thumbnail" onclick="goToSlide(3)"><img src="Images/Fanart/Birthday/Crystal.png" alt="Thumbnail 1"></div>
+                                <div class="thumbnail" onclick="goToSlide(4)"><img src="Images/Fanart/Birthday/Duke.png" alt="Thumbnail 1"></div>
+                                <div class="thumbnail" onclick="goToSlide(5)"><img src="Images/Fanart/Birthday/furry_yap.jpg" alt="Thumbnail 1"></div>
+                                <div class="thumbnail" onclick="goToSlide(6)"><img src="Images/Fanart/Birthday/Gibbsi.png" alt="Thumbnail 1"></div>
+                                <div class="thumbnail" onclick="goToSlide(7)"><img src="Images/Fanart/Birthday/Goober.png" alt="Thumbnail 1"></div>
+                                <div class="thumbnail" onclick="goToSlide(8)"><img src="Images/Fanart/Birthday/Irah.png" alt="Thumbnail 1"></div>
+                                <div class="thumbnail" onclick="goToSlide(9)"><img src="Images/Fanart/Birthday/Jack.png" alt="Thumbnail 2"></div>
+                                <div class="thumbnail" onclick="goToSlide(10)"><img src="Images/Fanart/Birthday/Reese.png" alt="Thumbnail 3"></div>
+                                <div class="thumbnail" onclick="goToSlide(11)"><img src="Images/Fanart/Birthday/Reqat.png" alt="Thumbnail 4"></div>
+                                <div class="thumbnail" onclick="goToSlide(12)"><img src="Images/Fanart/Birthday/Rhea.png" alt="Thumbnail 5"></div>
+                                <div class="thumbnail" onclick="goToSlide(13)"><img src="Images/Fanart/Birthday/Scot.jpg" alt="Thumbnail 6"></div>
+                                <div class="thumbnail" onclick="goToSlide(14)"><img src="Images/Fanart/Birthday/Shiki.png" alt="Thumbnail 7"></div>
+                                <div class="thumbnail" onclick="goToSlide(15)"><img src="Images/Fanart/Birthday/1.png" alt="Thumbnail 7"></div>
+                                <div class="thumbnail" onclick="goToSlide(16)"><img src="Images/Fanart/Birthday/Valky.png" alt="Thumbnail 7"></div>
+                                <div class="thumbnail" onclick="goToSlide(17)"><img src="Images/Fanart/Birthday/Yuskei.png" alt="Thumbnail 7"></div>
+                             </div>
+                    </div>
+                    <div class="gallery-container" id="gallery3">
+                        <div class="carousel-container">
+                            <div class="carousel">
+                                <button class="carousel-button prevbtn"  data-slide="prev">&#10094;</button>
+                                <div class="carousel-inner">
+                                
+                                    <div class="artist active">
+                                        <div class="artist-info">
+                                            <h3>Tsukima_Kurage</h3>
+                                            <a href="https://x.com/TsukimaVT" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                            <a href="https://www.twitch.tv/tsukima_kurage" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Maid/Tsukima.png" alt="Artist 1">
+                                    </div>
+
+                                    <div class="artist">
+                                        <div class="artist-info">
+                                            <h3>Reqat</h3>
+                                            <a href="https://www.twitch.tv/reqat" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Maid/Reqat.png" alt="Artist 6">
+                                    </div>
+
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>A_Burn_Buck</h3>
+                                            <a href="https://www.instagram.com/_fuelborn_" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                            <a href="https://www.twitch.tv/a_burnt_buck" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Maid/Buck_Maid.png" alt="Artist 1">
+                                    </div>
+
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>itzlemonbee</h3>
+                                            <a href="https://www.instagram.com/itzlemonbee_/_" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                            <a href="https://www.twitch.tv/itzlemonbee" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Maid/LemonBee.png" alt="Artist 1">
+                                    </div>
+
+                                    <div class="artist ">
+                                        <div class="artist-info">
+                                            <h3>Taronari</h3>
+                                            <a href="https://taronari.carrd.co/" target="_blank"><i class="fa-solid fa-address-card"></i></a>
+                                            <a href="https://www.twitch.tv/taronari" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                        </div>
+                                        <img src="Images/Fanart/Maid/Taro.jpg" alt="Artist 1">
+                                    </div>
+                                    <button class="carousel-button nextbtn" data-slide="next">&#10095;</button>
                                 </div>
-                                <img src="Images/Fanart/Brae.jpeg" alt="Artist 2">
                             </div>
-                            <div class="artist ">
-                                <div class="artist-info">
-                                    <h3>Reqat</h3>
-                                    <a href="https://www.instagram.com/letuqn_13/" target="_blank"><i class="fa-brands  fa-instagram"></i></a>
-                                </div>
-                                <img src="Images/Fanart/Reqat.png" alt="Artist 2">
-                            </div>
-                            <div class="artist ">
-                                <div class="artist-info">
-                                    <h3>GibbsiTentecles</h3>
-                                    <a href="https://www.twitch.tv/gibbsitentecles" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-                                </div>
-                                <img src="Images/Fanart/Gibbsi.png" alt="Artist 2">
-                            </div>
-                            <div class="artist ">
-                                <div class="artist-info">
-                                    <h3>YukiKumiko</h3>
-                                    <a href="https://www.instagram.com/kumiko.manga/" target="_blank"><i class="fa-brands  fa-instagram"></i></a>
-                                    <a href="https://www.twitch.tv/yukikumiko98" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-                                </div>
-                                <img src="Images/Fanart/Kumiko.jpg" alt="Artist 2">
-                            </div>
-                            <div class="artist">
-                                <div class="artist-info">
-                                    <h3>Tsukima_Kurage</h3>
-                                    <a href="https://twitter.com/TsukimaVT" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                                    <a href="https://www.twitch.tv/tsukima_kurage" target="_blank"><i class="fa-brands fa-twitch"></i></a>
-                                </div>
-                                <img src="Images/Fanart/Tsukima.png" alt="Artist 2">
+                    </div>      
+                        <div class="thumbnails">
+                
+                            <div class="thumbnail active" onclick="goToSlide(0)"><img src="Images/Fanart/Maid/Tsukima.png" alt="Thumbnail 1"></div>
+                            <div class="thumbnail" onclick="goToSlide(1)"><img src="Images/Fanart/Maid/Reqat.png" alt="Thumbnail 1"></div>
+                            <div class="thumbnail" onclick="goToSlide(2)"><img src="Images/Fanart/Maid/Buck_Maid.png" alt="Thumbnail 1"></div>
+                            <div class="thumbnail" onclick="goToSlide(3)"><img src="Images/Fanart/Maid/LemonBee.png" alt="Thumbnail 1"></div>
+                            <div class="thumbnail" onclick="goToSlide(4)"><img src="Images/Fanart/Maid/Taro.jpg" alt="Thumbnail 1"></div>
+                        </div>
+                    
+                </div>
+
+                <div class="gallery-container" id="gallery4">
+                    <div class="carousel-container">
+                        <div class="carousel">
+                            <button class="carousel-button prevbtn"  data-slide="prev">&#10094;</button>
+                            <div class="carousel-inner">
+                                <div class="artist active">
+                                    <div class="artist-info">
+                                        <h3>Airella_Nierling</h3>
+                                        <a href="https://www.instagram.com/airella.nierling" target="_blank"><i class="fa-brands  fa-instagram"></i></a>
+                                        <a href="https://www.twitch.tv/airella_nierling" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    </div>
+                                    <img src="Images/Fanart/Misc/A.png" alt="Artist 2">
                             </div>
                             <div class="artist ">
                                 <div class="artist-info">
@@ -167,16 +534,53 @@
                                     <a href="https://www.instagram.com/_fuelborn_" target="_blank"><i class="fa-brands fa-instagram"></i></a>
                                     <a href="https://www.twitch.tv/a_burnt_buck" target="_blank"><i class="fa-brands fa-twitch"></i></a>
                                 </div>
-                                <img src="Images/Fanart/Buck2.png" alt="Artist 1">
+                                <img src="Images/Fanart/Misc/Burnthatbuck- Furry Yap[White].png" alt="Artist 1">
                             </div>
+
                             <div class="artist">
                                 <div class="artist-info">
-                                    <h3>Makochivu</h3>
-                                    <a href="https://x.com/makochivu" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                                    <a href="https://www.instagram.com/makochivu" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-                                    <a href="https://www.twitch.tv/makochivu" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    <h3>Lazyscots</h3>
+                                    <a href="https://twitter.com/lazyscots" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                    <a href="https://www.twitch.tv/lazyscots" target="_blank"><i class="fa-brands fa-twitch"></i></a>
                                 </div>
-                                <img src="Images/Fanart/Makochivu.png" alt="Artist 2">
+                                <img src="Images/Fanart/Misc/faith_tut_yap.png" alt="Artist 5">
+                            </div>
+
+                            <div class="artist">
+                                <div class="artist-info">
+                                    <h3>Irah</h3>
+                                    <a href="https://www.instagram.com/ira_man27" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                    <a href="https://www.twitch.tv/irah_1" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                </div>
+                                <img src="Images/Fanart/Misc/OEMGEE_IT_MAX_AND_YAP.png" alt="Artist 4">
+                            </div>
+
+                            <div class="artist">
+                                <div class="artist-info">
+                                    <h3>Irah</h3>
+                                    <a href="https://www.instagram.com/ira_man27" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                    <a href="https://www.twitch.tv/irah_1" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                </div>
+                                <img src="Images/Fanart/Misc/irah.png" alt="Artist 4">
+                            </div>
+
+                    
+                            <div class="artist ">
+                                <div class="artist-info">
+                                    <h3>Yuskei_96</h3>
+                                    <a href="https://www.instagram.com/yuskei_fred/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                    <a href="https://www.twitch.tv/yuskei_96" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                </div>
+                                <img src="Images/Fanart/Misc/Yuskei (2).png" alt="Artist 1">
+                            </div>
+
+                            <div class="artist">
+                                <div class="artist-info">
+                                    <h3>Shiki_artscreen</h3>
+                                    <a href="https://twitter.com/ShikiPlays" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                    <a href="https://www.twitch.tv/shiki_artscreen" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                </div>
+                                <img src="Images/Fanart/Misc/Brae.jpg" alt="Artist 3">
                             </div>
                             <div class="artist">
                                 <div class="artist-info">
@@ -184,15 +588,33 @@
                                     <a href="https://twitter.com/ShikiPlays" target="_blank"><i class="fa-brands fa-twitter"></i></a>
                                     <a href="https://www.twitch.tv/shiki_artscreen" target="_blank"><i class="fa-brands fa-twitch"></i></a>
                                 </div>
-                                <img src="Images/Fanart/Shikiartscreen.jpeg" alt="Artist 3">
+                                <img src="Images/Fanart/Misc/Shiki Hampter.jpg" alt="Artist 3">
+                            </div>
+
+
+                            <div class="artist">
+                                <div class="artist-info">
+                                    <h3>Shiki_artscreen</h3>
+                                    <a href="https://twitter.com/ShikiPlays" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                    <a href="https://www.twitch.tv/shiki_artscreen" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                </div>
+                                <img src="Images/Fanart/Misc/Proposal.gif" alt="Artist 3">
                             </div>
                             <div class="artist">
                                 <div class="artist-info">
-                                    <h3>Irah</h3>
-                                    <a href="https://www.instagram.com/ira_man27" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-                                    <a href="https://www.twitch.tv/irah_1" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    <h3>Shiki_artscreen</h3>
+                                    <a href="https://twitter.com/ShikiPlays" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                    <a href="https://www.twitch.tv/shiki_artscreen" target="_blank"><i class="fa-brands fa-twitch"></i></a>
                                 </div>
-                                <img src="Images/Fanart/irah.png" alt="Artist 4">
+                                <img src="Images/Fanart/Misc/Timeout1.png" alt="Artist 3">
+                            </div>
+                            <div class="artist ">
+                                <div class="artist-info">
+                                    <h3>Tsukima_Kurage</h3>
+                                    <a href="https://x.com/TsukimaVT" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                    <a href="https://www.twitch.tv/tsukima_kurage" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                </div>
+                                <img src="Images/Fanart/Misc/Tsukima.png" alt="Artist 1">
                             </div>
                             <div class="artist">
                                 <div class="artist-info">
@@ -201,57 +623,84 @@
                                     <a href="https://www.instagram.com/reesethatpuffs/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
                                     <a href="https://www.twitch.tv/reesethatpuffs" target="_blank"><i class="fa-brands fa-twitch"></i></a>
                                 </div>
-                                <img src="Images/Fanart/Reesethatpuffs.png" alt="Artist 6">
+                                <img src="Images/Fanart/Misc/Emoyap.png" alt="Artist 6">
                             </div>
+
                             <div class="artist">
                                 <div class="artist-info">
-                                    <h3>Lazyscots</h3>
-                                    <a href="https://twitter.com/lazyscots" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                                    <a href="https://www.twitch.tv/lazyscots" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    <h3>Reesethatpuffs</h3>
+                                    <a href="https://twitter.com/reesethatpuffs" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                    <a href="https://www.instagram.com/reesethatpuffs/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                    <a href="https://www.twitch.tv/reesethatpuffs" target="_blank"><i class="fa-brands fa-twitch"></i></a>
                                 </div>
-                                <img src="Images/Fanart/Lazyscots.png" alt="Artist 5">
+                                <img src="Images/Fanart/Misc/ReesethatPuff- Yappie.png" alt="Artist 6">
                             </div>
+
+                            
                             <div class="artist">
                                 <div class="artist-info">
-                                    <h3>Toruhoshino</h3>
-                                    <a href="https://twitter.com/hoshino_toru" target="_blank"><i class="fa-brands fa-twitter"></i></a>
-                                    <a href="https://www.twitch.tv/toruhoshino" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                    <h3>Reesethatpuffs</h3>
+                                    <a href="https://twitter.com/reesethatpuffs" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+                                    <a href="https://www.instagram.com/reesethatpuffs/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+                                    <a href="https://www.twitch.tv/reesethatpuffs" target="_blank"><i class="fa-brands fa-twitch"></i></a>
                                 </div>
-                                <img src="Images/Fanart/Toruhoshino.jpg" alt="Artist 7">
+                                <img src="Images/Fanart/Misc/V_Gen.png" alt="Artist 6">
+                            </div>
+
+                            <div class="artist ">
+                                <div class="artist-info">
+                                    <h3>GibbsiTentecles</h3>
+                                    <a href="https://www.twitch.tv/gibbsitentecles" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                </div>
+                                <img src="Images/Fanart/Misc/OctipusYap.png" alt="Artist 2">
+                            </div>
+
+                            
+                            <div class="artist ">
+                                <div class="artist-info">
+                                    <h3>VoyagerLof</h3>
+                                    <a href="https://www.youtube.com/@VoyagerLOAF" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+                                    <a href="https://www.twitch.tv/voyagerloaf" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+                                </div>
+                                <img src="Images/Fanart/Misc/Adventorpadoru.png" alt="Artist 2">
+                            </div>
+
+                            
+                            
+                                <button class="carousel-button nextbtn" data-slide="next">&#10095;</button>
                             </div>
                         </div>
-                        <button class="carousel-button nextbtn" data-slide="next">&#10095;</button>
+                    </div>
+                            
+                    <div class="thumbnails">
+            
+                        <div class="thumbnail active" onclick="goToSlide(0)"><img src="Images/Fanart/Misc/A.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(1)"><img src="Images/Fanart/Misc/Burnthatbuck- Furry Yap[White].png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(2)"><img src="Images/Fanart/Misc/faith_tut_yap.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(3)"><img src="Images/Fanart/Misc/OEMGEE_IT_MAX_AND_YAP.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(4)"><img src="Images/Fanart/Misc/irah.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(5)"><img src="Images/Fanart/Misc/Yuskei (2).png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(6)"><img src="Images/Fanart/Misc/Brae.jpg" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(7)"><img src="Images/Fanart/Misc/Shiki Hampter.jpg" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(8)"><img src="Images/Fanart/Misc/P.png" alt="Thumbnail 1"></div>
+                        <div class="thumbnail" onclick="goToSlide(9)"><img src="Images/Fanart/Misc/Timeout.png" alt="Thumbnail 2"></div>
+                        <div class="thumbnail" onclick="goToSlide(10)"><img src="Images/Fanart/Misc/Tsukima.png" alt="Thumbnail 3"></div>
+                        <div class="thumbnail" onclick="goToSlide(11)"><img src="Images/Fanart/Misc/Emoyap.png" alt="Thumbnail 4"></div>
+                        <div class="thumbnail" onclick="goToSlide(12)"><img src="Images/Fanart/Misc/ReesethatPuff- Yappie.png" alt="Thumbnail 5"></div>
+                        <div class="thumbnail" onclick="goToSlide(13)"><img src="Images/Fanart/Misc/V_Gen.png" alt="Thumbnail 6"></div>
+                        <div class="thumbnail" onclick="goToSlide(14)"><img src="Images/Fanart/Misc/OctipusYap.png" alt="Thumbnail 7"></div>
+                        <div class="thumbnail" onclick="goToSlide(15)"><img src="Images/Fanart/Misc/Adventorpadoru.png" alt="Thumbnail 7"></div>
+                        
+                        
                     </div>
                 </div>
-            </section>
+            </div>
+            </div>
+        </section>
+        <div class="bottom-button button-container">
+            <a href="index.html">  <button class="white-button">Back</button></a>
         </div>
-
-                
-                <div class="thumbnails">
-            
-                    <div class="thumbnail active" onclick="goToSlide(0)"><img src="Images/Fanart/Duke.png" alt="Thumbnail 1"></div>
-                    <div class="thumbnail" onclick="goToSlide(1)"><img src="Images/Fanart/YUSKEI.png" alt="Thumbnail 1"></div>
-                    <div class="thumbnail" onclick="goToSlide(2)"><img src="Images/Fanart/Ootty.png" alt="Thumbnail 1"></div>
-                    <div class="thumbnail" onclick="goToSlide(3)"><img src="Images/Fanart/Brae.jpeg" alt="Thumbnail 1"></div>
-                    <div class="thumbnail" onclick="goToSlide(4)"><img src="Images/Fanart/Reqat.png" alt="Thumbnail 1"></div>
-                    <div class="thumbnail" onclick="goToSlide(5)"><img src="Images/Fanart/Gibbsi.png" alt="Thumbnail 1"></div>
-                    <div class="thumbnail" onclick="goToSlide(6)"><img src="Images/Fanart/Kumiko.jpg" alt="Thumbnail 1"></div>
-                    <div class="thumbnail" onclick="goToSlide(7)"><img src="Images/Fanart/Tsukima.png" alt="Thumbnail 1"></div>
-                    <div class="thumbnail" onclick="goToSlide(8)"><img src="Images/Fanart/Buck2.png" alt="Thumbnail 2"></div>
-                    <div class="thumbnail" onclick="goToSlide(9)"><img src="Images/Fanart/Makochivu.png" alt="Thumbnail 3"></div>
-                    <div class="thumbnail" onclick="goToSlide(10)"><img src="Images/Fanart/Shikiartscreen.jpeg" alt="Thumbnail 4"></div>
-                    <div class="thumbnail" onclick="goToSlide(11)"><img src="Images/Fanart/irah.png" alt="Thumbnail 5"></div>
-                    <div class="thumbnail" onclick="goToSlide(12)"><img src="Images/Fanart/Reesethatpuffs.png" alt="Thumbnail 6"></div>
-                    <div class="thumbnail" onclick="goToSlide(13)"><img src="Images/Fanart/Lazyscots.png" alt="Thumbnail 7"></div>
-                    <div class="thumbnail" onclick="goToSlide(14)"><img src="Images/Fanart/Toruhoshino.jpg" alt="Thumbnail 7"></div>
-                </div>
-
-
-        
-<div class="bottom-button button-container">
-    <a href="index.html">  <button class="white-button">Back</button></a>
-</div>
-    
+    </div>    
 </main>
 
 

@@ -211,80 +211,91 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 
-
-
-
-let slideIndex = 0;
-const slides = document.getElementsByClassName("artist");
-const thumbnails = document.getElementsByClassName("thumbnail");
-const totalSlides = slides.length;
-const prevBtn = document.querySelector(".prevbtn");
-const nextBtn = document.querySelector(".nextbtn");
 let autoScrollInterval;
+let activeGalleryIndex = 0;
 
-function showSlide(n) {
-    slideIndex = (n + totalSlides) % totalSlides; // Ensure slideIndex stays within bounds
+// Initialize carousels for all galleries
+function initializeGallery(gallery) {
+    const slides = gallery.querySelectorAll(".artist");
+    const thumbnails = gallery.querySelectorAll(".thumbnail");
+    let slideIndex = 0;
 
-    // Hide all slides and thumbnails
-    for (let i = 0; i < totalSlides; i++) {
-        slides[i].classList.remove("active");
-        thumbnails[i].classList.remove("active");
+    function showSlide(n) {
+        slideIndex = (n + slides.length) % slides.length;
+
+        slides.forEach(slide => slide.classList.remove("active"));
+        thumbnails.forEach(thumb => thumb.classList.remove("active"));
+
+        slides[slideIndex].classList.add("active");
+        thumbnails[slideIndex].classList.add("active");
     }
 
-    // Show the selected slide and activate the corresponding thumbnail
-    slides[slideIndex].classList.add("active");
-    thumbnails[slideIndex].classList.add("active");
-}
+    function prevSlide() {
+        showSlide(slideIndex - 1);
+    }
 
-function prevSlide() {
-    showSlide(slideIndex - 1);
-}
+    function nextSlide() {
+        showSlide(slideIndex + 1);
+    }
 
-function nextSlide() {
-    showSlide(slideIndex + 1);
-}
-
-function goToSlide(n) {
-    showSlide(n);
-}
-
-// Initialize by showing the first slide
-showSlide(slideIndex);
-
-// Function to start auto-scrolling
-function startAutoScroll() {
-    autoScrollInterval = setInterval(function() {
+    gallery.querySelector(".prevbtn").onclick = () => {
+        prevSlide();
+        stopAutoScroll();
+    };
+    gallery.querySelector(".nextbtn").onclick = () => {
         nextSlide();
-    }, 4000); // Adjust interval (in milliseconds) as needed
+        stopAutoScroll();
+    };
+
+    thumbnails.forEach((thumb, i) => {
+        thumb.onclick = () => {
+            showSlide(i);
+            stopAutoScroll();
+        };
+    });
+
+    // Start auto-scrolling for this gallery
+    startAutoScroll(() => nextSlide());
+
+    showSlide(slideIndex);
 }
 
-// Function to stop auto-scrolling
+// Start auto-scrolling
+function startAutoScroll(callback) {
+    stopAutoScroll(); // Clear existing intervals
+    autoScrollInterval = setInterval(callback, 4000);
+}
+
+// Stop auto-scrolling
 function stopAutoScroll() {
     clearInterval(autoScrollInterval);
 }
 
-// Event listeners for prev and next buttons
-prevBtn.addEventListener("click", function() {
-    prevSlide();
-    stopAutoScroll();
-});
+// Switch gallery
+function switchGallery(index) {
+    const galleries = document.querySelectorAll(".gallery-container");
+    const buttons = document.querySelectorAll(".gallery-btn");
 
-nextBtn.addEventListener("click", function() {
-    nextSlide();
-    stopAutoScroll();
-});
+    // Deactivate all galleries and buttons
+    galleries.forEach(gallery => gallery.classList.remove("active"));
+    buttons.forEach(button => button.classList.remove("active"));
 
-// Event listeners for thumbnails to navigate directly to a slide
-for (let i = 0; i < thumbnails.length; i++) {
-    thumbnails[i].addEventListener("click", function() {
-        goToSlide(i);
-        stopAutoScroll();
-    });
+    // Activate selected gallery and button
+    galleries[index].classList.add("active");
+    buttons[index].classList.add("active");
+
+    activeGalleryIndex = index;
+
+    // Initialize carousel for the active gallery
+    initializeGallery(galleries[index]);
 }
 
-// Start auto-scrolling initially
-startAutoScroll();
-
+// Initialize the first gallery
+document.addEventListener("DOMContentLoaded", () => {
+    const galleries = document.querySelectorAll(".gallery-container");
+    galleries.forEach(gallery => initializeGallery(gallery));
+    switchGallery(0); // Start with the first gallery
+});
 /*-------------------------------END--------------------------------*/
 
 

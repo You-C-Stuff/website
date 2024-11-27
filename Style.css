@@ -1607,6 +1607,30 @@ input, select, textarea {
 
 /*-----------------------------COMMUNITY-----------------------------*/
 
+.gallery-btn {
+    font-family: "audiowide", sans-serif;
+    padding: 10px 20px;
+    border: 2px solid white;
+    background-color: transparent;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.gallery-btn:hover {
+    background-color: white;
+    color: black;
+    scale: 1.04;
+}
+
+.gallery-btn.active {
+    background-color: white;
+    color: black;
+    border-color: black;
+}
+
+
 .community-body {
     display: flex;
     flex-direction: column;
@@ -1633,6 +1657,7 @@ input, select, textarea {
     font-size:4.5em;
     margin-bottom: 5px;
 }
+
 
 
 .top-content h2,.bottom-gallery .gallery-header h2 {
@@ -1676,7 +1701,13 @@ input, select, textarea {
     right: calc(46% - 350px); /* Adjust positioning to overlap right side */
 }
 
+.gallery-container {
+    display: none;
+}
 
+.gallery-container.active {
+    display: block;
+}
 .wall-body {
     max-width: 1200px;
     margin: 0 auto;
