@@ -356,6 +356,7 @@ function updateFormVisibility() {
     commonFields.classList.add("hidden");
     additionalCharactersField.classList.add("hidden");
     packageplanfields.classList.add("hidden");
+    packagetypefields.classList.add("hidden");
     designTypeFields.classList.add("hidden");
     addOns.classList.add("hidden");
     emoteFields.classList.add("hidden");
@@ -420,6 +421,9 @@ function updateFormVisibility() {
         rare.classList.add("hidden");
 
 
+    } else if (commissionType === "Package") {
+        document.getElementById("packagetypefields").classList.remove("hidden");
+        commonFields.classList.remove("hidden"); // optional if you want reference link to show
     }
 
     // Add event listener for the additional characters checkbox

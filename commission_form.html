@@ -79,7 +79,7 @@
             <h1>COMMISSION FORM</h1>
             <h3>You can send a commission request by filling out this form. Upon recieving the email, we will discuss more details, talk about image references, and a price will be negotiated. </h3>
 
-            <h3>Alternatively you can contact me through Discord via <span style="text-decoration: underline;">yapcreations</span>.</h3>
+            <h3>Alternatively you can contact me through Discord via <a href="https://discord.gg/82eQggBY" target="_blank"></a> yapcreations</a>.</h3>
             <div class="content-wrapper">
                     <div class="pricing-box">
                         <div class="base-pricing">
@@ -112,7 +112,7 @@
                         <div class="add-ons">
                             <div class="addon-row">
                                  <div class="addon-item">
-                                    <h3>Character Design</h3>
+                                    <h3>Concept Design</h3>
                                     <img src="Images/Commission/Yap_Ref.png" alt="Graphic Assets">
                                 </div>
                                 <div class="addon-item">
@@ -160,9 +160,10 @@
                             <option value="Animation">Animation</option>
                             <option value="Illustration">Illustration</option>
                             <option value="Toontuber">Toontuber</option>
-                            <option value="Character Design">Character Design</option>
+                            <option value="Character Design">Concept Design</option>
                             <option value="Animated Assets">Animated Assets</option>
                             <option value="Graphic Assets">Graphic Assets</option>
+                            <option value="Package">Package</option>
                         </select>
                     </div>
                     <div id="animationIllustrationFields" class="hidden">
@@ -175,9 +176,9 @@
                                 <option value="Shaded"  id="common2">Shaded</option>
                                 <option value="Chibi"  id="common3">Chibi</option>
                                 <option value="Emote"  id="uncommon">Emote</option>
-                                <option value="Profile Pic"  id="uncommon1">Profile Pic</option>
+                                <option value="Profile Pic / Banner"  id="uncommon1">Profile Pic / Banner</option>
                                 <option value="Banner"  id="rare">Banner</option>
-                                <option value="Twitch Panel"  id="rare1">Twitch Panel</option>
+                                <option value="Stream Overlay"  id="rare1">Stream Overlay</option>
                             </select>
                         </div>
                         <div id="addOns" class="form-grp hidden">
@@ -199,9 +200,10 @@
                     <div id="packageplanfields" class="hidden">
                         <div class="form-grp">
                             <label for="PackagePlan">Type*</label>
-                            <select id="PackagePlan" name="entry.876376510">
+                            <select id="Type" name="entry.876376510">
                                 <option value="">Select</option>
-                                <option value="Custom">Custom</option>
+                                <option value="Full Body">Full Body</option>
+                                <option value="Half Body">Half Body</option>
                                 <option value="Simple">Simple</option>
                             </select>
                         </div>
@@ -209,10 +211,23 @@
                     <div id="Designtype" class="hidden">
                         <div class="form-grp">
                             <label for="DesignPlan">Type*</label>
-                            <select id="DesignPlan" name="entry.770066938">
+                            <select id="Design" name="entry.770066938">
                                 <option value="">Select</option>
-                                <option value="Reference Sheet">Reference Sheet</option>
-                                <option value="Turnaround">Character Turnaround</option>
+                                <option value="Reference Sheet">Character Design</option>
+                                <option value="Turnaround">Reference Sheet</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="packagetypefields" class="hidden">
+                        <div class="form-grp">
+                            <label for="PackageType">Type*</label>
+                            <select id="Package Type" name="entry.1775762094">
+                                <option value="">Select</option>
+                                <option value="Minimum">Minimum</option>
+                                <option value="Lite">Lite</option>
+                                <option value="Pro">Pro</option>
+                                <option value="Full">Full</option>
                             </select>
                         </div>
                     </div>
