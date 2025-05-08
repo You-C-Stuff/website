@@ -1,26 +1,23 @@
 
 /*-------------------------------SCROLL TO TOP--------------------------------*/
 
-// Get the button
 let mybutton = document.getElementById("myBtn");
 
-// When the user scrolls down 20px from the top of the document, show the button
-window.onscroll = function() {scrollFunction()};
+window.onscroll = function() {
+  scrollFunction();
+};
 
 function scrollFunction() {
   if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    mybutton.style.display = "block";
+    mybutton.classList.add("show");
   } else {
-    mybutton.style.display = "none";
+    mybutton.classList.remove("show");
   }
 }
 
-// When the user clicks on the button, scroll to the top of the document
 function topFunction() {
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
-
 /*-------------------------------HEADER--------------------------------*/
 
 // Add click event listener to navigation links to retain text decoration
@@ -122,6 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   setActiveLink();
 
+  /*---------------------------------------------------------------*/
+
   // Update active link on hash change (e.g., for single-page applications)
   window.addEventListener('hashchange', setActiveLink);
   const modal = document.getElementById("modal");
@@ -147,6 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
       header.style.display = "none"; // Hide header when modal is open
       scrollTopButton.style.display = "none"; // Hide scroll-to-top button
+      document.querySelector('.dot-nav').style.display = "none"; // Hide dot navigation
       document.body.style.overflow = 'hidden'; // Prevent scrolling of background content
   };
   
@@ -202,6 +202,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Function to close the modal
   function closeModal() {
+    document.querySelector('.dot-nav').style.display = "block"; // Show dot navigation again
       modal.style.display = "none";
       header.style.display = ""; // Show header when modal is closed
       scrollTopButton.style.display = "block"; // Show scroll-to-top button
@@ -209,7 +210,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-
+/*-------------------------------GALLERY--------------------------------*/
 
 let autoScrollInterval;
 let activeGalleryIndex = 0;
@@ -271,7 +272,6 @@ function stopAutoScroll() {
     clearInterval(autoScrollInterval);
 }
 
-// Switch gallery
 function switchGallery(index) {
     const galleries = document.querySelectorAll(".gallery-container");
     const buttons = document.querySelectorAll(".gallery-btn");
@@ -296,7 +296,89 @@ document.addEventListener("DOMContentLoaded", () => {
     galleries.forEach(gallery => initializeGallery(gallery));
     switchGallery(0); // Start with the first gallery
 });
-/*-------------------------------END--------------------------------*/
+
+/*-------------------------------THUMBNAIL--------------------------------*/
+document.querySelectorAll('.thumbnail-wrapper').forEach(wrapper => {
+    const thumbnails = wrapper.querySelector('.thumbnails');
+    const scrollLeftBtn = wrapper.querySelector('.thumb-scroll.left');
+    const scrollRightBtn = wrapper.querySelector('.thumb-scroll.right');
+    const scrollAmount = 150;
+  
+    // Clone items for infinite scroll
+    const items = Array.from(thumbnails.children);
+    items.forEach(item => {
+        thumbnails.appendChild(item.cloneNode(true));
+      });
+    const thumbnailWidth = items[0].offsetWidth + 8; // 8 is gap
+    const originalCount = items.length;
+    const totalCount = thumbnails.children.length;
+  
+
+    // Scroll buttons
+    scrollLeftBtn.addEventListener('click', () => {
+      thumbnails.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    });
+  
+    scrollRightBtn.addEventListener('click', () => {
+      thumbnails.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    });
+  
+    // Infinite scroll logic
+    thumbnails.addEventListener('scroll', () => {
+      const scrollLeft = thumbnails.scrollLeft;
+      const maxScroll = thumbnails.scrollWidth - thumbnails.clientWidth;
+  
+      if (scrollLeft <= 0) {
+        thumbnails.scrollLeft = thumbnailWidth * originalCount;
+      } else if (scrollLeft >= maxScroll) {
+        thumbnails.scrollLeft = thumbnailWidth * originalCount - wrapper.offsetWidth / 2;
+      }
+    });
+  
+    // Drag functionality
+    let isDragging = false;
+    let startX, scrollLeft;
+  
+    thumbnails.addEventListener('mousedown', e => {
+      isDragging = true;
+      thumbnails.classList.add('dragging');
+      startX = e.pageX - thumbnails.offsetLeft;
+      scrollLeft = thumbnails.scrollLeft;
+    });
+  
+    thumbnails.addEventListener('mouseleave', () => {
+      isDragging = false;
+      thumbnails.classList.remove('dragging');
+    });
+  
+    thumbnails.addEventListener('mouseup', () => {
+      isDragging = false;
+      thumbnails.classList.remove('dragging');
+    });
+  
+    thumbnails.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - thumbnails.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      thumbnails.scrollLeft = scrollLeft - walk;
+    });
+  
+    // Touch support
+    thumbnails.addEventListener('touchstart', e => {
+      startX = e.touches[0].pageX;
+      scrollLeft = thumbnails.scrollLeft;
+    });
+  
+    thumbnails.addEventListener('touchmove', e => {
+      const x = e.touches[0].pageX;
+      const walk = (x - startX) * 1.2;
+      thumbnails.scrollLeft = scrollLeft - walk;
+    });
+  });
+  
+  
+/*-------------------------------FORM--------------------------------*/
 
 
 function postToGoogle() {
@@ -503,7 +585,38 @@ function updateFormVisibility() {
     }
 
 
-    
-
-
-    
+    document.addEventListener('DOMContentLoaded', () => {
+        const navLinks = document.querySelectorAll('.dot-nav a');
+  
+        // Smooth scroll on click
+        navLinks.forEach(link => {
+          link.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+              target.scrollIntoView({ behavior: 'smooth' });
+            }
+          });
+        });
+  
+        // ScrollSpy
+        window.addEventListener('scroll', () => {
+          const scrollPos = window.scrollY + window.innerHeight / 2;
+  
+          navLinks.forEach(link => {
+            const targetId = link.getAttribute('href');
+            const target = document.querySelector(targetId);
+  
+            if (target) {
+              const sectionTop = target.offsetTop;
+              const sectionHeight = target.offsetHeight;
+  
+              if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+                link.classList.add('active');
+              } else {
+                link.classList.remove('active');
+              }
+            }
+          });
+        });
+      });

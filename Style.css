@@ -115,21 +115,12 @@ body {
     margin: 0 10px;
 }
 
+
 .nav-links a {
     color: #fff;
     text-decoration: none;
 }
 
-.nav-links a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 0;
-    height: 2px;
-    background: #fff;
-    transition: width 0.3s;
-}
 
 
 .hamburger {
@@ -199,8 +190,35 @@ body {
     padding: 0;
 }
 
-.nav-links a.active, .nav-links a:hover, .overlay-menu a.active,.overlay-menu a:hover, .forced-active{
-text-decoration: underline !important;
+.nav-links a,
+.overlay-menu a,
+.forced-active {
+  position: relative;
+  text-decoration: none;
+}
+
+.nav-links a::after,
+.overlay-menu a::after,
+.forced-active::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background-color: white;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+  transform-origin: center;
+}
+
+.nav-links a:hover::after,
+.overlay-menu a:hover::after,
+.nav-links a.active::after,
+.overlay-menu a.active::after,
+.forced-active::after {
+  width: 100%;
+
 }
 
 .overlay-social a:hover{
@@ -216,16 +234,7 @@ color: #acacac;
     text-decoration: none;
 }
 
-.overlay-menu a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -5px;
-    width: 0;
-    height: 2px;
-    background: #fff;
-    transition: width 0.3s;
-}
+
 
 .overlay-social {
     animation-delay: 0.5s;
@@ -250,27 +259,96 @@ color: #acacac;
 
 /*------------------------------BUTTONS--------------------------------*/
 #myBtn {
-    display: none; /* Hidden by default */
-    position: fixed; /* Fixed/sticky position */
-    bottom: 3%; /* Place the button at the bottom of the page */
-    right: 3%; /* Place the button 30px from the right */
-    z-index: 90; /* Make sure it does not overlap */
-    border: solid; /* Remove borders */
-    outline: none; /* Remove outline */
-    color: #FFFFFF; /* Text color */
-    cursor: pointer; /* Add a mouse pointer on hover */
-    padding: 15px; /* Some padding */
-    border-radius: 10px; /* Rounded corners */
-    font-size: 1.5em; /* Increase font size */
-    transition: transform 0.4s ease; /* Added easing effect */
+    display: block; /* You will control visibility via opacity + transform */
+    position: fixed;
+    bottom: 3%;
+    right: 3%;
+    z-index: 90;
+    border: solid;
+    outline: none;
+    color: #FFFFFF;
+    cursor: pointer;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 1.5em;
+    /* Hide initially */
+    opacity: 0;
+    transform: scale(0.2);
+    pointer-events: none;
+  
+    /* Animate from center */
+    transform-origin: center center;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  
+  }
+  
+  #myBtn.show {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
   }
   
   #myBtn:hover {
-    color:#1A1A1A ; /* Text color */
+    color: #1A1A1A;
     border-color: #FFFFFF;
-    transform: scale(1.05);
+    transform: scale(1.1);
     background-color: #FFFFFF;
+  } 
+  
+  .dot-nav {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    z-index: 1000;
   }
+
+  .dot-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .dot-nav li {
+    margin: 16px 0;
+    position: relative;
+  }
+
+  .dot-nav a {
+    display: block;
+    width: 12px;
+    height: 12px;
+    background-color: transparent;
+    border: 2px solid white;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+  }
+
+  .dot-nav a:hover,
+  .dot-nav a.active {
+    background-color: white;
+  }
+
+  .dot-nav a::after {
+    content: attr(data-label);
+    position: absolute;
+    right: 150%;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    font-size: 12px;
+  }
+
+  .dot-nav a:hover::after {
+    opacity: 1;
+  }
+
+
 
 
 /*------------------------------END BUTTONS--------------------------------*/
@@ -718,7 +796,7 @@ color: #acacac;
     color: #fff;
     font-size: 50px;
     font-weight: bold;
-    transition: 0.3s;
+    transition: 0.3s transform ease, color 0.3s ease; /* Add transform transition */
     z-index: 2;
 }
 
@@ -1029,7 +1107,7 @@ td {
 .commission-prices h4{
     color: #D9D9D9;
     text-align: center;
-    margin: 40px 0px 0px 0px;
+    margin: 10vh 0vw 3vh 0vw;
     font-weight: normal;
     font-size: 2em;
 }
@@ -1039,15 +1117,19 @@ td {
     max-width: 90vw;
     margin: 0 auto;
     padding: 20px;
+    
 }
 
+
 /* Price section */
+
 .prices {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     flex:auto;
     gap:3%;
+    
 }
 
 .price-item {
@@ -1055,11 +1137,7 @@ td {
     text-align: center;
 }
 
-.price-item img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-}
+
 
 /* Add-ons section */
 .add-ons {
@@ -1075,11 +1153,6 @@ td {
     text-align: center;
 }
 
-.add-on-item img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-}
 
 /* Simple section */
 .simple {
@@ -1095,10 +1168,16 @@ td {
     text-align: center;
 }
 
-.simple-item img {
+.simple-item img,.add-on-item img,.price-item img,.past-commissions-container img {
     width: 100%;
+    border-radius: 1.5%;
     height: auto;
     object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.package .emote img:hover ,.more-emotes .emote img:hover,.more-examples .emote img:hover ,.simple-item img:hover,.add-on-item img:hover,.price-item img:hover,.past-commissions-container img:hover,   .package-card:hover  {
+     transform: translateY(-5px);
 }
 
 /* Past commissions section */
@@ -1116,11 +1195,6 @@ td {
   
 }
 
-.past-commissions-container img {
-    width: 100%;
-    height: auto; /* Allow the height to vary based on the image's aspect ratio */
-    object-fit: contain; /* Ensure the image fits within the container */
-}
 
 .past-commissions p {
     color: #FFFFFF;
@@ -1167,12 +1241,12 @@ td {
 
 .toontubers h2 {
     font-size: 3em;
-    margin-top: 5%;
+   
 }
 
 .toontubers h3 {
     font-size: 1.5em;
-    margin:5%;
+    margin: 10vh 0vw 3vh 0vw;
 }
 
 .toontubers p {
@@ -1196,12 +1270,11 @@ td {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin: 20px 0;
+    margin: 10px 0;
 }
 
 .emote {
     flex: 1 1 200px;
-    margin: 10px;
 }
 
 .package .emote img {
@@ -1210,21 +1283,77 @@ height: 300px;
 max-width: 800px;
 max-height: 800px;
 object-fit: contain;
+transition: transform 0.3s ease;
 }
 
 
+    
 .more-emotes .emote img,.more-examples .emote img {
     width: auto;
-    height: 200px;
+    height: 225px;
     max-width: 800px;
     max-height: 800px;
     object-fit: contain;
+    transition: transform 0.3s ease;
 }
 
 
 .emote p {
     margin: 10px 0 0;
 }
+
+
+.package-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+    padding: 2rem;
+  }
+  
+  .package-card {
+    background: #1a1a1a;
+    border: 2px solid #D9D9D9;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    flex: 1 1 20%;
+    max-width: 300px;
+    color: #D9D9D9;
+    padding: 1rem;
+    transition: transform 0.3s ease;
+  }
+
+  
+  .emote img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .emote p {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+  }
+  
+  .features ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 1rem;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+  
+  .features li {
+    padding: 0.25rem 0;
+    
+  }
+
+  .package-card p{
+    padding: 0.25rem 0;
+    border-bottom: 1px solid #f0f0f0;
+  }
+ 
 
 /*-------------------------------FORM----------------------------------------------*/
 
@@ -1811,66 +1940,114 @@ input, select, textarea {
     color: #acacac;
 }
 
-
-.thumbnails {
+.thumbnails-smol {
     display: flex;
-    justify-content: center;
-    margin-top: 10px;
-}
+    justify-content: center; /* center thumbnails horizontally */
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+    
 
-.thumbnail {
-    cursor: pointer;
-    margin: 0 5px;
+  }
+
+  .furry-mobile{
+    display: none;
+    visibility: hidden;
+  }
+  
+  .thumbnail-wrapper {
+    position: relative;
+    width: 90%;
+    margin: auto;
+    overflow: hidden;
+    border-radius: 6px;
+    overflow: hidden;
     border: 2px solid transparent;
-}
-
-.thumbnail img {
-    width: 50px;
-    height: 50px;
+  }
+  
+  
+  .thumbnails {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 10px 0;
+    /* Apply the fade mask only to the scrollable thumbnails */
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  }
+  
+  .thumbnails::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+  
+  .thumbnail {
+    flex: 0 0 auto;
+    width: 80px;
+    height: 80px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: transform 0.3s;
+  }
+  
+  .thumbnail img,   .thumbnails img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
+  }
+ 
+/* Highlight the thumbnail when active (image is shown) */
+.thumbnail.active {
+    border-color: white;
 }
 
-.thumbnail.active {
-    border-color: #333;
+/* Highlight the thumbnail on hover */
+.thumbnail:hover {
+    border-color: rgba(255, 255, 255, 0.6);
 }
+  
+ /* Make sure buttons are above */
+.thumb-scroll {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0); /* subtle button background for visibility */
+    border: none;
+    color: white;
+    font-size: 24px;
+    padding: 8px;
+    cursor: pointer;
+    z-index: 2; /* ensure it's above .thumbnails */
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  
+  .thumb-scroll.left {
+    left: 0;
+  }
+  
+  .thumb-scroll.right {
+    right: 0;
+  }
+  
+  /* Show scroll buttons when hovering over thumbnail wrapper */
+  .thumbnail-wrapper:hover .thumb-scroll {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  /* Dragging cursor */
+  .thumbnails.dragging {
+    cursor: grabbing;
+    scroll-behavior: auto; /* Disable smooth scroll while dragging */
+  }
+
 
 .carousel-button {
-    position: absolute;
-    top: 70%;
-    transform: translateY(-50%);
-    background-color: hsla(0, 0%, 0%, 0);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0);
-    padding: 10px;
-    cursor: pointer;
-    z-index: 10;
+    display: none; /* Hide prev/next buttons */
 }
-
-.prevbtn,
-.nextbtn{
-    cursor: pointer;
-    position: absolute;
-    width: auto;
-    padding: 16px;
-    color: white;
-    font-weight: bold;
-    font-size: 20px;
-    user-select: none;
-}
-
-.prevbtn:hover,
-.nextbtn:hover{
-    color: #bbb;
-}
-
-.carousel-button.prevbtn {
-    left: 90px;
-}
-
-.carousel-button.nextbtn {
-    right: 90px;
-}
-
 
 /*-------------------------------FOOTER--------------------------------*/
 
@@ -2061,11 +2238,6 @@ input, select, textarea {
         font-size: 0.8em;
     }
 
-        .gallery-container {
-            grid-template-columns: 1fr; /* Stack items in one column */
-            max-width: 90%; /* Maintain consistent width */
-        }
-    
         .gallery-item {
             height: auto; /* Adjust height as needed */
             max-width: 350px; /* Consistent width for items on small screens */
@@ -2117,26 +2289,10 @@ input, select, textarea {
     }
     
 
-    .thumbnail {
-  display:none;
-      
-    }
-
-    .carousel-button {
-        font-size: 2em;
-    }
-
     .artist img {
         height: 250px; /* Allow image height to adjust based on content */
     }
 
-    .carousel-button.prevbtn {
-        left: 20px;
-    }
-    
-    .carousel-button.nextbtn {
-        right: 20px;
-    }
 
     #caption {
         top:50px;
@@ -2163,7 +2319,7 @@ input, select, textarea {
     }
   
    .ill-heading h2 {
-      font-size: 1.5em;
+      font-size: 2em;
   }
     .image-wrapper img {
       max-width: 80%;
@@ -2408,67 +2564,37 @@ input, select, textarea {
 
 }
 
-.package-display {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 2rem;
-    justify-content: center;
-    padding: 2rem;
-  }
-  
-  .package-card {
-    background: #1a1a1a;
-    border: 2px solid #D9D9D9;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-    flex: 1 1 20%;
-    max-width: 300px;
-    color: #D9D9D9;
-    padding: 1rem;
-    transition: transform 0.3s ease;
-  }
-  .package-card:hover {
-    transform: translateY(-5px);
-  }
-  
-  .emote img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-  }
-  
-  .emote p {
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin-top: 0.5rem;
-  }
-  
-  .features ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 1rem;
-    font-size: 0.95rem;
-    text-align: center;
-  }
-  
-  .features li {
-    padding: 0.25rem 0;
-    
-  }
-
-  .package-card p{
-    padding: 0.25rem 0;
-    border-bottom: 1px solid #f0f0f0;
-  }
- 
   @media (max-width: 1024px) {
     .package-card {
       flex: 1 1 45%;
     }
+    .thumbnail-wrapper {
+        width: 50%; /* Use the full width of the container */
+      }
+    
+      .thumbnails {
+        gap: 10px; /* Increased gap for spacing */
+      }
   }
   
   @media (max-width: 600px) {
     .package-card {
       flex: 1 1 100%;
     }
+    .thumbnail-wrapper {
+        width: 25%; /* Use the full width of the container */
+      }
+    
+      .thumbnails {
+        gap: 5px; /* Increased gap for spacing */
+      }
+
+      .gallery-btn {
+        font-size: 10px;
+      
+    }
+    
   }
+
+  
+
