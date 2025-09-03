@@ -121,95 +121,78 @@ document.addEventListener("DOMContentLoaded", () => {
 
   /*---------------------------------------------------------------*/
 
-  // Update active link on hash change (e.g., for single-page applications)
-  window.addEventListener('hashchange', setActiveLink);
-  const modal = document.getElementById("modal");
-  const modalImg = document.getElementById("modal-img");
-  const closeBtn = document.getElementsByClassName("close")[0];
-  const nextBtn = document.getElementsByClassName("next")[0];
-  const prevBtn = document.getElementsByClassName("prev")[0];
-  const scrollTopButton = document.getElementById("myBtn");
-  
-  let currentIndex = 0;
-  let items = [];
-  
-  // Function to open modal
-  const openModal = (index) => {
-      currentIndex = index;
-      modal.style.display = "flex"; // Display modal as flex to center content
-  
-      const currentItem = items[index];
-      if (currentItem.tagName === 'IMG') {
-          modalImg.src = currentItem.getAttribute('data-full');
-          document.getElementById('caption').textContent = currentItem.nextElementSibling.textContent;
-      }
-  
-      header.style.display = "none"; // Hide header when modal is open
-      scrollTopButton.style.display = "none"; // Hide scroll-to-top button
-      document.querySelector('.dot-nav').style.display = "none"; // Hide dot navigation
-      document.body.style.overflow = 'hidden'; // Prevent scrolling of background content
-  };
-  
-  // Get all gallery items
-  const galleryItems = document.querySelectorAll(".image-wrapper img");
-  
-  // Assign gallery items to the items array
-  items = Array.from(galleryItems);
-  
-  // Add click event to each gallery item
-  items.forEach((item, index) => {
-      item.addEventListener("click", () => openModal(index));
-  });
-  
-  // Close the modal
-  closeBtn.onclick = () => closeModal();
-  
-  // Close modal if clicked outside of the image
-  modal.onclick = (event) => {
-      if (event.target == modal) {
-          closeModal();
-      }
-  };
-  
-  // Navigate to the next image
-  const showNext = () => {
-      currentIndex = (currentIndex + 1) % items.length;
-      openModal(currentIndex);
-  };
-  
-  // Navigate to the previous image
-  const showPrev = () => {
-      currentIndex = (currentIndex - 1 + items.length) % items.length;
-      openModal(currentIndex);
-  };
-  
-  // Bind navigation functions to next and previous buttons
-  nextBtn.onclick = showNext;
-  prevBtn.onclick = showPrev;
-  
-  // Handle keyboard navigation
-  document.addEventListener('keydown', (event) => {
-      if (modal.style.display === "flex") {
-          if (event.key === 'ArrowRight') {
-              showNext();
-          } else if (event.key === 'ArrowLeft') {
-              showPrev();
-          } else if (event.key === 'Escape') {
-              closeModal();
-          }
-      }
-  });
-  
-  // Function to close the modal
-  function closeModal() {
-    document.querySelector('.dot-nav').style.display = "block"; // Show dot navigation again
-      modal.style.display = "none";
-      header.style.display = ""; // Show header when modal is closed
-      scrollTopButton.style.display = "block"; // Show scroll-to-top button
-      document.body.style.overflow = ''; // Restore scrolling to background content
-  }
+  // Update active link on hash change (if you have a function for SPA navigation)
+window.addEventListener('hashchange', setActiveLink);
+
+// Modal elements
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modal-img");
+const closeBtn = document.getElementsByClassName("close")[0];
+const nextBtn = document.getElementsByClassName("next")[0];
+const prevBtn = document.getElementsByClassName("prev")[0];
+const scrollTopButton = document.getElementById("myBtn");
+
+let currentIndex = 0;
+
+// Get all gallery items
+const items = Array.from(document.querySelectorAll(".image-wrapper img"));
+
+// Function to open modal
+const openModal = (index) => {
+    currentIndex = index;
+    modal.style.display = "flex"; // show modal
+    const currentItem = items[index];
+    modalImg.src = currentItem.getAttribute('data-full');
+    document.getElementById('caption').textContent = currentItem.nextElementSibling.textContent;
+
+    // Hide header and scroll-to-top button
+    if (header) header.style.display = "none";
+    if (scrollTopButton) scrollTopButton.style.display = "none";
+
+    // Prevent background scrolling
+    document.body.style.overflow = 'hidden';
+};
+
+// Function to close modal
+const closeModal = () => {
+    modal.style.display = "none";
+
+    // Show header and scroll-to-top button
+    if (header) header.style.display = "";
+    if (scrollTopButton) scrollTopButton.style.display = "block";
+
+    document.body.style.overflow = ''; // restore scrolling
+};
+
+// Add click events to gallery images
+items.forEach((item, index) => {
+    item.addEventListener("click", () => openModal(index));
 });
 
+// Close modal with close button
+if (closeBtn) closeBtn.onclick = closeModal;
+
+// Close modal if clicked outside image
+if (modal) modal.onclick = (event) => {
+    if (event.target === modal) closeModal();
+};
+
+// Navigate images
+const showNext = () => openModal((currentIndex + 1) % items.length);
+const showPrev = () => openModal((currentIndex - 1 + items.length) % items.length);
+
+// Bind navigation buttons
+if (nextBtn) nextBtn.onclick = showNext;
+if (prevBtn) prevBtn.onclick = showPrev;
+
+// Keyboard navigation
+document.addEventListener('keydown', (event) => {
+    if (modal.style.display === "flex") {
+        if (event.key === 'ArrowRight') showNext();
+        else if (event.key === 'ArrowLeft') showPrev();
+        else if (event.key === 'Escape') closeModal();
+    }
+});
 /*-------------------------------GALLERY--------------------------------*/
 
 let autoScrollInterval;
@@ -625,4 +608,6 @@ function updateFormVisibility() {
             }
           });
         });
-      });
+   
+           });
+              });
