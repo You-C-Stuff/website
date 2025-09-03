@@ -1,368 +1,5 @@
-
-/*-------------------------------SCROLL TO TOP--------------------------------*/
-
-let mybutton = document.getElementById("myBtn");
-
-window.onscroll = function() {
-  scrollFunction();
-};
-
-function scrollFunction() {
-  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
-    mybutton.classList.add("show");
-  } else {
-    mybutton.classList.remove("show");
-  }
-}
-
-function topFunction() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-/*-------------------------------HEADER--------------------------------*/
-
-// Add click event listener to navigation links to retain text decoration
-const navLinks = document.querySelectorAll('.nav-links a');
-navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-        // Add active class to the clicked link and remove from others
-        navLinks.forEach(navLink => {
-            if (navLink === link) {
-                navLink.classList.add('active');
-            } else {
-                navLink.classList.remove('active');
-            }
-        });
-    });
-});
-
-/*-------------------------------EVERYTHING ELSE--------------------------------*/
-document.addEventListener("DOMContentLoaded", () => {
-    const hamburger = document.getElementById('hamburger');
-    const overlay = document.getElementById('overlay');
-    const body = document.body;
-    const header = document.querySelector('.header');
-    const a= document.querySelector('.prevbtn');
-    const b = document.querySelector('.nextbtn');
-    
-    hamburger.addEventListener('click', () => {
-        overlay.classList.toggle('active');
-        hamburger.classList.toggle('active');
-        body.classList.toggle('no-scroll');
-    
-        // Toggle visibility of prevBtn and nextBtn
-        if (a && b) {
-            a.classList.toggle('hidden');
-            b.classList.toggle('hidden');
-        }
-    });
-    
-    // Close overlay when a link is clicked
-    const overlayLinks = document.querySelectorAll('.overlay-menu a');
-    overlayLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            overlay.classList.remove('active');
-            hamburger.classList.remove('active');
-            body.classList.remove('no-scroll');
-    
-            // Ensure prevBtn and nextBtn are shown when overlay closes
-            if (a && b) {
-                a.classList.remove('hidden');
-                b.classList.remove('hidden');
-            }
-        });
-    });
-    
-    // Remove overlay and hamburger active class on window resize if larger than 768px
-    window.addEventListener('resize', () => {
-        if (window.innerWidth > 768) {
-            overlay.classList.remove('active');
-            hamburger.classList.remove('active');
-            body.classList.remove('no-scroll');
-    
-            // Ensure prevBtn and nextBtn are shown when window is resized
-            if (a && b) {
-                a.classList.remove('hidden');
-                b.classList.remove('hidden');
-            }
-        }
-    });
-    
-    // Header Scroll Behavior
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
-        }
-    });
-
-  // Highlight the active link based on the current page
-  const setActiveLink = () => {
-      const path = window.location.pathname.split('/').pop();
-      const navLinks = document.querySelectorAll('.nav-links a');
-      const overlayLinks = document.querySelectorAll('.overlay-menu a');
-
-      navLinks.forEach(link => {
-          link.classList.remove('active');
-          if (link.getAttribute('href') === path) {
-              link.classList.add('active');
-          }
-      });
-
-      overlayLinks.forEach(link => {
-          link.classList.remove('active');
-          if (link.getAttribute('href') === path) {
-              link.classList.add('active');
-          }
-      });
-  };
-
-  setActiveLink();
-
-  /*---------------------------------------------------------------*/
-
-  // Update active link on hash change (if you have a function for SPA navigation)
-window.addEventListener('hashchange', setActiveLink);
-
-// Modal elements
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modal-img");
-const closeBtn = document.getElementsByClassName("close")[0];
-const nextBtn = document.getElementsByClassName("next")[0];
-const prevBtn = document.getElementsByClassName("prev")[0];
-const scrollTopButton = document.getElementById("myBtn");
-
-let currentIndex = 0;
-
-// Get all gallery items
-const items = Array.from(document.querySelectorAll(".image-wrapper img"));
-
-// Function to open modal
-const openModal = (index) => {
-    currentIndex = index;
-    modal.style.display = "flex"; // show modal
-    const currentItem = items[index];
-    modalImg.src = currentItem.getAttribute('data-full');
-    document.getElementById('caption').textContent = currentItem.nextElementSibling.textContent;
-
-    // Hide header and scroll-to-top button
-    if (header) header.style.display = "none";
-    if (scrollTopButton) scrollTopButton.style.display = "none";
-
-    // Prevent background scrolling
-    document.body.style.overflow = 'hidden';
-};
-
-// Function to close modal
-const closeModal = () => {
-    modal.style.display = "none";
-
-    // Show header and scroll-to-top button
-    if (header) header.style.display = "";
-    if (scrollTopButton) scrollTopButton.style.display = "block";
-
-    document.body.style.overflow = ''; // restore scrolling
-};
-
-// Add click events to gallery images
-items.forEach((item, index) => {
-    item.addEventListener("click", () => openModal(index));
-});
-
-// Close modal with close button
-if (closeBtn) closeBtn.onclick = closeModal;
-
-// Close modal if clicked outside image
-if (modal) modal.onclick = (event) => {
-    if (event.target === modal) closeModal();
-};
-
-// Navigate images
-const showNext = () => openModal((currentIndex + 1) % items.length);
-const showPrev = () => openModal((currentIndex - 1 + items.length) % items.length);
-
-// Bind navigation buttons
-if (nextBtn) nextBtn.onclick = showNext;
-if (prevBtn) prevBtn.onclick = showPrev;
-
-// Keyboard navigation
-document.addEventListener('keydown', (event) => {
-    if (modal.style.display === "flex") {
-        if (event.key === 'ArrowRight') showNext();
-        else if (event.key === 'ArrowLeft') showPrev();
-        else if (event.key === 'Escape') closeModal();
-    }
-});
-/*-------------------------------GALLERY--------------------------------*/
-
-let autoScrollInterval;
-let activeGalleryIndex = 0;
-
-// Initialize carousels for all galleries
-function initializeGallery(gallery) {
-    const slides = gallery.querySelectorAll(".artist");
-    const thumbnails = gallery.querySelectorAll(".thumbnail");
-    let slideIndex = 0;
-
-    function showSlide(n) {
-        slideIndex = (n + slides.length) % slides.length;
-
-        slides.forEach(slide => slide.classList.remove("active"));
-        thumbnails.forEach(thumb => thumb.classList.remove("active"));
-
-        slides[slideIndex].classList.add("active");
-        thumbnails[slideIndex].classList.add("active");
-    }
-
-    function prevSlide() {
-        showSlide(slideIndex - 1);
-    }
-
-    function nextSlide() {
-        showSlide(slideIndex + 1);
-    }
-
-    gallery.querySelector(".prevbtn").onclick = () => {
-        prevSlide();
-        stopAutoScroll();
-    };
-    gallery.querySelector(".nextbtn").onclick = () => {
-        nextSlide();
-        stopAutoScroll();
-    };
-
-    thumbnails.forEach((thumb, i) => {
-        thumb.onclick = () => {
-            showSlide(i);
-            stopAutoScroll();
-        };
-    });
-
-    // Start auto-scrolling for this gallery
-    startAutoScroll(() => nextSlide());
-
-    showSlide(slideIndex);
-}
-
-// Start auto-scrolling
-function startAutoScroll(callback) {
-    stopAutoScroll(); // Clear existing intervals
-    autoScrollInterval = setInterval(callback, 4000);
-}
-
-// Stop auto-scrolling
-function stopAutoScroll() {
-    clearInterval(autoScrollInterval);
-}
-
-function switchGallery(index) {
-    const galleries = document.querySelectorAll(".gallery-container");
-    const buttons = document.querySelectorAll(".gallery-btn");
-
-    // Deactivate all galleries and buttons
-    galleries.forEach(gallery => gallery.classList.remove("active"));
-    buttons.forEach(button => button.classList.remove("active"));
-
-    // Activate selected gallery and button
-    galleries[index].classList.add("active");
-    buttons[index].classList.add("active");
-
-    activeGalleryIndex = index;
-
-    // Initialize carousel for the active gallery
-    initializeGallery(galleries[index]);
-}
-
-// Initialize the first gallery
-document.addEventListener("DOMContentLoaded", () => {
-    const galleries = document.querySelectorAll(".gallery-container");
-    galleries.forEach(gallery => initializeGallery(gallery));
-    switchGallery(0); // Start with the first gallery
-});
-
-/*-------------------------------THUMBNAIL--------------------------------*/
-document.querySelectorAll('.thumbnail-wrapper').forEach(wrapper => {
-    const thumbnails = wrapper.querySelector('.thumbnails');
-    const scrollLeftBtn = wrapper.querySelector('.thumb-scroll.left');
-    const scrollRightBtn = wrapper.querySelector('.thumb-scroll.right');
-    const scrollAmount = 150;
-  
-    // Clone items for infinite scroll
-    const items = Array.from(thumbnails.children);
-    items.forEach(item => {
-        thumbnails.appendChild(item.cloneNode(true));
-      });
-    const thumbnailWidth = items[0].offsetWidth + 8; // 8 is gap
-    const originalCount = items.length;
-    const totalCount = thumbnails.children.length;
-  
-
-    // Scroll buttons
-    scrollLeftBtn.addEventListener('click', () => {
-      thumbnails.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    });
-  
-    scrollRightBtn.addEventListener('click', () => {
-      thumbnails.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    });
-  
-    // Infinite scroll logic
-    thumbnails.addEventListener('scroll', () => {
-      const scrollLeft = thumbnails.scrollLeft;
-      const maxScroll = thumbnails.scrollWidth - thumbnails.clientWidth;
-  
-      if (scrollLeft <= 0) {
-        thumbnails.scrollLeft = thumbnailWidth * originalCount;
-      } else if (scrollLeft >= maxScroll) {
-        thumbnails.scrollLeft = thumbnailWidth * originalCount - wrapper.offsetWidth / 2;
-      }
-    });
-  
-    // Drag functionality
-    let isDragging = false;
-    let startX, scrollLeft;
-  
-    thumbnails.addEventListener('mousedown', e => {
-      isDragging = true;
-      thumbnails.classList.add('dragging');
-      startX = e.pageX - thumbnails.offsetLeft;
-      scrollLeft = thumbnails.scrollLeft;
-    });
-  
-    thumbnails.addEventListener('mouseleave', () => {
-      isDragging = false;
-      thumbnails.classList.remove('dragging');
-    });
-  
-    thumbnails.addEventListener('mouseup', () => {
-      isDragging = false;
-      thumbnails.classList.remove('dragging');
-    });
-  
-    thumbnails.addEventListener('mousemove', e => {
-      if (!isDragging) return;
-      e.preventDefault();
-      const x = e.pageX - thumbnails.offsetLeft;
-      const walk = (x - startX) * 1.5;
-      thumbnails.scrollLeft = scrollLeft - walk;
-    });
-  
-    // Touch support
-    thumbnails.addEventListener('touchstart', e => {
-      startX = e.touches[0].pageX;
-      scrollLeft = thumbnails.scrollLeft;
-    });
-  
-    thumbnails.addEventListener('touchmove', e => {
-      const x = e.touches[0].pageX;
-      const walk = (x - startX) * 1.2;
-      thumbnails.scrollLeft = scrollLeft - walk;
-    });
-  });
-  
   
 /*-------------------------------FORM--------------------------------*/
-
 
 function postToGoogle() {
     var field1 = $("#first-name").val();
@@ -607,7 +244,368 @@ function updateFormVisibility() {
               }
             }
           });
+ });
+ });
+
+/*-------------------------------GALLERY--------------------------------*/
+
+let autoScrollInterval;
+let activeGalleryIndex = 0;
+
+// Initialize carousels for all galleries
+function initializeGallery(gallery) {
+    const slides = gallery.querySelectorAll(".artist");
+    const thumbnails = gallery.querySelectorAll(".thumbnail");
+    let slideIndex = 0;
+
+    function showSlide(n) {
+        slideIndex = (n + slides.length) % slides.length;
+
+        slides.forEach(slide => slide.classList.remove("active"));
+        thumbnails.forEach(thumb => thumb.classList.remove("active"));
+
+        slides[slideIndex].classList.add("active");
+        thumbnails[slideIndex].classList.add("active");
+    }
+
+    function prevSlide() {
+        showSlide(slideIndex - 1);
+    }
+
+    function nextSlide() {
+        showSlide(slideIndex + 1);
+    }
+
+    gallery.querySelector(".prevbtn").onclick = () => {
+        prevSlide();
+        stopAutoScroll();
+    };
+    gallery.querySelector(".nextbtn").onclick = () => {
+        nextSlide();
+        stopAutoScroll();
+    };
+
+    thumbnails.forEach((thumb, i) => {
+        thumb.onclick = () => {
+            showSlide(i);
+            stopAutoScroll();
+        };
+    });
+
+    // Start auto-scrolling for this gallery
+    startAutoScroll(() => nextSlide());
+
+    showSlide(slideIndex);
+}
+
+// Start auto-scrolling
+function startAutoScroll(callback) {
+    stopAutoScroll(); // Clear existing intervals
+    autoScrollInterval = setInterval(callback, 4000);
+}
+
+// Stop auto-scrolling
+function stopAutoScroll() {
+    clearInterval(autoScrollInterval);
+}
+
+function switchGallery(index) {
+    const galleries = document.querySelectorAll(".gallery-container");
+    const buttons = document.querySelectorAll(".gallery-btn");
+
+    // Deactivate all galleries and buttons
+    galleries.forEach(gallery => gallery.classList.remove("active"));
+    buttons.forEach(button => button.classList.remove("active"));
+
+    // Activate selected gallery and button
+    galleries[index].classList.add("active");
+    buttons[index].classList.add("active");
+
+    activeGalleryIndex = index;
+
+    // Initialize carousel for the active gallery
+    initializeGallery(galleries[index]);
+}
+
+// Initialize the first gallery
+document.addEventListener("DOMContentLoaded", () => {
+    const galleries = document.querySelectorAll(".gallery-container");
+    galleries.forEach(gallery => initializeGallery(gallery));
+    switchGallery(0); // Start with the first gallery
+});
+
+/*-------------------------------THUMBNAIL--------------------------------*/
+document.querySelectorAll('.thumbnail-wrapper').forEach(wrapper => {
+    const thumbnails = wrapper.querySelector('.thumbnails');
+    const scrollLeftBtn = wrapper.querySelector('.thumb-scroll.left');
+    const scrollRightBtn = wrapper.querySelector('.thumb-scroll.right');
+    const scrollAmount = 150;
+  
+    // Clone items for infinite scroll
+    const items = Array.from(thumbnails.children);
+    items.forEach(item => {
+        thumbnails.appendChild(item.cloneNode(true));
+      });
+    const thumbnailWidth = items[0].offsetWidth + 8; // 8 is gap
+    const originalCount = items.length;
+    const totalCount = thumbnails.children.length;
+  
+
+    // Scroll buttons
+    scrollLeftBtn.addEventListener('click', () => {
+      thumbnails.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    });
+  
+    scrollRightBtn.addEventListener('click', () => {
+      thumbnails.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    });
+  
+    // Infinite scroll logic
+    thumbnails.addEventListener('scroll', () => {
+      const scrollLeft = thumbnails.scrollLeft;
+      const maxScroll = thumbnails.scrollWidth - thumbnails.clientWidth;
+  
+      if (scrollLeft <= 0) {
+        thumbnails.scrollLeft = thumbnailWidth * originalCount;
+      } else if (scrollLeft >= maxScroll) {
+        thumbnails.scrollLeft = thumbnailWidth * originalCount - wrapper.offsetWidth / 2;
+      }
+    });
+  
+    // Drag functionality
+    let isDragging = false;
+    let startX, scrollLeft;
+  
+    thumbnails.addEventListener('mousedown', e => {
+      isDragging = true;
+      thumbnails.classList.add('dragging');
+      startX = e.pageX - thumbnails.offsetLeft;
+      scrollLeft = thumbnails.scrollLeft;
+    });
+  
+    thumbnails.addEventListener('mouseleave', () => {
+      isDragging = false;
+      thumbnails.classList.remove('dragging');
+    });
+  
+    thumbnails.addEventListener('mouseup', () => {
+      isDragging = false;
+      thumbnails.classList.remove('dragging');
+    });
+  
+    thumbnails.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - thumbnails.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      thumbnails.scrollLeft = scrollLeft - walk;
+    });
+  
+    // Touch support
+    thumbnails.addEventListener('touchstart', e => {
+      startX = e.touches[0].pageX;
+      scrollLeft = thumbnails.scrollLeft;
+    });
+  
+    thumbnails.addEventListener('touchmove', e => {
+      const x = e.touches[0].pageX;
+      const walk = (x - startX) * 1.2;
+      thumbnails.scrollLeft = scrollLeft - walk;
+    });
+  });
+/*-------------------------------SCROLL TO TOP--------------------------------*/
+
+let mybutton = document.getElementById("myBtn");
+
+window.onscroll = function() {
+  scrollFunction();
+};
+
+function scrollFunction() {
+  if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+    mybutton.classList.add("show");
+  } else {
+    mybutton.classList.remove("show");
+  }
+}
+
+function topFunction() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+/*-------------------------------HEADER--------------------------------*/
+
+// Add click event listener to navigation links to retain text decoration
+const navLinks = document.querySelectorAll('.nav-links a');
+navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+        // Add active class to the clicked link and remove from others
+        navLinks.forEach(navLink => {
+            if (navLink === link) {
+                navLink.classList.add('active');
+            } else {
+                navLink.classList.remove('active');
+            }
         });
-   
-           });
-              });
+    });
+});
+
+/*-------------------------------EVERYTHING ELSE--------------------------------*/
+document.addEventListener("DOMContentLoaded", () => {
+    const hamburger = document.getElementById('hamburger');
+    const overlay = document.getElementById('overlay');
+    const body = document.body;
+    const header = document.querySelector('.header');
+    const a= document.querySelector('.prevbtn');
+    const b = document.querySelector('.nextbtn');
+    
+    hamburger.addEventListener('click', () => {
+        overlay.classList.toggle('active');
+        hamburger.classList.toggle('active');
+        body.classList.toggle('no-scroll');
+    
+        // Toggle visibility of prevBtn and nextBtn
+        if (a && b) {
+            a.classList.toggle('hidden');
+            b.classList.toggle('hidden');
+        }
+    });
+    
+    // Close overlay when a link is clicked
+    const overlayLinks = document.querySelectorAll('.overlay-menu a');
+    overlayLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            overlay.classList.remove('active');
+            hamburger.classList.remove('active');
+            body.classList.remove('no-scroll');
+    
+            // Ensure prevBtn and nextBtn are shown when overlay closes
+            if (a && b) {
+                a.classList.remove('hidden');
+                b.classList.remove('hidden');
+            }
+        });
+    });
+    
+    // Remove overlay and hamburger active class on window resize if larger than 768px
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 768) {
+            overlay.classList.remove('active');
+            hamburger.classList.remove('active');
+            body.classList.remove('no-scroll');
+    
+            // Ensure prevBtn and nextBtn are shown when window is resized
+            if (a && b) {
+                a.classList.remove('hidden');
+                b.classList.remove('hidden');
+            }
+        }
+    });
+    
+    // Header Scroll Behavior
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    });
+
+  // Highlight the active link based on the current page
+  const setActiveLink = () => {
+      const path = window.location.pathname.split('/').pop();
+      const navLinks = document.querySelectorAll('.nav-links a');
+      const overlayLinks = document.querySelectorAll('.overlay-menu a');
+
+      navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === path) {
+              link.classList.add('active');
+          }
+      });
+
+      overlayLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === path) {
+              link.classList.add('active');
+          }
+      });
+  };
+
+  setActiveLink();
+
+  /*---------------------------------------------------------------*/
+
+  const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modal-img");
+const closeBtn = document.getElementsByClassName("close")[0];
+const nextBtn = document.getElementsByClassName("next")[0];
+const prevBtn = document.getElementsByClassName("prev")[0];
+const scrollTopButton = document.getElementById("myBtn");
+// header is already defined elsewhere
+const dotNav = document.querySelector('.dot-nav'); // select the dot navigation
+
+let currentIndex = 0;
+
+// Get all gallery items
+const items = Array.from(document.querySelectorAll(".image-wrapper img"));
+
+// Function to open modal
+const openModal = (index) => {
+    currentIndex = index;
+    modal.style.display = "flex"; // show modal
+    const currentItem = items[index];
+    modalImg.src = currentItem.getAttribute('data-full');
+    document.getElementById('caption').textContent = currentItem.nextElementSibling.textContent;
+
+    // Hide header, scroll-to-top button, and dot navigation
+    if (header) header.style.display = "none";
+    if (scrollTopButton) scrollTopButton.style.display = "none";
+    if (dotNav) dotNav.style.display = "none";
+
+    // Prevent background scrolling
+    document.body.style.overflow = 'hidden';
+};
+
+// Function to close modal
+const closeModal = () => {
+    modal.style.display = "none";
+
+    // Show header, scroll-to-top button, and dot navigation
+    if (header) header.style.display = "";
+    if (scrollTopButton) scrollTopButton.style.display = "block";
+    if (dotNav) dotNav.style.display = "block";
+
+    document.body.style.overflow = ''; // restore scrolling
+};
+
+// Add click events to gallery images
+items.forEach((item, index) => {
+    item.addEventListener("click", () => openModal(index));
+});
+
+// Close modal with close button
+if (closeBtn) closeBtn.onclick = closeModal;
+
+// Close modal if clicked outside image
+if (modal) modal.onclick = (event) => {
+    if (event.target === modal) closeModal();
+};
+
+// Navigate images
+const showNext = () => openModal((currentIndex + 1) % items.length);
+const showPrev = () => openModal((currentIndex - 1 + items.length) % items.length);
+
+// Bind navigation buttons
+if (nextBtn) nextBtn.onclick = showNext;
+if (prevBtn) prevBtn.onclick = showPrev;
+
+// Keyboard navigation
+document.addEventListener('keydown', (event) => {
+    if (modal.style.display === "flex") {
+        if (event.key === 'ArrowRight') showNext();
+        else if (event.key === 'ArrowLeft') showPrev();
+        else if (event.key === 'Escape') closeModal();
+    }
+});
+ });
+ 
