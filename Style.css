@@ -585,7 +585,7 @@ color: #acacac;
 
 
 .image-container img {
-    max-width: 130%;
+    max-width: 120%;
     height: auto;
     border-radius: 8px;
 }
@@ -2118,6 +2118,7 @@ input, select, textarea {
 
 @media (max-width: 750px){
 
+
     
     .video-wrapper {
         width:82.5vw;
@@ -2607,5 +2608,13 @@ input, select, textarea {
     
   }
 
-  
+    @media (max-width: 422px) {
+   .image-container img {
+    max-width: 155%;
+    height: auto;
+    border-radius: 8px;
+
+}
+    
+  }
 
