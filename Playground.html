@@ -30,7 +30,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
 .tbbtn.active{background:rgba(127,119,221,0.3);border-color:#7F77DD;color:#b8b2ff;}
 .tbbtn.hoop{border-color:rgba(239,159,39,0.5);color:rgba(239,159,39,0.9);}
 .tbbtn.hoop:hover{background:rgba(239,159,39,0.15);}
-#showUIBtn{position:fixed;top:6px;left:50%;transform:translateX(-50%);background:rgba(15,15,15,0.8);border:0.5px solid rgba(255,255,255,0.15);border-radius:20px;padding:4px 14px;font-size:11px;color:rgba(255,255,255,0.5);cursor:pointer;z-index:21;font-family:inherit;display:none;backdrop-filter:blur(8px);white-space:nowrap;}
+#showUIBtn{position:fixed;top:6px;left:50%;transform:translateX(-50%);background:rgba(15,15,15,0.8);border:0.5px solid rgba(255,255,255,0.15);border-radius:20px;padding:4px 14px;font-size:11px;color:rgba(255,255,255,0.5);cursor:pointer;z-index:21;font-family:inherit;display:none;backdrop-filter:blur(8px);white-space:nowrap;opacity:0;transition:opacity 0.2s;}
 #showUIBtn:hover{color:#fff;}
 #spriteCount{font-size:11px;color:rgba(255,255,255,0.4);padding:0 8px;white-space:nowrap;}
 #spriteCount strong{color:#fff;font-weight:500;}
@@ -38,7 +38,11 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
 #costumeSelect option{background:#1c1c1c;}
 #settingsPanel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:flex-start;justify-content:center;padding-top:92px;}
 #settingsPanel.open{display:flex;}
-#settingsBox{background:#1c1c1c;border:0.5px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px;width:460px;max-height:calc(100vh - 75px);overflow-y:auto;color:#fff;}
+#settingsBox{background:#1c1c1c;border:0.5px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px;width:460px;max-height:calc(100vh - 75px);overflow-y:scroll;color:#fff;scrollbar-color:rgba(255,255,255,0.4) #1c1c1c;scrollbar-width:thin;}
+#settingsBox::-webkit-scrollbar{width:6px;}
+#settingsBox::-webkit-scrollbar-track{background:#1c1c1c;border-radius:3px;}
+#settingsBox::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.35);border-radius:3px;}
+#settingsBox::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.55);}
 #settingsBox h2{font-size:15px;font-weight:500;margin-bottom:16px;}
 .stabs{display:flex;gap:5px;margin-bottom:18px;flex-wrap:wrap;}
 .stab{flex:1;min-width:68px;padding:6px;font-size:12px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);cursor:pointer;font-family:inherit;}
@@ -93,23 +97,24 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <div class="tbslider"><span class="name">Gravity</span><input type="range" id="gravity" min="-3" max="3" step="0.1" value="1"><span class="val" id="gv">1.0</span></div>
       <div class="tbslider"><span class="name">Bounce</span><input type="range" id="bounce" min="0" max="3" step="0.05" value="0.7"><span class="val" id="bv">0.70</span></div>
       <div class="tbslider"><span class="name">Friction</span><input type="range" id="friction" min="-1" max="1" step="0.01" value="0"><span class="val" id="fv">0.00</span></div>
-      <div class="tbslider"><span class="name">Size</span><input type="range" id="size" min="10" max="120" step="1" value="24"><span class="val" id="sv">24</span></div>
     </div>
     <div class="tbsep"></div>
     <div class="tbgroup">
-      <button class="tbbtn" id="bounceBtn">Bounce</button>
       <button class="tbbtn" id="resetBtn">Reset</button>
+      <button class="tbbtn" id="explosionBtn">Explode</button>
       <button class="tbbtn" id="burstBtn">Burst</button>
       <button class="tbbtn" id="vibeBtn">Vibrate</button>
       <button class="tbbtn hoop" id="hoopShotBtn">Hoop shot</button>
+      <button class="tbbtn" id="brTopBtn" style="border-color:rgba(239,159,39,0.5);color:rgba(239,159,39,0.9);">⚔️ Battle</button>
+      <button class="tbbtn" id="warTopBtn" style="border-color:rgba(220,60,60,0.5);color:rgba(220,100,100,0.9);">⚔️🛡️ War</button>
     </div>
     <div class="tbsep"></div>
     <div class="tbgroup">
-      <span class="tblabel">Costume</span>
-      <select id="costumeSelect"><option value="">— none —</option></select>
+      <span class="tblabel">Builder</span>
+      <button class="tbbtn" id="builderBtn">Builder mode</button>
+      <button class="tbbtn" id="moverBtn">Move blocks</button>
+      <button class="tbbtn" id="clearBlocksBtn">Clear blocks</button>
     </div>
-    <div class="tbsep"></div>
-    <div class="tbgroup"><span id="spriteCount"><strong id="count">0</strong> sprites</span></div>
     <div class="tbsep"></div>
     <div class="tbgroup">
       <button class="tbbtn" id="settingsBtn">Settings</button>
@@ -119,26 +124,33 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
   <!-- Row 2: extra controls -->
   <div id="topbar-row2" style="display:flex;align-items:center;width:100%;height:38px;flex-shrink:0;border-top:0.5px solid rgba(255,255,255,0.07);">
     <div class="tbgroup">
+      <span class="tblabel">Global</span>
+      <button class="tbbtn" id="gravFlipBtn">Reverse gravity</button>
+      <button class="tbbtn" id="zeroGBtn">Zero G</button>
+      <button class="tbbtn" id="freezeBtn">Freeze</button>
+    </div>
+    <div class="tbsep"></div>
+    <div class="tbgroup">
       <span class="tblabel">Viewers</span>
+      <div class="tbslider"><span class="name">Size</span><input type="range" id="viewerSize" min="16" max="128" step="1" value="48"><span class="val" id="vsv">48</span></div>
       <button class="tbbtn" id="viewerToggleBtn">Hide viewers</button>
       <button class="tbbtn" id="petScatterBtn">Bounce</button>
     </div>
     <div class="tbsep"></div>
     <div class="tbgroup">
-      <span class="tblabel">Sprites</span>
-      <button class="tbbtn" id="gravFlipBtn">Reverse gravity</button>
-      <button class="tbbtn" id="zeroGBtn">Zero G</button>
-      <button class="tbbtn" id="freezeBtn">Freeze</button>
+      <span class="tblabel">Pets</span>
+      <div class="tbslider"><span class="name">Size</span><input type="range" id="size" min="10" max="120" step="1" value="24"><span class="val" id="sv">24</span></div>
       <button class="tbbtn" id="sizeUpBtn">Size +10</button>
       <button class="tbbtn" id="sizeDnBtn">Size -10</button>
-      <button class="tbbtn" id="explosionBtn">Explode</button>
+      <button class="tbbtn" id="bounceBtn">Bounce</button>
     </div>
     <div class="tbsep"></div>
     <div class="tbgroup">
-      <span class="tblabel">Builder</span>
-      <button class="tbbtn" id="builderBtn">Builder mode</button>
-      <button class="tbbtn" id="clearBlocksBtn">Clear blocks</button>
+      <span class="tblabel">Costume</span>
+      <select id="costumeSelect"><option value="">— none —</option></select>
     </div>
+    <div class="tbsep"></div>
+    <div class="tbgroup"><span id="spriteCount"><strong id="count">0</strong> pets</span></div>
     <div class="tbsep"></div>
     <div class="tbgroup">
       <span class="tblabel">Twitch</span>
@@ -153,31 +165,94 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
   <div id="settingsBox">
     <h2>Settings</h2>
     <div class="stabs">
-      <button class="stab active" data-tab="background">Background</button>
-      <button class="stab" data-tab="costumes">Costumes</button>
-      <button class="stab" data-tab="hoop">Hoop</button>
+      <button class="stab" data-tab="twitch">Twitch</button>
+      <button class="stab active" data-tab="costumes">Visuals</button>
       <button class="stab" data-tab="sound">Sound</button>
       <button class="stab" data-tab="hotkeys">Hotkeys</button>
-      <button class="stab" data-tab="twitch">Twitch</button>
+      <button class="stab" data-tab="fights">Fights</button>
     </div>
 
-    <div class="stabpanel active" id="tab-background">
+    <div class="stabpanel" id="tab-twitch">
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">
+        Connects to Twitch chat via IRC (anonymous, read-only). Viewers who chat spawn as desktop pets that walk along the bottom. Grab and toss them!
+      </p>
+      <div class="srow">
+        <label>Twitch channel name</label>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="twitchChannel" placeholder="yourchannelname" style="flex:1;">
+          <button id="twitchConnectBtn" style="padding:7px 14px;border-radius:8px;border:0.5px solid rgba(127,119,221,0.5);background:rgba(127,119,221,0.15);color:#b8b2ff;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;">Connect</button>
+          <button id="twitchDisconnectBtn" style="padding:7px 10px;border-radius:8px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);font-size:13px;cursor:pointer;font-family:inherit;">✕</button>
+        </div>
+        <div id="twitchStatus" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:6px;">Not connected</div>
+        <button id="testPetBtn" style="margin-top:8px;width:100%;padding:6px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;font-family:inherit;">+ Spawn test pet (preview)</button>
+      </div>
+      <div class="srow">
+        <label>Pet size (px)</label>
+        <input type="number" id="petSize" value="48" min="16" max="128">
+      </div>
+      <div class="srow">
+        <label>Walk speed</label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="range" id="petSpeed" min="0" max="500" step="5" value="30" style="flex:1;accent-color:#7F77DD;">
+          <span id="petSpeedVal" style="font-size:12px;color:#fff;min-width:36px;">30%</span>
+        </div>
+      </div>
+      <div class="srow">
+        <label>Max pets on screen</label>
+        <input type="number" id="maxPets" value="30" min="1" max="100">
+      </div>
+      <div class="srow">
+        <label>Speech bubble duration (seconds)</label>
+        <input type="number" id="bubbleDur" value="5" min="1" max="30">
+      </div>
+      <div class="srow">
+        <label>Speech bubble font size (px)</label>
+        <input type="number" id="bubbleFontSize" value="11" min="8" max="24">
+      </div>
+    </div>
+    <div class="stabpanel active" id="tab-costumes">
+      <!-- ── Background ── -->
       <div class="srow"><label>Background colour</label><input type="color" id="bgColor" value="#111111"></div>
-    </div>
-
-    <div class="stabpanel" id="tab-costumes">
-      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Create costumes and add frames. Right-click any sprite on canvas to assign it a costume. The default costume applies to new sprites spawned by clicking.</p>
+      <hr class="sdivider">
+      <!-- ── Pet costumes ── -->
+      <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Pet costumes</div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">Right-click any pet on canvas to assign it a costume. The default costume applies to new pets.</p>
       <div id="costumeGrid"></div>
       <button class="addCostumeBtn" id="addCostumeBtn">+ New costume</button>
-      <div class="srow" style="margin-top:16px;"><label>Animation fps</label><input type="number" id="fps" value="12" min="1" max="60"></div>
-    </div>
+      <div class="srow" style="margin-top:14px;"><label>Animation fps</label><input type="number" id="fps" value="12" min="1" max="60"></div>
+      <hr class="sdivider">
 
-    <div class="stabpanel" id="tab-hoop">
-      <div class="hoop-section" style="margin-bottom:14px;">
-        <h3>Hoop sprite frames</h3>
-        <div id="hoopFrameList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
-        <button class="addFrameBtn" id="addHoopFrameBtn">+</button>
-        <input type="file" id="hoopFileInput" multiple accept="image/*">
+      <!-- ── Viewer walking animation ── -->
+      <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Viewer walking animation</div>
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">Upload frames for all viewers' walking animation. If none, a coloured blob is used.</p>
+      <div id="viewerCostumeGrid" style="display:flex;flex-direction:column;gap:14px;">
+        <div class="costume-row">
+          <div class="costume-row-header" style="margin-bottom:10px;">
+            <span style="font-size:13px;color:#fff;font-weight:500;">Walking frames</span>
+          </div>
+          <div class="costume-frames" id="petFrameList"></div>
+          <button class="addFrameBtn" id="addPetFrameBtn" style="margin-top:6px;">+</button>
+          <input type="file" id="petFileInput" multiple accept="image/*" style="display:none;">
+        </div>
+      </div>
+      <hr class="sdivider">
+
+      <!-- ── Hoop sprite ── -->
+      <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Hoop sprite</div>
+      <div id="hoopCostumeRow" class="costume-row">
+        <div class="costume-frames" id="hoopFrameList"></div>
+        <button class="addFrameBtn" id="addHoopFrameBtn" style="margin-top:6px;">+</button>
+        <input type="file" id="hoopFileInput" multiple accept="image/*" style="display:none;">
+      </div>
+      <div class="srow" style="margin-top:12px;">
+        <button id="hoopToggleBtn" style="width:100%;padding:8px;border-radius:8px;border:0.5px solid rgba(239,159,39,0.4);background:rgba(239,159,39,0.08);color:rgba(239,159,39,0.9);font-size:12px;cursor:pointer;font-family:inherit;">Show hoop</button>
+      </div>
+      <div class="srow">
+        <label>Hoop size</label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="range" id="hoopSizeSlider" min="40" max="300" step="5" value="80" style="flex:1;accent-color:#EF9F27;">
+          <span id="hoopSizeVal" style="font-size:12px;color:#fff;min-width:36px;">80px</span>
+        </div>
       </div>
       <div class="srow">
         <label>Hoop height from top (% of screen)</label>
@@ -186,7 +261,16 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
           <span id="hoopHeightVal" style="font-size:12px;color:#fff;min-width:32px;">45%</span>
         </div>
       </div>
+      <div class="srow">
+        <label>Hoop distance from right edge (px)</label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="range" id="hoopRightSlider" min="10" max="300" step="5" value="30" style="flex:1;accent-color:#EF9F27;">
+          <span id="hoopRightVal" style="font-size:12px;color:#fff;min-width:36px;">30px</span>
+        </div>
+      </div>
     </div>
+
+    <div class="stabpanel" id="tab-hoop" style="display:none!important;"></div>
 
     <div class="stabpanel" id="tab-sound">
       <div class="srow">
@@ -225,6 +309,37 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <table id="hotkeyList"><tr><th>Action</th><th>Key</th></tr></table>
     </div>
 
+    <div class="stabpanel" id="tab-fights">
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Configure Battle Royale and War modes. War splits viewers into two teams. Triggered by <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!war</code> from the channel owner.</p>
+      <div class="sdivider"></div>
+      <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);margin-bottom:10px;">⚔️ War teams</div>
+      <div class="srow">
+        <label>Team A emoji</label>
+        <input type="text" id="teamAEmoji" value="⚔️" maxlength="4" style="width:80px;">
+      </div>
+      <div class="srow">
+        <label>Team A war cry</label>
+        <input type="text" id="teamACry" value="For glory!" placeholder="Team A battle cry">
+      </div>
+      <div class="srow">
+        <label>Team B emoji</label>
+        <input type="text" id="teamBEmoji" value="🛡️" maxlength="4" style="width:80px;">
+      </div>
+      <div class="srow">
+        <label>Team B war cry</label>
+        <input type="text" id="teamBCry" value="Hold the line!" placeholder="Team B battle cry">
+      </div>
+      <div class="sdivider"></div>
+      <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);margin-bottom:10px;">🏆 Battle Royale &amp; War</div>
+      <div class="srow">
+        <label>Fight check interval (ms) — lower = faster combat</label>
+        <input type="number" id="brInterval" value="180" min="50" max="1000" step="10">
+      </div>
+      <div class="srow">
+        <label>Attack range (multiplier of viewer size)</label>
+        <input type="number" id="brRange" value="2.8" min="1" max="8" step="0.1">
+      </div>
+    </div>
     <button class="sclose" id="closeSettings">Done</button>
   </div>
 </div>
@@ -244,7 +359,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
   font-family:'Courier New',monospace;letter-spacing:0.04em;
 }
 .speech-bubble{
-  position:absolute;bottom:105%;
+  position:absolute;bottom:100%;
   background:#1a1a2e;
   border:2px solid #fff;
   border-radius:0;
@@ -257,7 +372,6 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
   pointer-events:none;
   animation:bubblePop 0.1s steps(2) forwards;
 }
-/* pixel tail: square notch below bubble */
 .speech-bubble::after{
   content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
   width:6px;height:6px;background:#1a1a2e;
@@ -275,15 +389,46 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
 
 <!-- per-sprite costume picker -->
 <div id="costumePicker" style="display:none;position:fixed;background:#1c1c1c;border:0.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px;z-index:200;min-width:160px;">
-  <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Assign costume</div>
+  <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Assign costume to pet</div>
   <div id="costumePickerList"></div>
   <div style="margin-top:8px;border-top:0.5px solid rgba(255,255,255,0.1);padding-top:8px;">
     <button id="costumePickerNone" style="width:100%;padding:5px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;font-family:inherit;">— Remove costume —</button>
   </div>
 </div>
 
+
+<div id="blockMenu" style="display:none;position:fixed;z-index:300;background:#1c1c1c;border:0.5px solid rgba(255,255,255,0.2);border-radius:12px;padding:14px;min-width:220px;box-shadow:0 4px 24px rgba(0,0,0,0.7);">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+    <span style="font-size:12px;font-weight:500;color:#fff;">Edit block</span>
+    <button id="blockMenuClose" style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:16px;cursor:pointer;padding:0;line-height:1;">×</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+    <div>
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">X</label>
+      <input type="number" id="blockX" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;">
+    </div>
+    <div>
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">Y</label>
+      <input type="number" id="blockY" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;">
+    </div>
+    <div>
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">Width</label>
+      <input type="number" id="blockW" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;" min="10">
+    </div>
+    <div>
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">Height</label>
+      <input type="number" id="blockH" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;" min="10">
+    </div>
+  </div>
+  <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px;">Changes apply live as you type</div>
+  <button id="blockDeleteBtn" style="width:100%;padding:6px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);font-size:12px;cursor:pointer;font-family:inherit;">Delete block</button>
+</div>
+
 <script>
-document.addEventListener('wheel',e=>e.preventDefault(),{passive:false});
+document.addEventListener('wheel',e=>{
+  if(e.target.closest('#settingsBox'))return; // allow scroll inside settings
+  e.preventDefault();
+},{passive:false});
 document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 
 const canvas=document.getElementById('canvas');
@@ -298,7 +443,7 @@ const PALETTE=['#7F77DD','#534AB7','#1D9E75','#0F6E56','#D85A30','#993C1D','#D45
 // bounce: 0=no bounce, 1=perfect, 2+=energised
 let config={gravity:1,bounce:0.7,friction:0,size:24};
 
-let spires=[],vibrating=false,drag=null;
+let spires=[],vibrating=false,drag=null,frozen=false;
 let mouseX=0,mouseY=0,prevMouseX=0,prevMouseY=0,mouseVX=0,mouseVY=0;
 let hoveredSpire=null,uiVisible=true;
 
@@ -307,9 +452,11 @@ let fps=12,frameTime=1000/12;
 
 let hoopFrames=[],hoopCurFrame=0,hoopLastFrame=0;
 let hoopHeightPct=45; // default: 45% from top — lower, more reachable
+let hoopRightMargin=30; // px from right edge
 let hoopVisible=false,hoopTimer=null;
 let hoopShotActive=false,hoopBall=null,hoopScored=false;
-const HOOP_W=80,HOOP_H=60,HOOP_DURATION=8000;
+let HOOP_W=80,HOOP_H=60;
+const HOOP_DURATION=8000;
 // slide animation
 let hoopSlideX=HOOP_W+40; // start fully off screen right
 let hoopSliding=false;
@@ -323,14 +470,25 @@ let pickerTargetSpire=null;
 let savedPhysics=null;
 
 const ACTIONS=[
-  {id:'clear',   label:'Clear all',        default:'KeyC'},
-  {id:'burst',   label:'Big burst',        default:'KeyB'},
-  {id:'vibrate', label:'Toggle vibrate',   default:'KeyV'},
-  {id:'toggleUI',label:'Toggle UI',        default:'KeyH'},
-  {id:'hoop',    label:'Hoop shot',        default:'KeyO'},
-  {id:'bounce',  label:'Bounce all',       default:'KeyN'},
-  {id:'sizeUp',  label:'Size +10',         default:'Equal'},
-  {id:'sizeDown',label:'Size -10',         default:'Minus'},
+  // sprites
+  {id:'clear',        label:'Reset pets',       default:''},
+  {id:'burst',        label:'Burst spawn',         default:''},
+  {id:'vibrate',      label:'Toggle vibrate',      default:''},
+  {id:'bounce',       label:'Bounce pets',      default:''},
+  {id:'sizeUp',       label:'Size +10',            default:''},
+  {id:'sizeDown',     label:'Size -10',            default:''},
+  {id:'toggleUI',     label:'Toggle UI',           default:''},
+  {id:'hoop',         label:'Hoop shot',           default:''},
+  // global
+  {id:'gravFlip',     label:'Reverse gravity',     default:''},
+  {id:'zeroG',        label:'Zero G',              default:''},
+  {id:'freeze',       label:'Toggle freeze',       default:''},
+  {id:'explode',      label:'Explode everything',  default:''},
+  // viewers
+  {id:'viewerToggle', label:'Toggle viewers',      default:''},
+  {id:'viewerBounce', label:'Bounce viewers',      default:''},
+  // builder
+  {id:'builderToggle',label:'Toggle builder mode', default:''},
 ];
 let hotkeys={};
 ACTIONS.forEach(a=>hotkeys[a.id]=a.default);
@@ -473,7 +631,7 @@ function getFrictionMult(){
 
 function getHoopRect(){
   // hoopSlideX=0: on screen, hoopSlideX=HOOP_W+40: fully off right edge
-  const baseX=canvas.width-HOOP_W-30;
+  const baseX=canvas.width-HOOP_W-hoopRightMargin;
   return{x:baseX+hoopSlideX,y:canvas.height*(hoopHeightPct/100)+82,w:HOOP_W,h:HOOP_H};
 }
 function getHoopOpening(){
@@ -596,15 +754,15 @@ function drawHoop(now){
     if(now-hoopLastFrame>frameTime){hoopCurFrame=(hoopCurFrame+1)%hoopFrames.length;hoopLastFrame=now;}
     ctx.drawImage(hoopFrames[hoopCurFrame%hoopFrames.length].img,h.x,h.y,h.w,h.h);
   } else {
-    // backboard
-    ctx.fillStyle='rgba(255,255,255,0.07)';ctx.fillRect(h.x+h.w-10,h.y,10,h.h);
-    ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=1.5;ctx.strokeRect(h.x+h.w-10,h.y,10,h.h);
-    // rim
-    const rimY=h.y+h.h*0.45,rimX1=h.x+h.w*0.18,rimX2=h.x+h.w-10;
+    // backboard — thick black with white fill
+    ctx.fillStyle='rgba(255,255,255,0.12)';ctx.fillRect(h.x+h.w-12,h.y,12,h.h);
+    ctx.strokeStyle='#000';ctx.lineWidth=3;ctx.strokeRect(h.x+h.w-12,h.y,12,h.h);
+    // rim — red, thick
+    const rimY=h.y+h.h*0.45,rimX1=h.x+h.w*0.18,rimX2=h.x+h.w-12;
     ctx.beginPath();ctx.moveTo(rimX1,rimY);ctx.lineTo(rimX2,rimY);
-    ctx.strokeStyle='#EF9F27';ctx.lineWidth=4;ctx.stroke();
-    // net
-    ctx.strokeStyle='rgba(255,255,255,0.2)';ctx.lineWidth=1;
+    ctx.strokeStyle='#e02020';ctx.lineWidth=6;ctx.stroke();
+    // net — black, thicker
+    ctx.strokeStyle='rgba(0,0,0,0.7)';ctx.lineWidth=1.5;
     const nb=rimY+h.h*0.45;
     for(let i=0;i<=4;i++){const tx=rimX1+(rimX2-rimX1)*(i/4);ctx.beginPath();ctx.moveTo(tx,rimY);ctx.lineTo(rimX1+(rimX2-rimX1)*0.1+(rimX2-rimX1)*0.8*(i/4),nb);ctx.stroke();}
     for(let i=1;i<=3;i++){const ty=rimY+(nb-rimY)*(i/3),sh=i*0.06*(rimX2-rimX1);ctx.beginPath();ctx.moveTo(rimX1+sh,ty);ctx.lineTo(rimX2-sh,ty);ctx.stroke();}
@@ -664,6 +822,7 @@ function update(now){
 
   for(let s of spires){
     if(drag&&drag.spire===s)continue;
+    if(s._pickerFrozen){s.vx=0;s.vy=0;continue;} // frozen while costume picker is open
     if(vibrating&&!s.isHoopBall){s.vx+=(Math.random()-.5)*3;s.vy+=(Math.random()-.5)*3;}
     s.vy+=g;s.vx*=fr;s.vy*=fr;s.x+=s.vx;s.y+=s.vy;
     const sp=Math.sqrt(s.vx*s.vx+s.vy*s.vy);
@@ -780,6 +939,9 @@ canvas.addEventListener('touchend',()=>{drag=null;});
 
 function openPicker(spire,cx,cy){
   pickerTargetSpire=spire;
+  // freeze while menu is open
+  spire._pickerFrozen=true;
+  spire.vx=0;spire.vy=0;
   const el=document.getElementById('costumePicker');
   const list=document.getElementById('costumePickerList');
   list.innerHTML='';
@@ -795,7 +957,11 @@ function openPicker(spire,cx,cy){
   el.style.top=Math.min(cy,window.innerHeight-200)+'px';
   el.style.display='block';
 }
-function closePicker(){document.getElementById('costumePicker').style.display='none';pickerTargetSpire=null;}
+function closePicker(){
+  if(pickerTargetSpire){pickerTargetSpire._pickerFrozen=false;}
+  document.getElementById('costumePicker').style.display='none';
+  pickerTargetSpire=null;
+}
 document.getElementById('costumePickerNone').addEventListener('click',()=>{if(pickerTargetSpire)pickerTargetSpire.costumeId=null;closePicker();});
 document.addEventListener('mousedown',e=>{
   const picker=document.getElementById('costumePicker');
@@ -818,6 +984,13 @@ document.addEventListener('keydown',e=>{
       case 'bounce': bounceAll();break;
       case 'sizeUp': ensureAudio();adjustSize(10);break;
       case 'sizeDown': ensureAudio();adjustSize(-10);break;
+      case 'gravFlip': document.getElementById('gravFlipBtn').click();break;
+      case 'zeroG': document.getElementById('zeroGBtn').click();break;
+      case 'freeze': document.getElementById('freezeBtn').click();break;
+      case 'explode': document.getElementById('explosionBtn').click();break;
+      case 'viewerToggle': document.getElementById('viewerToggleBtn').click();break;
+      case 'viewerBounce': document.getElementById('petScatterBtn').click();break;
+      case 'builderToggle': document.getElementById('builderBtn').click();break;
     }
   }
 });
@@ -831,10 +1004,19 @@ function toggleVibrate(){
 function toggleUI(){
   uiVisible=!uiVisible;
   document.getElementById('topbar').classList.toggle('hidden',!uiVisible);
-  document.getElementById('showUIBtn').style.display=uiVisible?'none':'block';
+  const btn=document.getElementById('showUIBtn');
+  if(uiVisible){btn.style.display='none';btn.style.opacity='0';}
+  else{btn.style.display='block';}
 }
 document.getElementById('hideUIBtn').addEventListener('click',toggleUI);
 document.getElementById('showUIBtn').addEventListener('click',toggleUI);
+
+// reveal Show UI button only when mouse is within 40px of top
+document.addEventListener('mousemove',e=>{
+  if(uiVisible)return;
+  const btn=document.getElementById('showUIBtn');
+  btn.style.opacity=e.clientY<40?'1':'0';
+});
 
 document.getElementById('gravity').addEventListener('input',function(){config.gravity=parseFloat(this.value);document.getElementById('gv').textContent=parseFloat(this.value).toFixed(1);});
 document.getElementById('bounce').addEventListener('input',function(){config.bounce=parseFloat(this.value);document.getElementById('bv').textContent=parseFloat(this.value).toFixed(2);});
@@ -843,16 +1025,32 @@ document.getElementById('size').addEventListener('input',function(){
   config.size=parseInt(this.value);document.getElementById('sv').textContent=config.size;
   for(let s of spires){s.r=config.size;s.mass=config.size/24;}
 });
+document.getElementById('viewerSize').addEventListener('input',function(){
+  petSize=parseInt(this.value);document.getElementById('vsv').textContent=petSize;
+  pets.forEach(p=>{p.w=petSize;p.h=petSize;p.spriteEl.width=petSize;p.spriteEl.height=petSize;p.el.style.width=petSize+'px';});
+});
 document.getElementById('bounceBtn').addEventListener('click',bounceAll);
 document.getElementById('resetBtn').addEventListener('click',()=>{
   spires=[];
   clearTimeout(hoopTimer);
   hoopTimer=null;hoopVisible=false;hoopSlideDir=0;hoopSlideX=HOOP_W+40;
   hoopBall=null;hoopShotActive=false;savedPhysics=null;
+  // reset physics to defaults
+  config.gravity=1;config.bounce=0.7;config.friction=0;config.size=24;
+  document.getElementById('gravity').value=1;document.getElementById('gv').textContent='1.0';
+  document.getElementById('bounce').value=0.7;document.getElementById('bv').textContent='0.70';
+  document.getElementById('friction').value=0;document.getElementById('fv').textContent='0.00';
+  document.getElementById('size').value=24;document.getElementById('sv').textContent='24';
+  // reset gravity flip toggle state
+  gravReversed=false;
+  document.getElementById('gravFlipBtn').classList.remove('active');
+  document.getElementById('gravFlipBtn').textContent='Reverse gravity';
 });
 document.getElementById('burstBtn').addEventListener('click',()=>{for(let i=0;i<20;i++)setTimeout(()=>spawnAt(canvas.width/2+(Math.random()-.5)*200,canvas.height/2+(Math.random()-.5)*200),i*30);});
 document.getElementById('vibeBtn').addEventListener('click',toggleVibrate);
 document.getElementById('hoopShotBtn').addEventListener('click',()=>{ensureAudio();fireHoopShot();});
+document.getElementById('brTopBtn').addEventListener('click',startBattleRoyale);
+document.getElementById('warTopBtn').addEventListener('click',startWar);
 
 document.getElementById('settingsBtn').addEventListener('click',()=>document.getElementById('settingsPanel').classList.add('open'));
 document.getElementById('closeSettings').addEventListener('click',()=>document.getElementById('settingsPanel').classList.remove('open'));
@@ -866,7 +1064,15 @@ document.querySelectorAll('.stab').forEach(btn=>{
 });
 document.getElementById('bgColor').addEventListener('input',function(){bgColor=this.value;savePrefs();});
 document.getElementById('fps').addEventListener('input',function(){fps=Math.max(1,parseInt(this.value)||12);frameTime=1000/fps;savePrefs();});
+document.getElementById('hoopSizeSlider').addEventListener('input',function(){
+  HOOP_W=parseInt(this.value);
+  HOOP_H=Math.round(HOOP_W*0.75); // maintain 4:3 ratio
+  document.getElementById('hoopSizeVal').textContent=HOOP_W+'px';
+  // reset slide offset so hoop doesn't appear stuck off-screen
+  if(!hoopVisible)hoopSlideX=HOOP_W+40;
+});
 document.getElementById('hoopHeightSlider').addEventListener('input',function(){hoopHeightPct=parseInt(this.value);document.getElementById('hoopHeightVal').textContent=hoopHeightPct+'%';savePrefs();});
+document.getElementById('hoopRightSlider').addEventListener('input',function(){hoopRightMargin=parseInt(this.value);document.getElementById('hoopRightVal').textContent=hoopRightMargin+'px';});
 
 function updateCostumeSelect(){
   const sel=document.getElementById('costumeSelect');
@@ -929,6 +1135,18 @@ function renderHoopFrameList(){
     thumb.appendChild(img);thumb.appendChild(fdel);list.appendChild(thumb);
   });
 }
+document.getElementById('hoopToggleBtn').addEventListener('click',()=>{
+  const btn=document.getElementById('hoopToggleBtn');
+  if(hoopVisible||hoopSlideDir===-1){
+    startHoopSlideOut();
+    btn.textContent='Show hoop';
+    btn.style.background='rgba(239,159,39,0.08)';
+  } else {
+    startHoopSlideIn();
+    btn.textContent='Hide hoop';
+    btn.style.background='rgba(239,159,39,0.25)';
+  }
+});
 document.getElementById('addHoopFrameBtn').addEventListener('click',()=>document.getElementById('hoopFileInput').click());
 document.getElementById('hoopFileInput').addEventListener('change',function(){
   Array.from(this.files).forEach(file=>{
@@ -988,59 +1206,11 @@ buildHotkeyTable(); // rebuild after load so restored keys are shown
 // TWITCH CHAT PETS
 // ═══════════════════════════════════════════════════════════
 
-// inject Twitch tab panel
-(function(){
-  const panel=document.createElement('div');
-  panel.className='stabpanel';panel.id='tab-twitch';
-  panel.innerHTML=`
-    <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">
-      Connects to Twitch chat via IRC (anonymous, read-only). Viewers who chat spawn as desktop pets that walk along the bottom. Grab and toss them!
-    </p>
-    <div class="srow">
-      <label>Twitch channel name</label>
-      <div style="display:flex;gap:8px;">
-        <input type="text" id="twitchChannel" placeholder="yourchannelname" style="flex:1;">
-        <button id="twitchConnectBtn" style="padding:7px 14px;border-radius:8px;border:0.5px solid rgba(127,119,221,0.5);background:rgba(127,119,221,0.15);color:#b8b2ff;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;">Connect</button>
-        <button id="twitchDisconnectBtn" style="padding:7px 10px;border-radius:8px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);font-size:13px;cursor:pointer;font-family:inherit;">✕</button>
-      </div>
-      <div id="twitchStatus" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:6px;">Not connected</div>
-      <button id="testPetBtn" style="margin-top:8px;width:100%;padding:6px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;font-family:inherit;">+ Spawn test pet (preview)</button>
-    </div>
-    <div class="srow">
-      <label>Pet sprite (all viewers share this)</label>
-      <div id="petFrameList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
-      <button class="addFrameBtn" id="addPetFrameBtn" style="width:48px;height:48px;">+</button>
-      <input type="file" id="petFileInput" multiple accept="image/*" style="display:none;">
-      <p style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px;">Upload frames for the walking animation. If none, a coloured blob is used.</p>
-    </div>
-    <div class="srow">
-      <label>Pet size (px)</label>
-      <input type="number" id="petSize" value="48" min="16" max="128">
-    </div>
-    <div class="srow">
-      <label>Walk speed</label>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="range" id="petSpeed" min="0.3" max="4" step="0.1" value="1.2" style="flex:1;accent-color:#7F77DD;">
-        <span id="petSpeedVal" style="font-size:12px;color:#fff;min-width:28px;">1.2</span>
-      </div>
-    </div>
-    <div class="srow">
-      <label>Max pets on screen</label>
-      <input type="number" id="maxPets" value="30" min="1" max="100">
-    </div>
-    <div class="srow">
-      <label>Speech bubble duration (seconds)</label>
-      <input type="number" id="bubbleDur" value="5" min="1" max="30">
-    </div>
-    <hr class="sdivider">
-    <button id="clearPetsBtn" style="width:100%;padding:8px;border-radius:8px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);font-size:12px;cursor:pointer;font-family:inherit;">Clear all pets</button>
-  `;
-  document.getElementById('settingsBox').insertBefore(panel, document.querySelector('.sclose'));
-})();
+
 
 // ── pet state ─────────────────────────────────────────────
 let petFrames=[]; // loaded images for walking animation
-let petSize=48, petSpeed=1.2, maxPets=30, bubbleDur=5;
+let petSize=48, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
 let pets=[]; // array of ChatPet objects
 let petFileInput=null;
 const LS_PET='lpp_pet5', LS_TCHAN='lpp_tchan5';
@@ -1051,16 +1221,23 @@ class ChatPet{
   constructor(username,color){
     this.username=username;
     this.color=color||PET_COLORS[Math.floor(Math.random()*PET_COLORS.length)];
-    this.x=Math.random()*window.innerWidth;
-    this.y=0; // will be set to floor
-    this.vx=(Math.random()<0.5?-1:1)*(0.5+Math.random()*petSpeed);
-    this.vy=0;
     this.w=petSize; this.h=petSize;
+    this.x=window.innerWidth+this.w; // spawn off-screen right, walk in
+    this.y=window.innerHeight-this.h; // spawn at ground level
+    this.vx=-(0.5+Math.random()*petSpeed); // always walk left (into screen)
+    this.vy=0;
     this.frame=0; this.lastFrame=0;
     this.facingLeft=this.vx<0;
     this.bubble=null; this.bubbleTimer=0;
     this.grabbed=false; this.grabVX=0; this.grabVY=0;
     this.airborne=false;
+    this.pinned=false; // when true, locked in place
+    this.customImg=null; // per-viewer custom image override
+    // Battle Royale state
+    this.hp=100; this.maxHp=100; this.alive=true;
+    this.brCooldown=0;
+    this.brAngle=0; // current rotation angle for attack animation
+    this.brAngleTarget=0; // target rotation
     this.el=null;
     this.buildEl();
   }
@@ -1080,17 +1257,29 @@ class ChatPet{
 
     this.el.appendChild(this.nameEl);
     this.el.appendChild(this.spriteEl);
+
+    // health bar as DOM element (above nameEl, hidden until BR)
+    this.healthBarWrap=document.createElement('div');
+    this.healthBarWrap.style.cssText='display:none;width:100%;height:6px;background:rgba(0,0,0,0.5);border-radius:3px;margin-bottom:2px;overflow:hidden;position:relative;';
+    this.healthBarFill=document.createElement('div');
+    this.healthBarFill.style.cssText='height:100%;width:100%;background:#50c850;border-radius:3px;transition:width 0.1s,background 0.2s;';
+    this.healthBarWrap.appendChild(this.healthBarFill);
+    this.el.insertBefore(this.healthBarWrap,this.nameEl);
+
     document.body.appendChild(this.el);
     this.el.style.pointerEvents='auto';
 
-    // grab on mousedown/touchstart
     this.el.addEventListener('mousedown',e=>{e.preventDefault();startGrabPet(this,e.clientX,e.clientY);});
+    this.el.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();releasePet();});
     this.el.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];startGrabPet(this,t.clientX,t.clientY);},{passive:false});
+    // right-click → assign custom image
+    this.el.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();openPetImagePicker(this,e.clientX,e.clientY);});
   }
   say(msg){
     if(this.bubble)this.bubble.remove();
     this.bubble=document.createElement('div');
     this.bubble.className='speech-bubble';
+    this.bubble.style.fontSize=bubbleFontSize+'px';
     this.bubble.textContent=msg;
     this.el.appendChild(this.bubble);
     this.bubbleTimer=bubbleDur*60;
@@ -1098,15 +1287,15 @@ class ChatPet{
   drawSprite(now){
     const ctx2=this.spriteEl.getContext('2d');
     ctx2.clearRect(0,0,this.w,this.h);
-    if(petFrames.length>0){
-      // advance frame
-      if(now-this.lastFrame>frameTime){this.frame=(this.frame+1)%petFrames.length;this.lastFrame=now;}
+
+    const img=this.customImg||(petFrames.length>0?petFrames[this.frame%petFrames.length]:null);
+    if(img){
+      if(!this.customImg&&petFrames.length>1&&now-this.lastFrame>frameTime){this.frame=(this.frame+1)%petFrames.length;this.lastFrame=now;}
       ctx2.save();
       if(this.facingLeft){ctx2.translate(this.w,0);ctx2.scale(-1,1);}
-      ctx2.drawImage(petFrames[this.frame%petFrames.length],0,0,this.w,this.h);
+      ctx2.drawImage(img,0,0,this.w,this.h);
       ctx2.restore();
     } else {
-      // fallback: coloured blob with face
       ctx2.fillStyle=this.color;
       ctx2.beginPath();ctx2.arc(this.w/2,this.h/2,this.w*0.42,0,Math.PI*2);ctx2.fill();
       ctx2.fillStyle='rgba(0,0,0,0.5)';
@@ -1115,52 +1304,83 @@ class ChatPet{
       ctx2.beginPath();ctx2.arc(ex2,this.h*0.38,this.w*0.07,0,Math.PI*2);ctx2.fill();
       ctx2.beginPath();ctx2.arc(this.w/2,this.h*0.55,this.w*0.12,0,Math.PI);ctx2.fill();
     }
+
+    // update DOM health bar
+    if((battleRoyaleActive||warActive)&&this.alive){
+      this.healthBarWrap.style.display='block';
+      const ratio=Math.max(0,this.hp/this.maxHp);
+      this.healthBarFill.style.width=(ratio*100)+'%';
+      this.healthBarFill.style.background=ratio>0.5?`rgb(${Math.round((1-ratio)*2*255)},200,50)`:`rgb(220,${Math.round(ratio*2*200)},40)`;
+    } else {
+      this.healthBarWrap.style.display='none';
+    }
   }
   update(now){
     const W=window.innerWidth, H=window.innerHeight;
-    const floor=H-this.h;
+    const g=config.gravity*0.4;
+    const gravDown=g>=0;
+    const screenFloor=gravDown ? H-this.h : 0;
+
+    // pinned or menu-frozen — stay put, just draw
+    if(this.pinned||this._menuFrozen){
+      this.vx=0;this.vy=0;
+      this.el.style.left=this.x+'px';
+      this.el.style.bottom=(H-this.y-this.h)+'px';
+      this.drawSprite(now);
+      return;
+    }
 
     if(!this.grabbed){
-      // gravity when airborne
-      if(this.airborne){
-        this.vy+=config.gravity*0.4; // same gravity as sprites
-        this.x+=this.vx;
-        this.y+=this.vy;
-        // floor landing — small bounce
-        if(this.y>=floor){
-          this.y=floor;
-          const impactSpeed=Math.abs(this.vy);
-          if(impactSpeed>2){
-            // bounce with damping
-            this.vy=-impactSpeed*0.35;
-            this.vx*=0.75;
-            // stay airborne if still bouncing meaningfully
-            if(Math.abs(this.vy)<0.8){
-              this.vy=0;this.airborne=false;
-              this.vx=(Math.random()<0.5?-1:1)*(0.4+Math.random()*petSpeed);
-            }
-          } else {
-            this.vy=0;this.airborne=false;
-            this.vx=(Math.random()<0.5?-1:1)*(0.4+Math.random()*petSpeed);
-          }
+      // always apply gravity — pets are never "rooted" unless walking on a surface
+      this.vy+=g;
+      this.x+=this.vx;
+      this.y+=this.vy;
+
+      let onSurface=false;
+
+      // floor / ceiling collision depending on gravity direction
+      if(gravDown){
+        if(this.y>=screenFloor){
+          this.y=screenFloor;
+          const imp=Math.abs(this.vy);
+          if(imp>2){this.vy=-imp*0.35;this.vx*=0.75;if(Math.abs(this.vy)<0.8){this.vy=0;onSurface=true;}}
+          else{this.vy=0;onSurface=true;}
         }
-        // walls
-        if(this.x<0){this.x=0;this.vx=Math.abs(this.vx)*0.6;}
-        if(this.x+this.w>W){this.x=W-this.w;this.vx=-Math.abs(this.vx)*0.6;}
         if(this.y<0){this.y=0;this.vy=Math.abs(this.vy)*0.4;}
       } else {
-        // walk on floor
-        this.y=floor;
-        this.x+=this.vx;
+        // negative gravity — ceiling is the "floor"
+        if(this.y<=0){
+          this.y=0;
+          const imp=Math.abs(this.vy);
+          if(imp>2){this.vy=imp*0.35;this.vx*=0.75;if(Math.abs(this.vy)<0.8){this.vy=0;onSurface=true;}}
+          else{this.vy=0;onSurface=true;}
+        }
+        if(this.y+this.h>H){this.y=H-this.h;this.vy=-Math.abs(this.vy)*0.4;}
+      }
+
+      // left/right walls
+      if(this.x<0){this.x=0;this.vx=Math.abs(this.vx)*0.6;}
+      if(this.x+this.w>W){this.x=W-this.w;this.vx=-Math.abs(this.vx)*0.6;}
+
+      if(onSurface){
+        // walking state
+        this.airborne=false;
+        if(Math.abs(this.vx)<0.3)this.vx=(Math.random()<0.5?-1:1)*(0.4+Math.random()*petSpeed);
         // random direction change
         if(Math.random()<0.005)this.vx*=-1;
-        // wall bounce
-        if(this.x<=0){this.x=0;this.vx=Math.abs(this.vx)||petSpeed*0.5;}
-        if(this.x+this.w>=W){this.x=W-this.w;this.vx=-(Math.abs(this.vx)||petSpeed*0.5);}
-        // clamp walk speed
         const maxV=petSpeed*1.8;
         this.vx=Math.max(-maxV,Math.min(maxV,this.vx));
+        if(this.x<=0){this.x=0;this.vx=Math.abs(this.vx)||petSpeed*0.5;}
+        if(this.x+this.w>=W){this.x=W-this.w;this.vx=-(Math.abs(this.vx)||petSpeed*0.5);}
+      } else if(!this.airborne && Math.abs(this.vy)<0.1 && Math.abs(g)<0.01){
+        // zero gravity walk
+        if(Math.random()<0.005)this.vx*=-1;
+        if(this.x<=0){this.x=0;this.vx=Math.abs(this.vx)||petSpeed*0.5;}
+        if(this.x+this.w>=W){this.x=W-this.w;this.vx=-(Math.abs(this.vx)||petSpeed*0.5);}
+      } else {
+        this.airborne=true;
       }
+
       this.facingLeft=this.vx<0;
     }
 
@@ -1170,22 +1390,28 @@ class ChatPet{
       if(this.bubbleTimer<=0&&this.bubble){this.bubble.remove();this.bubble=null;}
     }
 
-    // push from physics spires (always)
+    // push from physics spires AND push spires back (Newton 3rd law)
     for(let s of spires){
+      if(this.pinned)break; // pinned viewers ignore physics
       const px=this.x+this.w/2, py=this.y+this.h/2;
       const dx=px-s.x, dy=py-s.y;
       const dist=Math.sqrt(dx*dx+dy*dy);
-      const minD=s.r+this.w*0.45;
+      const minD=s.r+this.w*0.4;
       if(dist<minD&&dist>0){
         const nx=dx/dist, ny=dy/dist;
-        const push=(minD-dist)*0.5;
-        this.vx+=nx*push+s.vx*0.35;
-        this.vy+=ny*push+s.vy*0.35;
-        if(!this.airborne)this.airborne=true;
+        const overlap=(minD-dist);
+        const push=overlap*0.4;
+        // push pet away
+        this.vx+=nx*push+s.vx*0.25;
+        this.vy+=ny*push+s.vy*0.25;
+        this.airborne=true;
+        // push sprite back (reaction force)
+        s.vx-=nx*push*0.5;
+        s.vy-=ny*push*0.5;
       }
     }
 
-    // push from other pets ONLY when airborne (not while walking past)
+    // push from other pets ONLY when airborne
     if(this.airborne){
       for(let p of pets){
         if(p===this||!p.airborne)continue;
@@ -1273,13 +1499,370 @@ function getOrCreatePet(username,color){
   const pet=new ChatPet(username,color);
   petMap[username]=pet;
   pets.push(pet);
+  applyViewerImgToPet(pet);
   return pet;
 }
 function clearAllPets(){
   pets.forEach(p=>p.destroy());
   pets=[];
   for(const k in petMap)delete petMap[k];
+  if(battleRoyaleActive)endBattleRoyale();
 }
+
+// ── bubble font size ──────────────────────────────────────
+let bubbleFontSize=11;
+
+// ── per-viewer image picker ────────────────────────────────
+const LS_VIEWER_IMGS='lpp_vi5';
+let viewerImgMap={}; // username → data URL
+(function(){try{const r=localStorage.getItem(LS_VIEWER_IMGS);if(r)viewerImgMap=JSON.parse(r);}catch(e){}})();
+function saveViewerImgs(){try{localStorage.setItem(LS_VIEWER_IMGS,JSON.stringify(viewerImgMap));}catch(e){console.warn('viewer img storage full');}}
+
+// Inject picker popup HTML
+const vip=document.createElement('div');
+vip.id='petImgPicker';
+vip.style.cssText='display:none;position:fixed;z-index:400;background:#1c1c1c;border:0.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:8px;min-width:130px;box-shadow:0 4px 20px rgba(0,0,0,0.7);';
+vip.innerHTML=`<div style="margin-bottom:6px;">
+<button id="petPinBtn" title="Pin / Unpin" style="width:100%;padding:7px;border-radius:6px;border:0.5px solid rgba(127,119,221,0.4);background:rgba(127,119,221,0.1);color:#b8b2ff;font-size:16px;cursor:pointer;font-family:inherit;">📌</button>
+</div>
+<div style="display:flex;gap:6px;">
+<button id="petImgUploadBtn" title="Upload custom image" style="flex:1;padding:6px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.7);font-size:15px;cursor:pointer;font-family:inherit;">+</button>
+<button id="petImgClearBtn" title="Remove custom image" style="flex:1;padding:6px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);font-size:12px;cursor:pointer;font-family:inherit;">Clear</button>
+</div>
+<input type="file" id="petImgFileInput" accept="image/*" style="display:none;">`;
+document.body.appendChild(vip);
+
+let petImgTarget=null;
+function openPetImagePicker(pet,cx,cy){
+  petImgTarget=pet;
+  // freeze in place while menu is open so it doesn't fall away
+  pet._menuFrozen=true;
+  pet.vx=0;pet.vy=0;pet.airborne=false;
+  const pinBtn=document.getElementById('petPinBtn');
+  pinBtn.style.background=pet.pinned?'rgba(127,119,221,0.4)':'rgba(127,119,221,0.1)';
+  pinBtn.style.borderColor=pet.pinned?'#7F77DD':'rgba(127,119,221,0.4)';
+  vip.style.left=Math.min(cx,window.innerWidth-160)+'px';
+  vip.style.top=Math.min(cy,window.innerHeight-100)+'px';
+  vip.style.display='block';
+}
+function closePetImagePicker(){
+  if(petImgTarget){
+    petImgTarget._menuFrozen=false;
+    // if not pinned, let gravity take over again
+    if(!petImgTarget.pinned)petImgTarget.airborne=true;
+  }
+  vip.style.display='none';petImgTarget=null;
+}
+
+document.getElementById('petPinBtn').addEventListener('click',()=>{
+  if(!petImgTarget)return;
+  petImgTarget.pinned=!petImgTarget.pinned;
+  if(petImgTarget.pinned){
+    petImgTarget.vx=0;petImgTarget.vy=0;petImgTarget.airborne=false;
+    // add a small pin indicator on the name
+    petImgTarget.nameEl.textContent='📌 '+petImgTarget.username;
+  } else {
+    petImgTarget.nameEl.textContent=petImgTarget.username;
+  }
+  closePetImagePicker();
+});
+document.getElementById('petImgUploadBtn').addEventListener('click',()=>document.getElementById('petImgFileInput').click());
+document.getElementById('petImgFileInput').addEventListener('change',function(){
+  const file=this.files[0];if(!file||!petImgTarget)return;
+  // capture before closing — async load would lose petImgTarget otherwise
+  const target=petImgTarget;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      target.customImg=img;
+      viewerImgMap[target.username]=ev.target.result;
+      saveViewerImgs();
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  closePetImagePicker();this.value='';
+});
+document.getElementById('petImgClearBtn').addEventListener('click',()=>{
+  if(!petImgTarget)return;
+  petImgTarget.customImg=null;
+  delete viewerImgMap[petImgTarget.username];
+  saveViewerImgs();
+  closePetImagePicker();
+});
+document.addEventListener('mousedown',e=>{if(vip.style.display!=='none'&&!vip.contains(e.target))closePetImagePicker();});
+
+// restore saved custom images when pets spawn
+function applyViewerImgToPet(pet){
+  const src=viewerImgMap[pet.username];
+  if(!src)return;
+  const img=new Image();img.onload=()=>{pet.customImg=img;};img.src=src;
+}
+
+// ── BATTLE ROYALE ─────────────────────────────────────────
+let battleRoyaleActive=false;
+let brInterval=null;
+
+function startBattleRoyale(){
+  if(pets.length<2){return;}
+  battleRoyaleActive=true;
+  spires=[];
+  // HP scales: 2 fighters = 20hp (2 hits), 10+ fighters = 100hp (10 hits). Each hit ~10hp avg.
+  const count=pets.length;
+  const maxHP=Math.min(10,count)*10;
+  pets.forEach(p=>{
+    p.hp=maxHP;p.maxHp=maxHP;p.alive=true;p.brCooldown=0;p.brAngle=0;p.brAngleTarget=0;
+    p.x=Math.random()*(window.innerWidth-p.w);
+    p.y=window.innerHeight-p.h;
+    p.vx=(Math.random()-.5)*4;
+    p.vy=-3-Math.random()*3;
+    p.airborne=true;
+    p.el.style.transition='none';
+    p.el.style.display='flex';
+    p.el.style.opacity='1';
+    p.el.style.filter='none';
+  });
+  clearInterval(brInterval);
+  brInterval=setInterval(()=>{
+    if(!battleRoyaleActive)return;
+    const alive=pets.filter(p=>p.alive);
+    // check win condition
+    if(alive.length<=1){
+      if(alive.length===1){
+        alive[0].say('👑 I WIN!');
+        alive[0].brAngleTarget=0;
+      }
+      endBattleRoyale();
+      return;
+    }
+    for(const p of alive){
+      if(p.grabbed||p.pinned)continue;
+      // find nearest opponent
+      let nearest=null,nearDist=Infinity;
+      for(const q of alive){
+        if(q===p)continue;
+        const d=Math.hypot((q.x+q.w/2)-(p.x+p.w/2),(q.y+q.h/2)-(p.y+p.h/2));
+        if(d<nearDist){nearDist=d;nearest=q;}
+      }
+      if(!nearest)continue;
+      const dx=(nearest.x+nearest.w/2)-(p.x+p.w/2);
+      const dy=(nearest.y+nearest.h/2)-(p.y+p.h/2);
+      const dist=Math.sqrt(dx*dx+dy*dy)||1;
+      // point toward nearest
+      p.brAngleTarget=Math.atan2(dy,dx)+Math.PI/2;
+      // wander toward
+      const dir=dx>0?1:-1;
+      p.vx+=dir*0.5;
+      if(Math.abs(p.vx)>petSpeed*3)p.vx=dir*petSpeed*3;
+      p.facingLeft=dir<0;
+      // attack if in range
+      if(p.brCooldown>0){p.brCooldown--;continue;}
+      const range=p.w*2.8;
+      if(dist<range){
+        if(Math.random()<0.5){
+          // hit
+          const dmg=8+Math.floor(Math.random()*4); // avg 10hp per hit
+          nearest.hp=Math.max(0,nearest.hp-dmg);
+          const nx=dx/dist, ny=dy/dist;
+          nearest.vx+=nx*5;nearest.vy-=4;nearest.airborne=true;
+          p.brCooldown=35+Math.floor(Math.random()*25);
+          // spin attacker briefly
+          p.brAngleTarget+=Math.PI*0.5*(Math.random()<0.5?1:-1);
+          if(nearest.hp<=0){
+            nearest.alive=false;
+            if(nearest.bubble){nearest.bubble.remove();nearest.bubble=null;}
+            nearest.healthBarWrap.style.display='none';
+            nearest.brAngleTarget=Math.PI*4*(Math.random()<0.5?1:-1);
+            // fade and fly off, then hide completely
+            nearest.vx=(Math.random()<0.5?-1:1)*(10+Math.random()*8);
+            nearest.vy=-(8+Math.random()*5);
+            nearest.airborne=true;
+            nearest.el.style.transition='opacity 0.8s';
+            nearest.el.style.opacity='0';
+            setTimeout(()=>{if(!nearest.alive)nearest.el.style.display='none';},900);
+          }
+        } else {
+          // miss — stumble
+          p.brCooldown=15;
+          p.vx-=dx/dist*2;
+        }
+      }
+    }
+  },180);
+}
+
+function endBattleRoyale(){
+  battleRoyaleActive=false;
+  clearInterval(brInterval);brInterval=null;
+  setTimeout(()=>{
+    pets.forEach(p=>{
+      p.alive=true;p.hp=p.maxHp||100;
+      p.el.style.transition='opacity 0.6s';
+      p.el.style.display='flex';
+      p.el.style.filter='none';
+      p.brAngle=0;p.brAngleTarget=0;
+      p.healthBarWrap.style.display='none';
+      p.x=Math.random()*(window.innerWidth-p.w);
+      p.y=window.innerHeight-p.h;
+      p.vx=(Math.random()-.5)*3;
+      p.vy=-2-Math.random()*2;
+      p.airborne=true;
+      requestAnimationFrame(()=>{p.el.style.opacity='1';});
+    });
+  },2500);
+}
+
+// ── FIGHT SETTINGS ────────────────────────────────────────
+let teamAEmoji='⚔️', teamBEmoji='🛡️';
+let teamACry='For glory!', teamBCry='Hold the line!';
+let brCheckInterval=180, brAttackRange=2.8;
+
+// ══════════════════════════════════════════════════════════
+// WAR MODE
+// ══════════════════════════════════════════════════════════
+let warActive=false;
+let warInterval=null;
+
+function startWar(){
+  if(pets.length<2)return;
+  if(warActive)endWar();
+  if(battleRoyaleActive)endBattleRoyale();
+  warActive=true;
+  spires=[];
+
+  // split into two teams alternately (shuffle first)
+  const shuffled=[...pets].sort(()=>Math.random()-0.5);
+  const mid=Math.floor(shuffled.length/2);
+  const count=pets.length;
+  const maxHP=Math.min(10,count)*10;
+
+  shuffled.forEach((p,i)=>{
+    p.team=i<mid?'A':'B';
+    p.hp=maxHP;p.maxHp=maxHP;p.alive=true;p.brCooldown=0;p.brAngle=0;p.brAngleTarget=0;
+    p.el.style.display='flex';p.el.style.opacity='1';p.el.style.filter='none';
+    p.el.style.transition='none';
+    // spawn team A from bottom-left corner, team B from bottom-right corner
+    const teamIdx=shuffled.filter((q,j)=>j<i&&q.team===p.team).length;
+    if(p.team==='A'){
+      p.x=teamIdx*p.w*0.4; // stack near left edge
+    } else {
+      p.x=window.innerWidth-(p.w)-(teamIdx*p.w*0.4); // stack near right edge
+    }
+    p.y=window.innerHeight-p.h;
+    p.vx=(p.team==='A'?1:-1)*(1+Math.random()*petSpeed);
+    p.vy=-3-Math.random()*3;
+    p.airborne=true;
+    // set team name label
+    const emoji=p.team==='A'?teamAEmoji:teamBEmoji;
+    p.nameEl.textContent=emoji+' '+p.username;
+    p.nameEl.style.color=p.team==='A'?'#5588ff':'#ff5555';
+    // war cry with slight stagger so bubbles don't all overlap at once
+    const cry=p.team==='A'?teamACry:teamBCry;
+    if(cry){setTimeout(()=>{if(p.alive)p.say(cry);},300+teamIdx*120);}
+  });
+
+  clearInterval(warInterval);
+  warInterval=setInterval(()=>{
+    if(!warActive)return;
+    const aliveA=pets.filter(p=>p.alive&&p.team==='A');
+    const aliveB=pets.filter(p=>p.alive&&p.team==='B');
+
+    // win conditions
+    if(aliveA.length===0||aliveB.length===0){
+      const winner=aliveA.length>0?'A':'B';
+      const emoji=winner==='A'?teamAEmoji:teamBEmoji;
+      const winTeam=winner==='A'?aliveA:aliveB;
+      winTeam.forEach(p=>p.say(`${emoji} VICTORY!`));
+      endWar();
+      return;
+    }
+
+    // combat: each fighter attacks nearest enemy
+    const alive=pets.filter(p=>p.alive);
+    for(const p of alive){
+      if(p.grabbed||p.pinned)continue;
+      // find nearest enemy
+      const enemies=alive.filter(q=>q.team!==p.team);
+      let nearest=null,nearDist=Infinity;
+      for(const q of enemies){
+        const d=Math.hypot((q.x+q.w/2)-(p.x+p.w/2),(q.y+q.h/2)-(p.y+p.h/2));
+        if(d<nearDist){nearDist=d;nearest=q;}
+      }
+      if(!nearest)continue;
+      const dx=(nearest.x+nearest.w/2)-(p.x+p.w/2);
+      const dy=(nearest.y+nearest.h/2)-(p.y+p.h/2);
+      const dist=Math.sqrt(dx*dx+dy*dy)||1;
+      p.brAngleTarget=Math.atan2(dy,dx)+Math.PI/2;
+      // move toward enemy
+      const dir=dx>0?1:-1;
+      p.vx+=dir*0.5;
+      if(Math.abs(p.vx)>petSpeed*3)p.vx=dir*petSpeed*3;
+      p.facingLeft=dir<0;
+
+      if(p.brCooldown>0){p.brCooldown--;continue;}
+      const range=p.w*brAttackRange;
+      if(dist<range){
+        if(Math.random()<0.5){
+          const dmg=8+Math.floor(Math.random()*6);
+          nearest.hp=Math.max(0,nearest.hp-dmg);
+          const nx=dx/dist;
+          nearest.vx+=nx*5;nearest.vy-=4;nearest.airborne=true;
+          p.brCooldown=35+Math.floor(Math.random()*25);
+          p.brAngleTarget+=Math.PI*0.5*(Math.random()<0.5?1:-1);
+          if(nearest.hp<=0){
+            nearest.alive=false;
+            if(nearest.bubble){nearest.bubble.remove();nearest.bubble=null;}
+            nearest.healthBarWrap.style.display='none';
+            nearest.brAngleTarget=Math.PI*4*(Math.random()<0.5?1:-1);
+            nearest.vx=(Math.random()<0.5?-1:1)*(10+Math.random()*8);
+            nearest.vy=-(8+Math.random()*5);
+            nearest.airborne=true;
+            nearest.el.style.transition='opacity 0.8s';
+            nearest.el.style.opacity='0';
+            setTimeout(()=>{if(!nearest.alive)nearest.el.style.display='none';},900);
+          }
+        } else {
+          p.brCooldown=15;
+          p.vx-=dx/dist*2;
+        }
+      }
+    }
+  },brCheckInterval);
+}
+
+function endWar(){
+  warActive=false;
+  clearInterval(warInterval);warInterval=null;
+  setTimeout(()=>{
+    pets.forEach(p=>{
+      p.alive=true;p.hp=p.maxHp||100;p.team=null;
+      p.el.style.transition='opacity 0.6s';
+      p.el.style.display='flex';p.el.style.opacity='1';p.el.style.filter='none';
+      p.brAngle=0;p.brAngleTarget=0;p.healthBarWrap.style.display='none';
+      // restore original name
+      const pinPrefix=p.pinned?'📌 ':'';
+      p.nameEl.textContent=pinPrefix+p.username;
+      p.nameEl.style.color=p.color;
+      p.x=Math.random()*(window.innerWidth-p.w);
+      p.y=window.innerHeight-p.h;
+      p.vx=(Math.random()-.5)*3;p.vy=-2-Math.random()*2;p.airborne=true;
+      requestAnimationFrame(()=>{p.el.style.opacity='1';});
+    });
+  },2500);
+}
+
+// also expose warActive to health bar drawing
+// (reuse battleRoyaleActive check — patch drawSprite to also show HP in war)
+const _origBattleCheck=()=>battleRoyaleActive||warActive;
+
+// ── fight settings wiring ─────────────────────────────────
+document.getElementById('teamAEmoji').addEventListener('input',function(){teamAEmoji=this.value||'⚔️';});
+document.getElementById('teamBEmoji').addEventListener('input',function(){teamBEmoji=this.value||'🛡️';});
+document.getElementById('teamACry').addEventListener('input',function(){teamACry=this.value;});
+document.getElementById('teamBCry').addEventListener('input',function(){teamBCry=this.value;});
+document.getElementById('brInterval').addEventListener('input',function(){brCheckInterval=Math.max(50,parseInt(this.value)||180);});
+document.getElementById('brRange').addEventListener('input',function(){brAttackRange=Math.max(1,parseFloat(this.value)||2.8);});
 
 // ── Twitch chat via anonymous IRC WebSocket ───────────────
 // tmi.js dynamic loading is unreliable from local files.
@@ -1333,10 +1916,17 @@ function _doConnect(){
       const pm=msg.match(/^:(\w+)!\w+@\S+ PRIVMSG #\S+ :(.+)$/);
       if(pm){
         const username=tags['display-name']||pm[1];
-        const text=pm[2];
+        const text=pm[2].trim();
         const color=tags['color']||null;
         const pet=getOrCreatePet(username,color||undefined);
         if(pet)pet.say(text);
+        // battle royale command — only channel owner (matches channel name)
+        if(text.toLowerCase()==='!battleroyale'&&twitchChannel&&username.toLowerCase()===twitchChannel.toLowerCase()){
+          setTimeout(startBattleRoyale,500);
+        }
+        if(text.toLowerCase()==='!war'&&twitchChannel&&username.toLowerCase()===twitchChannel.toLowerCase()){
+          setTimeout(startWar,500);
+        }
       }
     }
   };
@@ -1400,7 +1990,6 @@ document.getElementById('petScatterBtn').addEventListener('click',()=>{
 
 // row-2 sprite buttons
 let gravReversed=false;
-let frozen=false;
 document.getElementById('gravFlipBtn').addEventListener('click',()=>{
   gravReversed=!gravReversed;
   setGravity(gravReversed?-1:1);
@@ -1428,25 +2017,42 @@ document.getElementById('explosionBtn').addEventListener('click',()=>{
 });
 
 // BUILDER MODE
-let builderMode=false,blocks=[],buildDrag=null;
+let builderMode=false,moverMode=false,blocks=[],buildDrag=null;
 const BLOCK_MIN=10,LS_BLOCKS='lpp_blocks5';
 function saveBlocks(){try{localStorage.setItem(LS_BLOCKS,JSON.stringify(blocks));}catch(e){}}
 (function(){try{const r=localStorage.getItem(LS_BLOCKS);if(r)blocks=JSON.parse(r);}catch(e){}})();
 
+let blockPreviewTimer=null,showingBlockPreview=false;
+function showBlocksPreview(){showingBlockPreview=true;clearTimeout(blockPreviewTimer);blockPreviewTimer=setTimeout(()=>{showingBlockPreview=false;},1500);}
+
 document.getElementById('builderBtn').addEventListener('click',()=>{
+  moverMode=false;
+  document.getElementById('moverBtn').classList.remove('active');
+  document.getElementById('moverBtn').textContent='Move blocks';
   builderMode=!builderMode;
   const btn=document.getElementById('builderBtn');
   btn.classList.toggle('active',builderMode);
   btn.textContent=builderMode?'Exit builder':'Builder mode';
   if(builderMode)showBlocksPreview();
+  canvas.style.cursor=builderMode?'crosshair':'crosshair';
+});
+document.getElementById('moverBtn').addEventListener('click',()=>{
+  builderMode=false;
+  buildDrag=null;
+  document.getElementById('builderBtn').classList.remove('active');
+  document.getElementById('builderBtn').textContent='Builder mode';
+  moverMode=!moverMode;
+  const btn=document.getElementById('moverBtn');
+  btn.classList.toggle('active',moverMode);
+  btn.textContent=moverMode?'Exit mover':'Move blocks';
+  if(moverMode){showBlocksPreview();canvas.style.cursor='grab';}
+  else canvas.style.cursor='crosshair';
 });
 document.getElementById('clearBlocksBtn').addEventListener('click',()=>{blocks=[];saveBlocks();});
 
-let blockPreviewTimer=null,showingBlockPreview=false;
-function showBlocksPreview(){showingBlockPreview=true;clearTimeout(blockPreviewTimer);blockPreviewTimer=setTimeout(()=>{showingBlockPreview=false;},1500);}
-
+// Draw new block (only in builderMode, not moverMode)
 canvas.addEventListener('mousedown',e=>{
-  if(!builderMode||e.button!==0)return;
+  if(!builderMode||moverMode||e.button!==0)return;
   e.stopImmediatePropagation();
   const p=getPos(e);buildDrag={startX:p.x,startY:p.y,curX:p.x,curY:p.y};
 },{capture:true});
@@ -1465,35 +2071,90 @@ canvas.addEventListener('mouseup',e=>{
 
 function applyBlockCollisions(){
   const bo=config.bounce;
+  const g=config.gravity*0.4;
+  const gravDown=g>=0;
+
   for(let s of spires){
     for(let b of blocks){
+      // broad-phase
       if(s.x+s.r<b.x||s.x-s.r>b.x+b.w||s.y+s.r<b.y||s.y-s.r>b.y+b.h)continue;
-      const dL=s.x+s.r-b.x,dR=b.x+b.w-(s.x-s.r),dT=s.y+s.r-b.y,dB=b.y+b.h-(s.y-s.r);
+      // penetration depths from each side
+      const dL=s.x+s.r-b.x, dR=b.x+b.w-(s.x-s.r);
+      const dT=s.y+s.r-b.y, dB=b.y+b.h-(s.y-s.r);
       const m=Math.min(dL,dR,dT,dB);
-      if(m===dL){s.x=b.x-s.r;s.vx=-Math.abs(s.vx)*bo;}
-      else if(m===dR){s.x=b.x+b.w+s.r;s.vx=Math.abs(s.vx)*bo;}
-      else if(m===dT){s.y=b.y-s.r;s.vy=-Math.abs(s.vy)*bo;s.vx*=0.85;}
-      else{s.y=b.y+b.h+s.r;s.vy=Math.abs(s.vy)*bo;}
+      if(m===dT){
+        // sit on top of block
+        s.y=b.y-s.r;s.vy=-Math.abs(s.vy)*bo;s.vx*=0.85;
+      } else if(m===dB){
+        // hit bottom of block
+        s.y=b.y+b.h+s.r;s.vy=Math.abs(s.vy)*bo;
+      } else if(m===dL){
+        s.x=b.x-s.r;s.vx=-Math.abs(s.vx)*bo;
+      } else {
+        s.x=b.x+b.w+s.r;s.vx=Math.abs(s.vx)*bo;
+      }
     }
   }
+
   for(let p of pets){
     for(let b of blocks){
       if(p.x+p.w<b.x||p.x>b.x+b.w||p.y+p.h<b.y||p.y>b.y+b.h)continue;
-      const dL=p.x+p.w-b.x,dR=b.x+b.w-p.x,dT=p.y+p.h-b.y,dB=b.y+b.h-p.y;
+      const dL=p.x+p.w-b.x, dR=b.x+b.w-p.x;
+      const dT=p.y+p.h-b.y, dB=b.y+b.h-p.y;
       const m=Math.min(dL,dR,dT,dB);
-      if(m===dL){p.x=b.x-p.w;p.vx=0;}
-      else if(m===dR){p.x=b.x+b.w;p.vx=0;}
-      else if(m===dT){p.y=b.y-p.h;const imp=Math.abs(p.vy);if(imp>2){p.vy=-imp*0.35;if(Math.abs(p.vy)<0.8){p.vy=0;p.airborne=false;}}else{p.vy=0;p.airborne=false;}}
-      else{p.y=b.y+b.h;p.vy=0;}
+      if(m===dT && gravDown){
+        // land on top — snap to surface, small bounce
+        p.y=b.y-p.h;
+        const imp=Math.abs(p.vy);
+        if(imp>2){p.vy=-imp*0.35;if(Math.abs(p.vy)<0.8){p.vy=0;p.airborne=false;}}
+        else{p.vy=0;p.airborne=false;}
+      } else if(m===dB && !gravDown){
+        // negative gravity: stick to underside
+        p.y=b.y+b.h;
+        const imp=Math.abs(p.vy);
+        if(imp>2){p.vy=imp*0.35;if(Math.abs(p.vy)<0.8){p.vy=0;p.airborne=false;}}
+        else{p.vy=0;p.airborne=false;}
+      } else if(m===dL){
+        p.x=b.x-p.w;p.vx=0;
+      } else if(m===dR){
+        p.x=b.x+b.w;p.vx=0;
+      } else if(m===dT){
+        p.y=b.y-p.h;p.vy=0;
+      } else {
+        p.y=b.y+b.h;p.vy=0;
+      }
+    }
+
+    // persist walking on top of a block when not airborne
+    if(!p.airborne && !p.grabbed){
+      let onBlock=false;
+      for(let b of blocks){
+        // pet is just above or on top of block, within 2px
+        if(p.x+p.w>b.x && p.x<b.x+b.w){
+          if(gravDown && Math.abs((p.y+p.h)-b.y)<=3 && p.vy>=0){
+            p.y=b.y-p.h;p.vy=0;onBlock=true;break;
+          }
+          if(!gravDown && Math.abs(p.y-b.y-b.h)<=3 && p.vy<=0){
+            p.y=b.y+b.h;p.vy=0;onBlock=true;break;
+          }
+        }
+      }
+      // if not on any block and not at screen floor/ceiling, become airborne
+      if(!onBlock){
+        const screenFloor=gravDown?window.innerHeight-p.h:0;
+        const atScreenSurface=gravDown?(p.y>=screenFloor-1):(p.y<=1);
+        if(!atScreenSurface)p.airborne=true;
+      }
     }
   }
 }
 
 function drawBlocks(){
-  if(!builderMode&&!showingBlockPreview)return;
+  if(!builderMode&&!moverMode&&!showingBlockPreview)return;
   ctx.save();
-  ctx.strokeStyle=builderMode?'rgba(127,119,221,0.8)':'rgba(127,119,221,0.35)';
-  ctx.fillStyle=builderMode?'rgba(127,119,221,0.13)':'rgba(127,119,221,0.06)';
+  const active=builderMode||moverMode;
+  ctx.strokeStyle=active?'rgba(127,119,221,0.8)':'rgba(127,119,221,0.35)';
+  ctx.fillStyle=active?'rgba(127,119,221,0.13)':'rgba(127,119,221,0.06)';
   ctx.lineWidth=builderMode?1.5:1;ctx.setLineDash([5,4]);
   for(const b of blocks){ctx.fillRect(b.x,b.y,b.w,b.h);ctx.strokeRect(b.x,b.y,b.w,b.h);}
   if(buildDrag){
@@ -1511,6 +2172,101 @@ window.update=function(now){
   __updatePre(now);applyBlockCollisions();
 };
 
+// ── block right-click editor ──────────────────────────────
+let blockMenuTarget=null;
+function closeBlockMenu(){document.getElementById('blockMenu').style.display='none';blockMenuTarget=null;}
+
+function openBlockMenu(idx,clientX,clientY){
+  blockMenuTarget=idx;
+  const b=blocks[idx];
+  document.getElementById('blockX').value=Math.round(b.x);
+  document.getElementById('blockY').value=Math.round(b.y);
+  document.getElementById('blockW').value=Math.round(b.w);
+  document.getElementById('blockH').value=Math.round(b.h);
+  const menu=document.getElementById('blockMenu');
+  menu.style.left=Math.min(clientX,window.innerWidth-240)+'px';
+  menu.style.top=Math.min(clientY,window.innerHeight-260)+'px';
+  menu.style.display='block';
+}
+
+// Live update on any input change
+function applyBlockFromInputs(){
+  if(blockMenuTarget===null)return;
+  const b=blocks[blockMenuTarget];
+  const nx=parseInt(document.getElementById('blockX').value);
+  const ny=parseInt(document.getElementById('blockY').value);
+  const nw=Math.max(10,parseInt(document.getElementById('blockW').value)||b.w);
+  const nh=Math.max(10,parseInt(document.getElementById('blockH').value)||b.h);
+  if(!isNaN(nx))b.x=nx;
+  if(!isNaN(ny))b.y=ny;
+  b.w=nw;b.h=nh;
+  saveBlocks();
+}
+['blockX','blockY','blockW','blockH'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',applyBlockFromInputs);
+});
+
+canvas.addEventListener('contextmenu',e=>{
+  if(!builderMode&&!moverMode)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  const p=getPos(e);
+  let hit=null;
+  for(let i=blocks.length-1;i>=0;i--){
+    const b=blocks[i];
+    if(p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h){hit=i;break;}
+  }
+  if(hit===null){closeBlockMenu();return;}
+  openBlockMenu(hit,e.clientX,e.clientY);
+},{capture:true});
+
+document.getElementById('blockDeleteBtn').addEventListener('click',()=>{
+  if(blockMenuTarget===null)return;
+  blocks.splice(blockMenuTarget,1);
+  saveBlocks();closeBlockMenu();
+});
+document.getElementById('blockMenuClose').addEventListener('click',closeBlockMenu);
+document.addEventListener('mousedown',e=>{
+  const menu=document.getElementById('blockMenu');
+  if(menu.style.display!=='none'&&!menu.contains(e.target))closeBlockMenu();
+});
+document.addEventListener('keydown',e=>{if(e.code==='Escape'){closeBlockMenu();document.getElementById('settingsPanel').classList.remove('open');}});
+
+// ── block drag: in mover mode, click a block to grab and move it ───
+let blockMoveDrag=null;
+
+canvas.addEventListener('mousedown',e=>{
+  if(!moverMode||e.button!==0)return;
+  const p=getPos(e);
+  for(let i=blocks.length-1;i>=0;i--){
+    const b=blocks[i];
+    if(p.x>=b.x&&p.x<=b.x+b.w&&p.y>=b.y&&p.y<=b.y+b.h){
+      e.stopImmediatePropagation();
+      blockMoveDrag={idx:i,offX:p.x-b.x,offY:p.y-b.y};
+      canvas.style.cursor='grabbing';
+      closeBlockMenu();
+      return;
+    }
+  }
+},{capture:true});
+
+canvas.addEventListener('mousemove',e=>{
+  if(!blockMoveDrag)return;
+  const p=getPos(e);
+  const b=blocks[blockMoveDrag.idx];
+  b.x=Math.round(p.x-blockMoveDrag.offX);
+  b.y=Math.round(p.y-blockMoveDrag.offY);
+  const menu=document.getElementById('blockMenu');
+  if(menu.style.display!=='none'&&blockMenuTarget===blockMoveDrag.idx){
+    document.getElementById('blockX').value=b.x;
+    document.getElementById('blockY').value=b.y;
+  }
+},{capture:true});
+
+canvas.addEventListener('mouseup',e=>{
+  if(!blockMoveDrag)return;
+  saveBlocks();blockMoveDrag=null;canvas.style.cursor=moverMode?'grab':'crosshair';
+},{capture:true});
+
 // VIEWER COSTUME ASSIGNMENT
 const LS_VIEWER_COSTUMES='lpp_vc5';
 let viewerCostumeMap={};
@@ -1526,10 +2282,22 @@ setInterval(()=>{
 },1000);
 
 document.getElementById('petSize').addEventListener('input',function(){petSize=parseInt(this.value)||48;pets.forEach(p=>{p.w=petSize;p.h=petSize;p.spriteEl.width=petSize;p.spriteEl.height=petSize;p.el.style.width=petSize+'px';});});
-document.getElementById('petSpeed').addEventListener('input',function(){petSpeed=parseFloat(this.value);document.getElementById('petSpeedVal').textContent=parseFloat(this.value).toFixed(1);});
+document.getElementById('petSpeed').addEventListener('input',function(){
+  petSpeed=6*(parseInt(this.value)/100); // 100% = 6 units/frame (noticeable), 0% = 0, 500% = 30
+  document.getElementById('petSpeedVal').textContent=this.value+'%';
+  // immediately apply to all walking pets
+  pets.forEach(p=>{
+    if(!p.airborne&&!p.grabbed&&!p.pinned){
+      const dir=p.facingLeft?-1:1;
+      if(petSpeed===0){p.vx=0;}
+      else{p.vx=dir*(0.5+Math.random()*petSpeed);}
+    }
+  });
+});
 document.getElementById('maxPets').addEventListener('input',function(){maxPets=parseInt(this.value)||30;});
 document.getElementById('bubbleDur').addEventListener('input',function(){bubbleDur=parseInt(this.value)||5;});
-document.getElementById('clearPetsBtn').addEventListener('click',clearAllPets); // settings panel button
+document.getElementById('bubbleFontSize').addEventListener('input',function(){bubbleFontSize=Math.max(8,Math.min(24,parseInt(this.value)||11));});
+
 
 petFileInput=document.getElementById('petFileInput');
 document.getElementById('addPetFrameBtn').addEventListener('click',()=>petFileInput.click());
@@ -1570,5 +2338,6 @@ function loadPetFrames(){
 }
 loadPetFrames();
 </script>
+
 </body>
 </html>
