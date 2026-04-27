@@ -104,9 +104,10 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <button class="tbbtn" id="explosionBtn">Explode</button>
       <button class="tbbtn" id="burstBtn">Burst</button>
       <button class="tbbtn" id="vibeBtn">Vibrate</button>
-      <button class="tbbtn hoop" id="hoopShotBtn">Hoop shot</button>
+      <button class="tbbtn hoop" id="hoopShotBtn">🏀 Ballin'</button>
       <button class="tbbtn" id="brTopBtn" style="border-color:rgba(239,159,39,0.5);color:rgba(239,159,39,0.9);">⚔️ Battle</button>
-      <button class="tbbtn" id="warTopBtn" style="border-color:rgba(220,60,60,0.5);color:rgba(220,100,100,0.9);">⚔️🛡️ War</button>
+      <button class="tbbtn" id="kaijuTopBtn" style="border-color:rgba(60,200,120,0.5);color:rgba(80,220,140,0.9);">🦖 Kaiju</button>
+      <button class="tbbtn" id="warTopBtn" style="border-color:rgba(220,60,60,0.5);color:rgba(220,100,100,0.9);">🚩 War</button>
     </div>
     <div class="tbsep"></div>
     <div class="tbgroup">
@@ -132,14 +133,15 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
     <div class="tbsep"></div>
     <div class="tbgroup">
       <span class="tblabel">Viewers</span>
-      <div class="tbslider"><span class="name">Size</span><input type="range" id="viewerSize" min="16" max="128" step="1" value="48"><span class="val" id="vsv">48</span></div>
+      <div class="tbslider"><span class="name">Size</span><input type="range" id="viewerSize" min="8" max="300" step="1" value="48"><span class="val" id="vsv">48</span></div>
       <button class="tbbtn" id="viewerToggleBtn">Hide viewers</button>
+      <button class="tbbtn" id="bubbleToggleBtn">Bubbles on</button>
       <button class="tbbtn" id="petScatterBtn">Bounce</button>
     </div>
     <div class="tbsep"></div>
     <div class="tbgroup">
       <span class="tblabel">Pets</span>
-      <div class="tbslider"><span class="name">Size</span><input type="range" id="size" min="10" max="120" step="1" value="24"><span class="val" id="sv">24</span></div>
+      <div class="tbslider"><span class="name">Size</span><input type="range" id="size" min="10" max="300" step="1" value="24"><span class="val" id="sv">24</span></div>
       <button class="tbbtn" id="sizeUpBtn">Size +10</button>
       <button class="tbbtn" id="sizeDnBtn">Size -10</button>
       <button class="tbbtn" id="bounceBtn">Bounce</button>
@@ -193,22 +195,27 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <div class="srow">
         <label>Walk speed</label>
         <div style="display:flex;align-items:center;gap:8px;">
-          <input type="range" id="petSpeed" min="0" max="500" step="5" value="30" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="petSpeed" min="0" max="3000" step="5" value="30" style="flex:1;accent-color:#7F77DD;">
           <span id="petSpeedVal" style="font-size:12px;color:#fff;min-width:36px;">30%</span>
         </div>
       </div>
       <div class="srow">
-        <label>Max pets on screen</label>
-        <input type="number" id="maxPets" value="30" min="1" max="100">
+        <label>Max viewers on screen</label>
+        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="maxPets" min="1" max="200" step="1" value="30" style="flex:1;accent-color:#7F77DD;"><span id="maxPetsVal" style="font-size:12px;color:#fff;min-width:36px;">30</span></div>
+      </div>
+      <div class="srow">
+        <label>Max sprites on screen</label>
+        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="maxSpritesSlider" min="1" max="1000" step="1" value="500" style="flex:1;accent-color:#7F77DD;"><span id="maxSpritesVal" style="font-size:12px;color:#fff;min-width:36px;">500</span></div>
       </div>
       <div class="srow">
         <label>Speech bubble duration (seconds)</label>
-        <input type="number" id="bubbleDur" value="5" min="1" max="30">
+        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="bubbleDur" min="1" max="60" step="1" value="5" style="flex:1;accent-color:#7F77DD;"><span id="bubbleDurVal" style="font-size:12px;color:#fff;min-width:36px;">5s</span></div>
       </div>
       <div class="srow">
         <label>Speech bubble font size (px)</label>
-        <input type="number" id="bubbleFontSize" value="11" min="8" max="24">
+        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="bubbleFontSize" min="6" max="48" step="1" value="11" style="flex:1;accent-color:#7F77DD;"><span id="bubbleFontSizeVal" style="font-size:12px;color:#fff;min-width:36px;">11px</span></div>
       </div>
+      <div class="srow"><label>Viewer animation fps</label><input type="number" id="viewerFpsInput" value="12" min="1" max="120"></div>
     </div>
     <div class="stabpanel active" id="tab-costumes">
       <!-- ── Background ── -->
@@ -224,15 +231,25 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
 
       <!-- ── Viewer walking animation ── -->
       <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Viewer walking animation</div>
-      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">Upload frames for all viewers' walking animation. If none, a coloured blob is used.</p>
-      <div id="viewerCostumeGrid" style="display:flex;flex-direction:column;gap:14px;">
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">Upload directional frames. Forward is used as fallback if Left/Right not set.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="costume-row">
-          <div class="costume-row-header" style="margin-bottom:10px;">
-            <span style="font-size:13px;color:#fff;font-weight:500;">Walking frames</span>
-          </div>
-          <div class="costume-frames" id="petFrameList"></div>
-          <button class="addFrameBtn" id="addPetFrameBtn" style="margin-top:6px;">+</button>
-          <input type="file" id="petFileInput" multiple accept="image/*" style="display:none;">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">⬅ Walking left</div>
+          <div class="costume-frames" id="petFrameLeft"></div>
+          <button class="addFrameBtn" id="addPetFrameLeftBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
+          <input type="file" id="petFileLeft" multiple accept="image/*" style="display:none;">
+        </div>
+        <div class="costume-row">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">➡ Walking right</div>
+          <div class="costume-frames" id="petFrameRight"></div>
+          <button class="addFrameBtn" id="addPetFrameRightBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
+          <input type="file" id="petFileRight" multiple accept="image/*" style="display:none;">
+        </div>
+        <div class="costume-row">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">⬤ Idle / forward</div>
+          <div class="costume-frames" id="petFrameIdle"></div>
+          <button class="addFrameBtn" id="addPetFrameIdleBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
+          <input type="file" id="petFileIdle" multiple accept="image/*" style="display:none;">
         </div>
       </div>
       <hr class="sdivider">
@@ -264,7 +281,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <div class="srow">
         <label>Hoop distance from right edge (px)</label>
         <div style="display:flex;align-items:center;gap:8px;">
-          <input type="range" id="hoopRightSlider" min="10" max="300" step="5" value="30" style="flex:1;accent-color:#EF9F27;">
+          <input type="range" id="hoopRightSlider" min="0" max="300" step="5" value="30" style="flex:1;accent-color:#EF9F27;">
           <span id="hoopRightVal" style="font-size:12px;color:#fff;min-width:36px;">30px</span>
         </div>
       </div>
@@ -339,6 +356,13 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
         <label>Attack range (multiplier of viewer size)</label>
         <input type="number" id="brRange" value="2.8" min="1" max="8" step="0.1">
       </div>
+      <div class="sdivider"></div>
+      <div style="font-size:12px;font-weight:500;color:rgba(80,220,140,0.8);margin-bottom:10px;">🦖 Kaiju Battle</div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px;">All viewers vs 1 giant Kaiju. Chat types <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!attack</code> to damage it. Owner types <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!kaiju</code> to start.</p>
+      <div class="srow"><label>Kaiju size (px)</label><input type="number" id="kaijuSize" value="200" min="80" max="500"></div>
+      <div class="srow"><label>Stomp interval (ms)</label><input type="number" id="kaijuStompInterval" value="3000" min="500" max="10000" step="100"></div>
+      <div class="srow"><label>Stomp fling force</label><input type="number" id="kaijuFlingForce" value="18" min="5" max="50"></div>
+      <div class="srow"><label>Hits to kill a viewer (stomps)</label><input type="number" id="kaijuHitsToDie" value="4" min="1" max="20"></div>
     </div>
     <button class="sclose" id="closeSettings">Done</button>
   </div>
@@ -444,11 +468,13 @@ const PALETTE=['#7F77DD','#534AB7','#1D9E75','#0F6E56','#D85A30','#993C1D','#D45
 let config={gravity:1,bounce:0.7,friction:0,size:24};
 
 let spires=[],vibrating=false,drag=null,frozen=false;
+let maxSprites=500;
 let mouseX=0,mouseY=0,prevMouseX=0,prevMouseY=0,mouseVX=0,mouseVY=0;
 let hoveredSpire=null,uiVisible=true;
 
 let costumes=[],activeCostumeId=null;
 let fps=12,frameTime=1000/12;
+let viewerFps=12,viewerFrameTime=1000/12;
 
 let hoopFrames=[],hoopCurFrame=0,hoopLastFrame=0;
 let hoopHeightPct=45; // default: 45% from top — lower, more reachable
@@ -537,7 +563,12 @@ function loadAudioBuffer(key,cb){
 function genId(){return'id_'+Date.now()+'_'+Math.random().toString(36).slice(2);}
 function saveCostumes(){
   try{
-    localStorage.setItem(LS_C,JSON.stringify(costumes.map(c=>({id:c.id,name:c.name,frames:c.frames.map(f=>({id:f.id,src:f.img.src}))}))));
+    localStorage.setItem(LS_C,JSON.stringify(costumes.map(c=>({
+      id:c.id,name:c.name,
+      frames:(c.frames||[]).map(f=>({id:f.id,src:f.img?f.img.src:f.src})),
+      framesLeft:(c.framesLeft||[]).map(f=>({id:f.id,src:f.img?f.img.src:f.src})),
+      framesRight:(c.framesRight||[]).map(f=>({id:f.id,src:f.img?f.img.src:f.src})),
+    }))));
     localStorage.setItem(LS_A,activeCostumeId||'');
   }catch(e){}
 }
@@ -571,13 +602,18 @@ function loadAll(){
       const finish=()=>{activeCostumeId=localStorage.getItem(LS_A)||null;renderCostumeGrid();updateCostumeSelect();};
       if(!pending){costumes=data.map(d=>({...d,frames:[]}));finish();return;}
       data.forEach(cd=>{
-        const c={id:cd.id,name:cd.name,frames:[]};costumes.push(c);
-        cd.frames.forEach(fd=>{
+        const c={id:cd.id,name:cd.name,frames:[],framesLeft:[],framesRight:[]};costumes.push(c);
+        const allDirs=[
+          {arr:c.frames,data:cd.frames||[]},
+          {arr:c.framesLeft,data:cd.framesLeft||[]},
+          {arr:c.framesRight,data:cd.framesRight||[]},
+        ];
+        allDirs.forEach(({arr,data})=>data.forEach(fd=>{
           const img=new Image();
-          img.onload=()=>{c.frames.push({id:fd.id,img});if(!--pending)finish();};
+          img.onload=()=>{arr.push({id:fd.id,img});if(!--pending)finish();};
           img.onerror=()=>{if(!--pending)finish();};
           img.src=fd.src;
-        });
+        }));
       });
     }
   }catch(e){}
@@ -604,6 +640,7 @@ class Spire{
     this.scaleX=1;this.scaleY=1;this.squashTimer=0;this.mass=this.r/24;
     this.costumeId=activeCostumeId;
     this.frame=0;this.lastFrame=0;
+    this.facingLeft=false;
     this.isHoopBall=false;
   }
 }
@@ -787,8 +824,14 @@ function playResize(){
   if(resizeBuffer&&audioCtx)playSound(resizeBuffer,soundVol);
 }
 
-function getCostumeFrames(costumeId){
-  const c=costumes.find(c=>c.id===costumeId);return c?c.frames.map(f=>f.img):[];
+function getCostumeFrames(costumeId,facingLeft,isMoving){
+  const c=costumes.find(c=>c.id===costumeId);
+  if(!c)return[];
+  const hasDir=(c.framesLeft&&c.framesLeft.length)||(c.framesRight&&c.framesRight.length);
+  if(!hasDir)return(c.frames||[]).map(f=>f.img);
+  if(!isMoving)return(c.frames&&c.frames.length?c.frames:c.framesLeft||c.framesRight||[]).map(f=>f.img);
+  if(facingLeft)return((c.framesLeft&&c.framesLeft.length?c.framesLeft:c.frames)||[]).map(f=>f.img);
+  return((c.framesRight&&c.framesRight.length?c.framesRight:c.frames)||[]).map(f=>f.img);
 }
 
 function bounceAll(){
@@ -833,7 +876,9 @@ function update(now){
     if(s.squashTimer>0){s.squashTimer--;const t=s.squashTimer/10;s.scaleX=1+(s.scaleX-1)*t;s.scaleY=1+(s.scaleY-1)*t;}else{s.scaleX=1;s.scaleY=1;}
     if(s.isHoopBall||hoopVisible)checkHoopScore(s);
     // per-sprite frame advance
-    const frames=getCostumeFrames(s.costumeId);
+    const isMovingS=Math.abs(s.vx)>0.3;
+    if(!s.facingLeft)s.facingLeft=s.vx<0;else if(Math.abs(s.vx)>0.1)s.facingLeft=s.vx<0;
+    const frames=getCostumeFrames(s.costumeId,s.facingLeft,isMovingS);
     if(frames.length>1&&now-s.lastFrame>frameTime){s.frame=(s.frame+1)%frames.length;s.lastFrame=now;}
   }
 
@@ -882,15 +927,18 @@ function draw(now){
       ctx.fill();ctx.restore();
     }
 
-    const frames=getCostumeFrames(s.costumeId);
-    const frame=frames.length>0?frames[s.frame%frames.length]:null;
+    const framesD=getCostumeFrames(s.costumeId,s.facingLeft,Math.abs(s.vx)>0.3);
+    const frame=framesD.length>0?framesD[s.frame%framesD.length]:null;
+    const c2=costumes.find(c=>c.id===s.costumeId);
+    const hasDirFrames=c2&&((c2.framesLeft&&c2.framesLeft.length)||(c2.framesRight&&c2.framesRight.length));
 
     ctx.save();
     ctx.translate(s.x,s.y);
     ctx.scale(s.scaleX,s.scaleY);
 
     if(frame){
-      ctx.drawImage(frame,-s.r,-s.r,s.r*2,s.r*2);
+      if(!hasDirFrames&&s.facingLeft){ctx.save();ctx.scale(-1,1);ctx.drawImage(frame,-s.r,-s.r,s.r*2,s.r*2);ctx.restore();}
+      else ctx.drawImage(frame,-s.r,-s.r,s.r*2,s.r*2);
     } else {
       ctx.beginPath();ctx.arc(0,0,s.r,0,Math.PI*2);ctx.fillStyle=s.color;ctx.fill();
     }
@@ -1027,7 +1075,8 @@ document.getElementById('size').addEventListener('input',function(){
 });
 document.getElementById('viewerSize').addEventListener('input',function(){
   petSize=parseInt(this.value);document.getElementById('vsv').textContent=petSize;
-  pets.forEach(p=>{p.w=petSize;p.h=petSize;p.spriteEl.width=petSize;p.spriteEl.height=petSize;p.el.style.width=petSize+'px';});
+  const namePx=Math.max(8,Math.round(petSize*0.22))+'px';
+  pets.forEach(p=>{p.w=petSize;p.h=petSize;p.spriteEl.width=petSize;p.spriteEl.height=petSize;p.el.style.width=petSize+'px';p.nameEl.style.fontSize=namePx;});
 });
 document.getElementById('bounceBtn').addEventListener('click',bounceAll);
 document.getElementById('resetBtn').addEventListener('click',()=>{
@@ -1051,6 +1100,7 @@ document.getElementById('vibeBtn').addEventListener('click',toggleVibrate);
 document.getElementById('hoopShotBtn').addEventListener('click',()=>{ensureAudio();fireHoopShot();});
 document.getElementById('brTopBtn').addEventListener('click',startBattleRoyale);
 document.getElementById('warTopBtn').addEventListener('click',startWar);
+document.getElementById('kaijuTopBtn').addEventListener('click',startKaiju);
 
 document.getElementById('settingsBtn').addEventListener('click',()=>document.getElementById('settingsPanel').classList.add('open'));
 document.getElementById('closeSettings').addEventListener('click',()=>document.getElementById('settingsPanel').classList.remove('open'));
@@ -1064,6 +1114,7 @@ document.querySelectorAll('.stab').forEach(btn=>{
 });
 document.getElementById('bgColor').addEventListener('input',function(){bgColor=this.value;savePrefs();});
 document.getElementById('fps').addEventListener('input',function(){fps=Math.max(1,parseInt(this.value)||12);frameTime=1000/fps;savePrefs();});
+document.getElementById('viewerFpsInput').addEventListener('input',function(){viewerFps=Math.max(1,parseInt(this.value)||12);viewerFrameTime=1000/viewerFps;});
 document.getElementById('hoopSizeSlider').addEventListener('input',function(){
   HOOP_W=parseInt(this.value);
   HOOP_H=Math.round(HOOP_W*0.75); // maintain 4:3 ratio
@@ -1086,6 +1137,9 @@ document.getElementById('costumeSelect').addEventListener('change',function(){ac
 function renderCostumeGrid(){
   const grid=document.getElementById('costumeGrid');grid.innerHTML='';
   costumes.forEach((costume,ci)=>{
+    if(!costume.framesLeft)costume.framesLeft=[];
+    if(!costume.framesRight)costume.framesRight=[];
+    if(!costume.framesIdle)costume.framesIdle=[];
     const row=document.createElement('div');row.className='costume-row';
     const header=document.createElement('div');header.className='costume-row-header';
     const nameInp=document.createElement('input');nameInp.type='text';nameInp.value=costume.name;nameInp.placeholder='Name';
@@ -1097,27 +1151,39 @@ function renderCostumeGrid(){
       saveCostumes();renderCostumeGrid();updateCostumeSelect();
     });
     header.appendChild(nameInp);header.appendChild(delBtn);row.appendChild(header);
-    const frames=document.createElement('div');frames.className='costume-frames';
-    costume.frames.forEach((f,fi)=>{
-      const thumb=document.createElement('div');thumb.className='frameThumb';
-      const img=document.createElement('img');img.src=f.img.src;
-      const fdel=document.createElement('div');fdel.className='fdel';fdel.textContent='x';
-      fdel.addEventListener('click',e=>{e.stopPropagation();costume.frames.splice(fi,1);saveCostumes();renderCostumeGrid();});
-      thumb.appendChild(img);thumb.appendChild(fdel);frames.appendChild(thumb);
+
+    // directional frame sections: Forward/All, Left, Right
+    const dirs=[
+      {key:'frames',      label:'\u2b24 Forward / All'},
+      {key:'framesLeft',  label:'\u2b05 Left'},
+      {key:'framesRight', label:'\u27a1 Right'},
+    ];
+    dirs.forEach(({key,label})=>{
+      const sec=document.createElement('div');sec.style.marginTop='8px';
+      const lbl=document.createElement('div');lbl.style.cssText='font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;';lbl.textContent=label;
+      const framesEl=document.createElement('div');framesEl.className='costume-frames';
+      (costume[key]||[]).forEach((f,fi)=>{
+        const thumb=document.createElement('div');thumb.className='frameThumb';
+        const img=document.createElement('img');img.src=f.img?f.img.src:(f.src||'');
+        const fdel=document.createElement('div');fdel.className='fdel';fdel.textContent='x';
+        fdel.addEventListener('click',e=>{e.stopPropagation();costume[key].splice(fi,1);saveCostumes();renderCostumeGrid();});
+        thumb.appendChild(img);thumb.appendChild(fdel);framesEl.appendChild(thumb);
+      });
+      const addBtn=document.createElement('button');addBtn.className='addFrameBtn';addBtn.textContent='+';addBtn.style.marginTop='2px';
+      addBtn.addEventListener('click',()=>{
+        const fi=document.getElementById('fileInputHidden');
+        fi.onchange=function(){
+          Array.from(this.files).forEach(file=>{
+            if(!file.type.startsWith('image/'))return;
+            const reader=new FileReader();
+            reader.onload=ev=>{const im=new Image();im.onload=()=>{costume[key].push({id:genId(),img:im});saveCostumes();renderCostumeGrid();};im.src=ev.target.result;};
+            reader.readAsDataURL(file);
+          });this.value='';
+        };fi.click();
+      });
+      framesEl.appendChild(addBtn);sec.appendChild(lbl);sec.appendChild(framesEl);row.appendChild(sec);
     });
-    const addBtn=document.createElement('button');addBtn.className='addFrameBtn';addBtn.textContent='+';
-    addBtn.addEventListener('click',()=>{
-      const fi=document.getElementById('fileInputHidden');
-      fi.onchange=function(){
-        Array.from(this.files).forEach(file=>{
-          if(!file.type.startsWith('image/'))return;
-          const reader=new FileReader();
-          reader.onload=ev=>{const im=new Image();im.onload=()=>{costume.frames.push({id:genId(),img:im});saveCostumes();renderCostumeGrid();};im.src=ev.target.result;};
-          reader.readAsDataURL(file);
-        });this.value='';
-      };fi.click();
-    });
-    frames.appendChild(addBtn);row.appendChild(frames);grid.appendChild(row);
+    grid.appendChild(row);
   });
 }
 document.getElementById('addCostumeBtn').addEventListener('click',()=>{
@@ -1209,10 +1275,15 @@ buildHotkeyTable(); // rebuild after load so restored keys are shown
 
 
 // ── pet state ─────────────────────────────────────────────
-let petFrames=[]; // loaded images for walking animation
+let petFrames=[];
+let petFramesLeft=[],petFramesRight=[],petFramesIdle=[];
+function getPetFramesForDir(fl,mov){
+  if(!mov){if(petFramesIdle.length)return petFramesIdle;if(petFrames.length)return petFrames;return[];}
+  if(fl){if(petFramesLeft.length)return petFramesLeft;if(petFrames.length)return petFrames;return[];}
+  if(petFramesRight.length)return petFramesRight;if(petFrames.length)return petFrames;return[];
+} // loaded images for walking animation
 let petSize=48, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
 let pets=[]; // array of ChatPet objects
-let petFileInput=null;
 const LS_PET='lpp_pet5', LS_TCHAN='lpp_tchan5';
 
 const PET_COLORS=['#7F77DD','#1D9E75','#D85A30','#D4537E','#378ADD','#EF9F27','#E24B4A','#9FE1CB'];
@@ -1232,7 +1303,10 @@ class ChatPet{
     this.grabbed=false; this.grabVX=0; this.grabVY=0;
     this.airborne=false;
     this.pinned=false; // when true, locked in place
-    this.customImg=null; // per-viewer custom image override
+    this.customImg=null; // per-viewer directional image overrides
+    this.customImgForward=null;
+    this.customImgLeft=null;
+    this.customImgRight=null;
     // Battle Royale state
     this.hp=100; this.maxHp=100; this.alive=true;
     this.brCooldown=0;
@@ -1250,6 +1324,7 @@ class ChatPet{
     this.nameEl.className='chat-pet-name';
     this.nameEl.textContent=this.username;
     this.nameEl.style.color=this.color;
+    this.nameEl.style.fontSize=Math.max(8,Math.round(petSize*0.22))+"px";
 
     this.spriteEl=document.createElement('canvas');
     this.spriteEl.className='chat-pet-sprite';
@@ -1276,10 +1351,12 @@ class ChatPet{
     this.el.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();openPetImagePicker(this,e.clientX,e.clientY);});
   }
   say(msg){
+    if(!bubblesEnabled)return;
     if(this.bubble)this.bubble.remove();
     this.bubble=document.createElement('div');
     this.bubble.className='speech-bubble';
-    this.bubble.style.fontSize=bubbleFontSize+'px';
+    const scaledFont=Math.max(8,Math.round(bubbleFontSize*(this.w/48)));
+    this.bubble.style.fontSize=scaledFont+"px";
     this.bubble.textContent=msg;
     this.el.appendChild(this.bubble);
     this.bubbleTimer=bubbleDur*60;
@@ -1288,25 +1365,60 @@ class ChatPet{
     const ctx2=this.spriteEl.getContext('2d');
     ctx2.clearRect(0,0,this.w,this.h);
 
-    const img=this.customImg||(petFrames.length>0?petFrames[this.frame%petFrames.length]:null);
-    if(img){
-      if(!this.customImg&&petFrames.length>1&&now-this.lastFrame>frameTime){this.frame=(this.frame+1)%petFrames.length;this.lastFrame=now;}
+    // pick directional custom image first, then directional frames, then fallback
+    const isMoving=Math.abs(this.vx)>0.3;
+    let customFrame=null;
+    if(this.customImgLeft||this.customImgRight||this.customImgForward){
+      if(!isMoving) customFrame=this.customImgForward||this.customImgLeft||this.customImgRight;
+      else if(this.facingLeft) customFrame=this.customImgLeft||this.customImgForward||this.customImgRight;
+      else customFrame=this.customImgRight||this.customImgForward||this.customImgLeft;
+    } else if(this.customImg){ customFrame=this.customImg; }
+
+    const dirFrames=customFrame?null:getPetFramesForDir(this.facingLeft,isMoving);
+    const frames=customFrame?[customFrame]:(dirFrames&&dirFrames.length>0?dirFrames:[]);
+    const hasDir=(petFramesLeft.length>0||petFramesRight.length>0||petFramesIdle.length>0);
+
+    if(frames.length>0){
+      if(frames.length>1&&now-this.lastFrame>viewerFrameTime){this.frame=(this.frame+1)%frames.length;this.lastFrame=now;}
+      const img=frames[this.frame%frames.length];
       ctx2.save();
-      if(this.facingLeft){ctx2.translate(this.w,0);ctx2.scale(-1,1);}
+      // only auto-flip when using shared single set, not directional sets or custom images
+      const usingCustomDir=this.customImgLeft||this.customImgRight||this.customImgForward;
+      if(!hasDir&&!usingCustomDir&&!this.customImg&&this.facingLeft){ctx2.translate(this.w,0);ctx2.scale(-1,1);}
       ctx2.drawImage(img,0,0,this.w,this.h);
       ctx2.restore();
     } else {
-      ctx2.fillStyle=this.color;
-      ctx2.beginPath();ctx2.arc(this.w/2,this.h/2,this.w*0.42,0,Math.PI*2);ctx2.fill();
-      ctx2.fillStyle='rgba(0,0,0,0.5)';
-      const ex=this.facingLeft?this.w*0.35:this.w*0.4, ex2=this.facingLeft?this.w*0.55:this.w*0.6;
-      ctx2.beginPath();ctx2.arc(ex,this.h*0.38,this.w*0.07,0,Math.PI*2);ctx2.fill();
-      ctx2.beginPath();ctx2.arc(ex2,this.h*0.38,this.w*0.07,0,Math.PI*2);ctx2.fill();
-      ctx2.beginPath();ctx2.arc(this.w/2,this.h*0.55,this.w*0.12,0,Math.PI);ctx2.fill();
+      // ── fallback character (reference: tall narrow rect head, small rect eyes/mouth, narrow trapezoid body)
+      const w=this.w, h=this.h, lw=Math.max(1,w*0.03);
+      // body: narrow trapezoid
+      const nkW=w*0.21, bsW=w*0.35, nkTop=h*0.72;
+      ctx2.fillStyle='#fff';
+      ctx2.beginPath();
+      ctx2.moveTo((w-nkW)*0.5,nkTop);ctx2.lineTo((w+nkW)*0.5,nkTop);
+      ctx2.lineTo((w+bsW)*0.5,h);ctx2.lineTo((w-bsW)*0.5,h);
+      ctx2.closePath();ctx2.fill();
+      ctx2.strokeStyle='#111';ctx2.lineWidth=lw;ctx2.stroke();
+      // head: narrow tall rect (62% wide)
+      const hx=w*0.19, hy=h*0.02, hw=w*0.62, hh=h*0.68;
+      ctx2.fillStyle='#fff';ctx2.fillRect(hx,hy,hw,hh);
+      ctx2.strokeStyle='#111';ctx2.lineWidth=lw;ctx2.strokeRect(hx,hy,hw,hh);
+      // face centre with directional shift
+      const shift=isMoving?(this.facingLeft?-hw*0.07:hw*0.07):0;
+      const cx=hx+hw*0.5+shift;
+      // eyes: small narrow rects at 40% down head
+      const eW=w*0.04, eH=h*0.10, eY=hy+hh*0.40, eGap=hw*0.16;
+      ctx2.fillStyle='#4a4460';
+      ctx2.fillRect(cx-eGap-eW*0.5,eY,eW,eH);
+      ctx2.strokeStyle='#111';ctx2.lineWidth=lw*0.55;ctx2.strokeRect(cx-eGap-eW*0.5,eY,eW,eH);
+      ctx2.fillRect(cx+eGap-eW*0.5,eY,eW,eH);ctx2.strokeRect(cx+eGap-eW*0.5,eY,eW,eH);
+      // smile: tiny V at 72% down head
+      const smY=hy+hh*0.72;
+      ctx2.strokeStyle='#111';ctx2.lineWidth=lw*0.75;ctx2.lineJoin='round';ctx2.lineCap='round';
+      ctx2.beginPath();ctx2.moveTo(cx-w*0.038,smY);ctx2.lineTo(cx,smY+h*0.022);ctx2.lineTo(cx+w*0.038,smY);ctx2.stroke();
     }
 
     // update DOM health bar
-    if((battleRoyaleActive||warActive)&&this.alive){
+    if((battleRoyaleActive||warActive||kaijuActive)&&this.alive){
       this.healthBarWrap.style.display='block';
       const ratio=Math.max(0,this.hp/this.maxHp);
       this.healthBarFill.style.width=(ratio*100)+'%';
@@ -1321,6 +1433,7 @@ class ChatPet{
     const gravDown=g>=0;
     const screenFloor=gravDown ? H-this.h : 0;
 
+    if(this._hidden)return;
     // pinned or menu-frozen — stay put, just draw
     if(this.pinned||this._menuFrozen){
       this.vx=0;this.vy=0;
@@ -1525,11 +1638,15 @@ vip.style.cssText='display:none;position:fixed;z-index:400;background:#1c1c1c;bo
 vip.innerHTML=`<div style="margin-bottom:6px;">
 <button id="petPinBtn" title="Pin / Unpin" style="width:100%;padding:7px;border-radius:6px;border:0.5px solid rgba(127,119,221,0.4);background:rgba(127,119,221,0.1);color:#b8b2ff;font-size:16px;cursor:pointer;font-family:inherit;">📌</button>
 </div>
-<div style="display:flex;gap:6px;">
-<button id="petImgUploadBtn" title="Upload custom image" style="flex:1;padding:6px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.7);font-size:15px;cursor:pointer;font-family:inherit;">+</button>
-<button id="petImgClearBtn" title="Remove custom image" style="flex:1;padding:6px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);font-size:12px;cursor:pointer;font-family:inherit;">Clear</button>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:6px;">
+<button id="petImgLeftBtn" title="Upload left-facing" style="padding:5px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit;">⬅</button>
+<button id="petImgFwdBtn" title="Upload forward/idle" style="padding:5px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit;">⬤</button>
+<button id="petImgRightBtn" title="Upload right-facing" style="padding:5px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit;">➡</button>
 </div>
-<input type="file" id="petImgFileInput" accept="image/*" style="display:none;">`;
+<button id="petImgClearBtn" style="width:100%;padding:5px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);font-size:11px;cursor:pointer;font-family:inherit;">Clear all</button>
+<input type="file" id="petImgFileInputFwd" accept="image/*" style="display:none;">
+<input type="file" id="petImgFileInputLeft" accept="image/*" style="display:none;">
+<input type="file" id="petImgFileInputRight" accept="image/*" style="display:none;">`;
 document.body.appendChild(vip);
 
 let petImgTarget=null;
@@ -1566,27 +1683,39 @@ document.getElementById('petPinBtn').addEventListener('click',()=>{
   }
   closePetImagePicker();
 });
-document.getElementById('petImgUploadBtn').addEventListener('click',()=>document.getElementById('petImgFileInput').click());
-document.getElementById('petImgFileInput').addEventListener('change',function(){
-  const file=this.files[0];if(!file||!petImgTarget)return;
-  // capture before closing — async load would lose petImgTarget otherwise
-  const target=petImgTarget;
+// per-viewer directional image upload
+function loadViewerImgDir(file,target,dir){
+  if(!file||!target)return;
   const reader=new FileReader();
   reader.onload=ev=>{
     const img=new Image();
     img.onload=()=>{
-      target.customImg=img;
-      viewerImgMap[target.username]=ev.target.result;
+      if(dir==='left')target.customImgLeft=img;
+      else if(dir==='right')target.customImgRight=img;
+      else target.customImgForward=img;
+      if(!viewerImgMap[target.username])viewerImgMap[target.username]={};
+      viewerImgMap[target.username][dir]=ev.target.result;
       saveViewerImgs();
     };
     img.src=ev.target.result;
   };
   reader.readAsDataURL(file);
-  closePetImagePicker();this.value='';
-});
+}
+function wireVipInput(btnId,fileId,dir){
+  document.getElementById(btnId).addEventListener('click',()=>document.getElementById(fileId).click());
+  document.getElementById(fileId).addEventListener('change',function(){
+    const target=petImgTarget;
+    loadViewerImgDir(this.files[0],target,dir);
+    closePetImagePicker();this.value='';
+  });
+}
+wireVipInput('petImgFwdBtn','petImgFileInputFwd','fwd');
+wireVipInput('petImgLeftBtn','petImgFileInputLeft','left');
+wireVipInput('petImgRightBtn','petImgFileInputRight','right');
 document.getElementById('petImgClearBtn').addEventListener('click',()=>{
   if(!petImgTarget)return;
   petImgTarget.customImg=null;
+  petImgTarget.customImgLeft=null;petImgTarget.customImgRight=null;petImgTarget.customImgForward=null;
   delete viewerImgMap[petImgTarget.username];
   saveViewerImgs();
   closePetImagePicker();
@@ -1595,9 +1724,12 @@ document.addEventListener('mousedown',e=>{if(vip.style.display!=='none'&&!vip.co
 
 // restore saved custom images when pets spawn
 function applyViewerImgToPet(pet){
-  const src=viewerImgMap[pet.username];
-  if(!src)return;
-  const img=new Image();img.onload=()=>{pet.customImg=img;};img.src=src;
+  const data=viewerImgMap[pet.username];
+  if(!data)return;
+  if(typeof data==='string'){const img=new Image();img.onload=()=>{pet.customImg=img;};img.src=data;return;}
+  if(data.fwd){const img=new Image();img.onload=()=>{pet.customImgForward=img;};img.src=data.fwd;}
+  if(data.left){const img=new Image();img.onload=()=>{pet.customImgLeft=img;};img.src=data.left;}
+  if(data.right){const img=new Image();img.onload=()=>{pet.customImgRight=img;};img.src=data.right;}
 }
 
 // ── BATTLE ROYALE ─────────────────────────────────────────
@@ -1863,6 +1995,10 @@ document.getElementById('teamACry').addEventListener('input',function(){teamACry
 document.getElementById('teamBCry').addEventListener('input',function(){teamBCry=this.value;});
 document.getElementById('brInterval').addEventListener('input',function(){brCheckInterval=Math.max(50,parseInt(this.value)||180);});
 document.getElementById('brRange').addEventListener('input',function(){brAttackRange=Math.max(1,parseFloat(this.value)||2.8);});
+document.getElementById('kaijuSize').addEventListener('input',function(){kaijuSize=Math.max(80,parseInt(this.value)||200);});
+document.getElementById('kaijuStompInterval').addEventListener('input',function(){kaijuStompInterval=Math.max(500,parseInt(this.value)||3000);});
+document.getElementById('kaijuFlingForce').addEventListener('input',function(){kaijuFlingForce=Math.max(5,parseInt(this.value)||18);});
+document.getElementById('kaijuHitsToDie').addEventListener('input',function(){kaijuHitsToDie=Math.max(1,parseInt(this.value)||4);});
 
 // ── Twitch chat via anonymous IRC WebSocket ───────────────
 // tmi.js dynamic loading is unreliable from local files.
@@ -1919,13 +2055,19 @@ function _doConnect(){
         const text=pm[2].trim();
         const color=tags['color']||null;
         const pet=getOrCreatePet(username,color||undefined);
-        if(pet)pet.say(text);
+        if(pet&&!text.startsWith('!'))pet.say(text);
         // battle royale command — only channel owner (matches channel name)
         if(text.toLowerCase()==='!battleroyale'&&twitchChannel&&username.toLowerCase()===twitchChannel.toLowerCase()){
           setTimeout(startBattleRoyale,500);
         }
         if(text.toLowerCase()==='!war'&&twitchChannel&&username.toLowerCase()===twitchChannel.toLowerCase()){
           setTimeout(startWar,500);
+        }
+        if(text.toLowerCase()==='!kaiju'&&twitchChannel&&username.toLowerCase()===twitchChannel.toLowerCase()){
+          setTimeout(startKaiju,500);
+        }
+        if(text.toLowerCase()==='!attack'&&kaijuActive){
+          kaijuTakeDamage(10,username);
         }
       }
     }
@@ -1979,10 +2121,18 @@ function setGravity(v){
 let viewersVisible=true;
 document.getElementById('viewerToggleBtn').addEventListener('click',()=>{
   viewersVisible=!viewersVisible;
-  pets.forEach(p=>{p.el.style.display=viewersVisible?'flex':'none';});
+  pets.forEach(p=>{p.el.style.display=viewersVisible?'flex':'none';p._hidden=!viewersVisible;});
   const btn=document.getElementById('viewerToggleBtn');
   btn.textContent=viewersVisible?'Hide viewers':'Show viewers';
   btn.classList.toggle('active',!viewersVisible);
+});
+let bubblesEnabled=true;
+document.getElementById('bubbleToggleBtn').addEventListener('click',()=>{
+  bubblesEnabled=!bubblesEnabled;
+  const btn=document.getElementById('bubbleToggleBtn');
+  btn.textContent=bubblesEnabled?'Bubbles on':'Bubbles off';
+  btn.classList.toggle('active',!bubblesEnabled);
+  if(!bubblesEnabled)pets.forEach(p=>{if(p.bubble){p.bubble.remove();p.bubble=null;}});
 });
 document.getElementById('petScatterBtn').addEventListener('click',()=>{
   pets.forEach(p=>{p.vx=(Math.random()-.5)*10;p.vy=-(3+Math.random()*5);p.airborne=true;});
@@ -2273,6 +2423,141 @@ let viewerCostumeMap={};
 (function(){try{const r=localStorage.getItem(LS_VIEWER_COSTUMES);if(r)viewerCostumeMap=JSON.parse(r);}catch(e){}})();
 function saveViewerCostumes(){try{localStorage.setItem(LS_VIEWER_COSTUMES,JSON.stringify(viewerCostumeMap));}catch(e){}}
 
+
+// KAIJU BATTLE SYSTEM
+let kaijuActive=false, kaijuStompTimer=null;
+let kaijuSize=200, kaijuStompInterval=3000, kaijuFlingForce=18, kaijuHitsToDie=4;
+let kaijuPet=null, kaijuHp=0, kaijuMaxHp=0, kaijuBarEl=null;
+
+// kaijuSpire: the canvas ball that becomes the Kaiju
+let kaijuSpire=null;
+
+function startKaiju(){
+  if(pets.length<1)return;
+  if(kaijuActive)endKaiju();
+  if(battleRoyaleActive)endBattleRoyale();
+  if(warActive)endWar();
+  kaijuActive=true;
+
+  // scale all health
+  const vc=pets.length;
+  kaijuMaxHp=Math.max(100,vc*25); kaijuHp=kaijuMaxHp;
+
+  // spawn (or pick existing) a big Spire as the kaiju
+  const kr=Math.round(kaijuSize/2);
+  spires=[];
+  kaijuSpire=spawnAt(window.innerWidth/2,window.innerHeight-kr,kr);
+  if(!kaijuSpire){kaijuActive=false;return;}
+  kaijuSpire.color='#50e090';
+  kaijuSpire.vx=0; kaijuSpire.vy=0;
+  kaijuSpire.r=kr; kaijuSpire.mass=kr/24;
+
+  const hitHP=kaijuHitsToDie*25;
+  pets.forEach(p=>{
+    p.hp=hitHP; p.maxHp=hitHP; p.alive=true; p.brCooldown=0; p.brAngle=0; p.brAngleTarget=0;
+    p.el.style.display='flex'; p.el.style.opacity='1'; p.el.style.filter='none'; p.el.style.transition='none';
+    p.x=Math.random()*(window.innerWidth-p.w); p.y=window.innerHeight-p.h;
+    p.vx=(Math.random()-.5)*4; p.vy=-2-Math.random()*2; p.airborne=true;
+    p.nameEl.textContent='⚔ '+p.username; p.nameEl.style.color=p.color;
+  });
+
+  function kaijuStomp(){
+    if(!kaijuActive||!kaijuSpire||!spires.includes(kaijuSpire))return;
+    const alive=pets.filter(p=>p.alive);
+    if(!alive.length){endKaiju();return;}
+    const cx=alive.reduce((s,p)=>s+(p.x+p.w/2),0)/alive.length;
+    kaijuSpire.vx=Math.sign(cx-kaijuSpire.x)*8;
+    kaijuSpire.vy=-(10+Math.random()*6);
+    // roar bubble from nearest viewer
+    const nearest=alive.reduce((a,b)=>Math.hypot(b.x-kaijuSpire.x,b.y-kaijuSpire.y)<Math.hypot(a.x-kaijuSpire.x,a.y-kaijuSpire.y)?b:a,alive[0]);
+    // no roar bubble — kaiju is silent
+    setTimeout(()=>{
+      if(!kaijuActive||!kaijuSpire)return;
+      // flash kaiju green on stomp
+      kaijuSpire.color='#80ffb0';
+      setTimeout(()=>{if(kaijuSpire)kaijuSpire.color='#50e090';},250);
+      const stomped=pets.filter(p=>{
+        if(!p.alive)return false;
+        return Math.abs((p.x+p.w/2)-kaijuSpire.x)<kaijuSpire.r*3.0
+            && Math.abs((p.y+p.h/2)-kaijuSpire.y)<kaijuSpire.r*3.0;
+      });
+      stomped.forEach(p=>{
+        const nx=Math.sign((p.x+p.w/2)-kaijuSpire.x)||1;
+        p.vx+=nx*kaijuFlingForce*(0.7+Math.random()*0.6);
+        p.vy-=kaijuFlingForce*(0.5+Math.random()*0.5);
+        p.airborne=true; p.hp=Math.max(0,p.hp-25);
+        if(p.hp<=0&&p.alive){
+          p.alive=false;
+          if(p.bubble){p.bubble.remove();p.bubble=null;}
+          p.healthBarWrap.style.display='none';
+          p.brAngleTarget=Math.PI*4*(Math.random()<0.5?1:-1);
+          p.el.style.transition='opacity 0.8s'; p.el.style.opacity='0';
+          setTimeout(()=>{if(!p.alive)p.el.style.display='none';},900);
+        }
+        if(!pets.some(q=>q.alive)){endKaiju();}
+      });
+    },700);
+  }
+
+  kaijuStomp();
+  kaijuStompTimer=setInterval(kaijuStomp,kaijuStompInterval);
+
+  if(kaijuBarEl)kaijuBarEl.remove();
+  kaijuBarEl=document.createElement('div');
+  kaijuBarEl.style.cssText='position:fixed;top:88px;left:50%;transform:translateX(-50%);width:260px;z-index:50;pointer-events:none;text-align:center;';
+  kaijuBarEl.innerHTML='<div style="font-size:11px;font-weight:700;color:#50e090;letter-spacing:0.08em;margin-bottom:4px;">🦖 KAIJU HP</div><div style="height:10px;background:rgba(0,0,0,0.5);border-radius:5px;overflow:hidden;border:0.5px solid rgba(80,220,140,0.4);"><div id="kaijuBarFill" style="height:100%;width:100%;background:linear-gradient(90deg,#50e090,#20c060);border-radius:5px;transition:width 0.2s;"></div></div>';
+  document.body.appendChild(kaijuBarEl);
+}
+
+function updateKaijuBar(){
+  const fill=document.getElementById('kaijuBarFill');if(!fill)return;
+  const r=Math.max(0,kaijuHp/kaijuMaxHp);
+  fill.style.width=(r*100)+'%';
+  fill.style.background=r>0.5?'linear-gradient(90deg,#50e090,#20c060)':r>0.25?'linear-gradient(90deg,#e0c050,#c08020)':'linear-gradient(90deg,#e05050,#c02020)';
+}
+
+function kaijuTakeDamage(dmg,username){
+  if(!kaijuActive||!kaijuSpire)return;
+  kaijuHp=Math.max(0,kaijuHp-dmg); updateKaijuBar();
+  kaijuSpire.vx+=(Math.random()-.5)*6; kaijuSpire.vy-=3+Math.random()*3;
+  // flash red briefly
+  const prevColor=kaijuSpire.color;
+  kaijuSpire.color='#ff6060';
+  setTimeout(()=>{if(kaijuSpire)kaijuSpire.color='#50e090';},200);
+  const attacker=pets.find(p=>p.username===username&&p.alive);
+  if(attacker)attacker.say('HIT!');
+  if(kaijuHp<=0){
+    pets.filter(p=>p.alive).forEach(p=>p.say('WE WIN!'));
+    // fling kaiju spire off screen
+    if(kaijuSpire){kaijuSpire.vx=(Math.random()-.5)*20;kaijuSpire.vy=-15;}
+    endKaiju();
+  }
+}
+
+function endKaiju(){
+  kaijuActive=false;
+  clearInterval(kaijuStompTimer); kaijuStompTimer=null;
+  if(kaijuBarEl){kaijuBarEl.remove();kaijuBarEl=null;}
+  // remove kaiju spire after a moment
+  setTimeout(()=>{
+    if(kaijuSpire){spires=spires.filter(s=>s!==kaijuSpire);kaijuSpire=null;}
+  },2000);
+  // respawn all viewers
+  setTimeout(()=>{
+    pets.forEach(p=>{
+      p.alive=true; p.hp=p.maxHp||100;
+      p.el.style.transition='opacity 0.6s'; p.el.style.display='flex';
+      p.el.style.opacity='1'; p.el.style.filter='none';
+      p.brAngle=0; p.brAngleTarget=0; p.healthBarWrap.style.display='none';
+      p.nameEl.textContent=(p.pinned?'📌 ':'')+p.username; p.nameEl.style.color=p.color;
+      p.x=Math.random()*(window.innerWidth-p.w); p.y=window.innerHeight-p.h;
+      p.vx=(Math.random()-.5)*2; p.vy=-2; p.airborne=true;
+      requestAnimationFrame(()=>{p.el.style.opacity='1';});
+    });
+    kaijuSpire=null;
+  },2500);
+}
+
 // Twitch online indicator
 setInterval(()=>{
   const ind=document.getElementById('twitchIndicator');
@@ -2294,35 +2579,54 @@ document.getElementById('petSpeed').addEventListener('input',function(){
     }
   });
 });
-document.getElementById('maxPets').addEventListener('input',function(){maxPets=parseInt(this.value)||30;});
-document.getElementById('bubbleDur').addEventListener('input',function(){bubbleDur=parseInt(this.value)||5;});
-document.getElementById('bubbleFontSize').addEventListener('input',function(){bubbleFontSize=Math.max(8,Math.min(24,parseInt(this.value)||11));});
+document.getElementById('maxPets').addEventListener('input',function(){maxPets=parseInt(this.value)||30;document.getElementById('maxPetsVal').textContent=this.value;while(pets.length>maxPets){const p=pets.pop();if(p.username&&petMap[p.username])delete petMap[p.username];p.destroy();}});
+document.getElementById('maxSpritesSlider').addEventListener('input',function(){maxSprites=parseInt(this.value)||500;document.getElementById('maxSpritesVal').textContent=this.value;if(spires.length>maxSprites)spires.splice(maxSprites);});
+document.getElementById('bubbleDur').addEventListener('input',function(){bubbleDur=parseInt(this.value)||5;document.getElementById('bubbleDurVal').textContent=this.value+'s';});
+document.getElementById('bubbleFontSize').addEventListener('input',function(){bubbleFontSize=parseInt(this.value)||11;document.getElementById('bubbleFontSizeVal').textContent=this.value+'px';});
 
 
-petFileInput=document.getElementById('petFileInput');
-document.getElementById('addPetFrameBtn').addEventListener('click',()=>petFileInput.click());
-petFileInput.addEventListener('change',function(){
-  Array.from(this.files).forEach(file=>{
-    if(!file.type.startsWith('image/'))return;
-    const reader=new FileReader();
-    reader.onload=ev=>{
-      const img=new Image();
-      img.onload=()=>{petFrames.push(img);savePetFrames();renderPetFrameList();};
-      img.src=ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  });this.value='';
-});
-function renderPetFrameList(){
-  const list=document.getElementById('petFrameList');list.innerHTML='';
-  petFrames.forEach((f,fi)=>{
+// directional viewer frame wiring
+const LS_PFL='lpp_pfl5',LS_PFR='lpp_pfr5',LS_PFI='lpp_pfi5';
+function savePetFramesDir(){
+  try{localStorage.setItem(LS_PFL,JSON.stringify(petFramesLeft.map(i=>i.src)));}catch(e){}
+  try{localStorage.setItem(LS_PFR,JSON.stringify(petFramesRight.map(i=>i.src)));}catch(e){}
+  try{localStorage.setItem(LS_PFI,JSON.stringify(petFramesIdle.map(i=>i.src)));}catch(e){}
+}
+function renderPetFrameDir(arr,listId){
+  const list=document.getElementById(listId);if(!list)return;list.innerHTML='';
+  arr.forEach((f,fi)=>{
     const thumb=document.createElement('div');thumb.className='frameThumb';
     const img=document.createElement('img');img.src=f.src;
     const fdel=document.createElement('div');fdel.className='fdel';fdel.textContent='x';
-    fdel.addEventListener('click',e=>{e.stopPropagation();petFrames.splice(fi,1);savePetFrames();renderPetFrameList();});
+    fdel.addEventListener('click',e=>{e.stopPropagation();arr.splice(fi,1);savePetFramesDir();renderAllPetFrameDirs();});
     thumb.appendChild(img);thumb.appendChild(fdel);list.appendChild(thumb);
   });
 }
+function renderAllPetFrameDirs(){
+  renderPetFrameDir(petFramesLeft,'petFrameLeft');
+  renderPetFrameDir(petFramesRight,'petFrameRight');
+  renderPetFrameDir(petFramesIdle,'petFrameIdle');
+}
+function wireViewerFrameBtn(btnId,fileId,arr){
+  document.getElementById(btnId).addEventListener('click',()=>document.getElementById(fileId).click());
+  document.getElementById(fileId).addEventListener('change',function(){
+    Array.from(this.files).forEach(file=>{
+      if(!file.type.startsWith('image/'))return;
+      const reader=new FileReader();
+      reader.onload=ev=>{const img=new Image();img.onload=()=>{arr.push(img);savePetFramesDir();renderAllPetFrameDirs();};img.src=ev.target.result;};
+      reader.readAsDataURL(file);
+    });this.value='';
+  });
+}
+wireViewerFrameBtn('addPetFrameLeftBtn','petFileLeft',petFramesLeft);
+wireViewerFrameBtn('addPetFrameRightBtn','petFileRight',petFramesRight);
+wireViewerFrameBtn('addPetFrameIdleBtn','petFileIdle',petFramesIdle);
+// load saved directional frames
+(function(){
+  [[LS_PFL,petFramesLeft],[LS_PFR,petFramesRight],[LS_PFI,petFramesIdle]].forEach(([key,arr])=>{
+    try{const r=localStorage.getItem(key);if(r)JSON.parse(r).forEach(src=>{const img=new Image();img.onload=()=>{arr.push(img);renderAllPetFrameDirs();};img.src=src;});}catch(e){}
+  });
+})();
 const LS_PET_FRAMES='lpp_petf5';
 function savePetFrames(){
   try{localStorage.setItem(LS_PET_FRAMES,JSON.stringify(petFrames.map(f=>f.src)));}catch(e){}
