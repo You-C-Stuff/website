@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Living Physics Playground</title>
+<title>Twitch Playground</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans-serif;}
@@ -73,7 +73,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
 .soundUpBtn{width:100%;padding:8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;font-family:inherit;}
 .soundUpBtn:hover{border-color:#7F77DD;}
 .snd-label{font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;min-height:16px;}
-#fileInputHidden,#hoopFileInput,#soundInput,#victorySoundInput,#resizeSoundInput{display:none;}
+#fileInputHidden,#hoopFileInput,#soundInput,#victorySoundInput,#resizeSoundInput,#battleStartSoundInput,#hitSoundInput,#koSoundInput,#winSoundInput,#stompSoundInput,#dvdBounceSoundInput{display:none;}
 #hotkeyList{width:100%;border-collapse:collapse;font-size:12px;}
 #hotkeyList th{text-align:left;color:rgba(255,255,255,0.4);font-weight:400;padding:4px 6px;border-bottom:0.5px solid rgba(255,255,255,0.08);}
 #hotkeyList td{padding:6px 6px;vertical-align:middle;}
@@ -105,9 +105,10 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <button class="tbbtn" id="burstBtn">Burst</button>
       <button class="tbbtn" id="vibeBtn">Vibrate</button>
       <button class="tbbtn hoop" id="hoopShotBtn">🏀 Ballin'</button>
-      <button class="tbbtn" id="brTopBtn" style="border-color:rgba(239,159,39,0.5);color:rgba(239,159,39,0.9);">⚔️ Battle</button>
-      <button class="tbbtn" id="kaijuTopBtn" style="border-color:rgba(60,200,120,0.5);color:rgba(80,220,140,0.9);">🦖 Kaiju</button>
+      <button class="tbbtn" id="brTopBtn" style="border-color:rgba(220,60,60,0.5);color:rgba(220,80,80,0.9);">⚔️ Battle</button>
       <button class="tbbtn" id="warTopBtn" style="border-color:rgba(220,60,60,0.5);color:rgba(220,100,100,0.9);">🚩 War</button>
+      <button class="tbbtn" id="kaijuTopBtn" style="border-color:rgba(60,200,120,0.5);color:rgba(80,220,140,0.9);">🦖 Kaiju</button>
+      <button class="tbbtn" id="dvdBtn" style="border-color:rgba(80,160,255,0.5);color:rgba(100,180,255,0.9);">💿 DVD</button>
     </div>
     <div class="tbsep"></div>
     <div class="tbgroup">
@@ -172,6 +173,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <button class="stab" data-tab="sound">Sound</button>
       <button class="stab" data-tab="hotkeys">Hotkeys</button>
       <button class="stab" data-tab="fights">Fights</button>
+      <button class="stab" data-tab="commands">Commands</button>
     </div>
 
     <div class="stabpanel" id="tab-twitch">
@@ -186,11 +188,10 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
           <button id="twitchDisconnectBtn" style="padding:7px 10px;border-radius:8px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);font-size:13px;cursor:pointer;font-family:inherit;">✕</button>
         </div>
         <div id="twitchStatus" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:6px;">Not connected</div>
-        <button id="testPetBtn" style="margin-top:8px;width:100%;padding:6px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;font-family:inherit;">+ Spawn test pet (preview)</button>
-      </div>
-      <div class="srow">
-        <label>Pet size (px)</label>
-        <input type="number" id="petSize" value="48" min="16" max="128">
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button id="testPetBtn" style="flex:1;padding:6px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;font-family:inherit;">+ Spawn test viewer</button>
+          <button id="clearTestPetsBtn" style="flex:1;padding:6px;border-radius:7px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.7);font-size:11px;cursor:pointer;font-family:inherit;">Clear test viewers</button>
+        </div>
       </div>
       <div class="srow">
         <label>Walk speed</label>
@@ -215,11 +216,15 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
         <label>Speech bubble font size (px)</label>
         <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="bubbleFontSize" min="6" max="48" step="1" value="11" style="flex:1;accent-color:#7F77DD;"><span id="bubbleFontSizeVal" style="font-size:12px;color:#fff;min-width:36px;">11px</span></div>
       </div>
-      <div class="srow"><label>Viewer animation fps</label><input type="number" id="viewerFpsInput" value="12" min="1" max="120"></div>
+
     </div>
     <div class="stabpanel active" id="tab-costumes">
       <!-- ── Background ── -->
       <div class="srow"><label>Background colour</label><input type="color" id="bgColor" value="#111111"></div>
+      <div class="srow" style="display:flex;align-items:center;gap:10px;">
+        <label style="margin:0;">Transparent BG</label>
+        <input type="checkbox" id="bgTransparent" style="width:16px;height:16px;accent-color:#7F77DD;cursor:pointer;">
+      </div>
       <hr class="sdivider">
       <!-- ── Pet costumes ── -->
       <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Pet costumes</div>
@@ -227,10 +232,11 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <div id="costumeGrid"></div>
       <button class="addCostumeBtn" id="addCostumeBtn">+ New costume</button>
       <div class="srow" style="margin-top:14px;"><label>Animation fps</label><input type="number" id="fps" value="12" min="1" max="60"></div>
+      <div class="srow"><label>Default pet size (px)</label><input type="number" id="defaultPetSize" value="24" min="10" max="300"></div>
       <hr class="sdivider">
 
-      <!-- ── Viewer walking animation ── -->
-      <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Viewer walking animation</div>
+      <!-- ── Viewer Costume ── -->
+      <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Viewer Costume</div>
       <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">Upload directional frames. Forward is used as fallback if Left/Right not set.</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="costume-row">
@@ -252,6 +258,8 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
           <input type="file" id="petFileIdle" multiple accept="image/*" style="display:none;">
         </div>
       </div>
+      <div class="srow" style="margin-top:8px;"><label>Animation fps</label><input type="number" id="viewerFpsInput" value="12" min="1" max="120"></div>
+      <div class="srow"><label>Default viewer size (px)</label><input type="number" id="defaultViewerSize" value="48" min="8" max="300"></div>
       <hr class="sdivider">
 
       <!-- ── Hoop sprite ── -->
@@ -290,6 +298,9 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
     <div class="stabpanel" id="tab-hoop" style="display:none!important;"></div>
 
     <div class="stabpanel" id="tab-sound">
+      <div class="srow"><label>Volume</label><input type="range" id="soundVol" min="0" max="1" step="0.01" value="0.707" style="width:100%;accent-color:#7F77DD;"></div>
+      <hr class="sdivider">
+      <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">General</div>
       <div class="srow">
         <label>Collision sound</label>
         <button class="soundUpBtn" id="soundUpBtn">Upload (MP3, WAV, OGG)</button>
@@ -299,26 +310,81 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
           <button id="soundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
         </div>
       </div>
+      <div class="srow"><label>Min velocity to trigger collision sound</label><input type="number" id="soundThresh" value="3" min="0" max="20" step="0.5"></div>
       <div class="srow">
-        <label>Victory sound (hoop scored)</label>
-        <button class="soundUpBtn" id="victorySoundUpBtn">Upload victory sound</button>
+        <label>🏀 Hoop scored</label>
+        <button class="soundUpBtn" id="victorySoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="victorySoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="victorySoundName" style="flex:1;margin:0;">No victory sound loaded</div>
+          <div class="snd-label" id="victorySoundName" style="flex:1;margin:0;">No sound loaded</div>
           <button id="victorySoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
         </div>
       </div>
       <div class="srow">
-        <label>Resize sound (size hotkey)</label>
-        <button class="soundUpBtn" id="resizeSoundUpBtn">Upload resize sound</button>
+        <label>🔢 Resize (size hotkey)</label>
+        <button class="soundUpBtn" id="resizeSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="resizeSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="resizeSoundName" style="flex:1;margin:0;">No resize sound loaded</div>
+          <div class="snd-label" id="resizeSoundName" style="flex:1;margin:0;">No sound loaded</div>
           <button id="resizeSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
         </div>
       </div>
-      <div class="srow"><label>Volume</label><input type="range" id="soundVol" min="0" max="1" step="0.01" value="0.707" style="width:100%;accent-color:#7F77DD;"></div>
-      <div class="srow"><label>Min velocity to trigger collision sound</label><input type="number" id="soundThresh" value="3" min="0" max="20" step="0.5"></div>
+      <hr class="sdivider">
+      <div style="font-size:11px;font-weight:600;color:rgba(239,159,39,0.8);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Events</div>
+      <div class="srow">
+        <label>⚔️ Battle / War / Kaiju start</label>
+        <button class="soundUpBtn" id="battleStartSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="battleStartSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="battleStartSoundName" style="flex:1;margin:0;">No sound loaded</div>
+          <button id="battleStartSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+        </div>
+      </div>
+      <div class="srow">
+        <label>🥊 Viewer hit (takes damage)</label>
+        <button class="soundUpBtn" id="hitSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="hitSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="hitSoundName" style="flex:1;margin:0;">No sound loaded</div>
+          <button id="hitSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+        </div>
+      </div>
+      <div class="srow">
+        <label>💀 Viewer KO’d</label>
+        <button class="soundUpBtn" id="koSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="koSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="koSoundName" style="flex:1;margin:0;">No sound loaded</div>
+          <button id="koSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+        </div>
+      </div>
+      <div class="srow">
+        <label>🏆 Winner declared</label>
+        <button class="soundUpBtn" id="winSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="winSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="winSoundName" style="flex:1;margin:0;">No sound loaded</div>
+          <button id="winSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+        </div>
+      </div>
+      <div class="srow">
+        <label>🦖 Kaiju stomp</label>
+        <button class="soundUpBtn" id="stompSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="stompSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="stompSoundName" style="flex:1;margin:0;">No sound loaded</div>
+          <button id="stompSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+        </div>
+      </div>
+      <div class="srow">
+        <label>💿 DVD wall bounce</label>
+        <button class="soundUpBtn" id="dvdBounceSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="dvdBounceSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="dvdBounceSoundName" style="flex:1;margin:0;">No sound loaded</div>
+          <button id="dvdBounceSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+        </div>
+      </div>
     </div>
 
     <div class="stabpanel" id="tab-hotkeys">
@@ -364,6 +430,16 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <div class="srow"><label>Stomp fling force</label><input type="number" id="kaijuFlingForce" value="18" min="5" max="50"></div>
       <div class="srow"><label>Hits to kill a viewer (stomps)</label><input type="number" id="kaijuHitsToDie" value="4" min="1" max="20"></div>
     </div>
+    <div class="stabpanel" id="tab-commands">
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Customise command triggers. Commands starting with ! can be renamed. Leave a field blank to disable that command.</p>
+
+      <div style="font-size:11px;font-weight:600;color:rgba(239,159,39,0.8);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Owner-only commands</div>
+      <div id="ownerCmdsGrid"></div>
+
+      <div style="font-size:11px;font-weight:600;color:rgba(127,180,255,0.8);text-transform:uppercase;letter-spacing:0.06em;margin-top:16px;margin-bottom:10px;">Viewer commands</div>
+      <div id="viewerCmdsGrid"></div>
+    </div>
+
     <button class="sclose" id="closeSettings">Done</button>
   </div>
 </div>
@@ -445,6 +521,9 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
     </div>
   </div>
   <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px;">Changes apply live as you type</div>
+  <button id="blockImgUploadBtn" style="width:100%;margin-bottom:6px;padding:6px;border-radius:6px;border:1px dashed rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.6);font-size:12px;cursor:pointer;font-family:inherit;">+ Set block image</button>
+  <button id="blockImgClearBtn" style="width:100%;margin-bottom:6px;padding:6px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;font-family:inherit;">Clear image</button>
+  <input type="file" id="blockImgFileInput" accept="image/*" style="display:none;">
   <button id="blockDeleteBtn" style="width:100%;padding:6px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);font-size:12px;cursor:pointer;font-family:inherit;">Delete block</button>
 </div>
 
@@ -457,7 +536,7 @@ document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 
 const canvas=document.getElementById('canvas');
 const ctx=canvas.getContext('2d');
-let bgColor='#111111';
+let bgColor='#111111', bgTransparent=false;
 function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
 resize();window.addEventListener('resize',resize);
 
@@ -489,6 +568,7 @@ let hoopSliding=false;
 let hoopSlideDir=0;    // +1 = sliding out, -1 = sliding in
 
 let collisionBuffer=null,victoryBuffer=null,resizeBuffer=null;
+let battleStartBuffer=null,hitBuffer=null,koBuffer=null,winBuffer=null,stompBuffer=null,dvdBounceBuffer=null;
 let audioCtx=null,soundVol=0.02,soundThresh=3,lastSoundTime=0,lastResizeSound=0,lastVictoryTime=0;
 let pickerTargetSpire=null;
 
@@ -496,31 +576,26 @@ let pickerTargetSpire=null;
 let savedPhysics=null;
 
 const ACTIONS=[
-  // sprites
-  {id:'clear',        label:'Reset pets',       default:''},
-  {id:'burst',        label:'Burst spawn',         default:''},
-  {id:'vibrate',      label:'Toggle vibrate',      default:''},
-  {id:'bounce',       label:'Bounce pets',      default:''},
+  {id:'bounce',       label:'Bounce Pets',         default:''},
+  {id:'viewerBounce', label:'Bounce Viewers',      default:''},
+  {id:'viewerToggle', label:'Toggle Viewers',      default:''},
   {id:'sizeUp',       label:'Size +10',            default:''},
   {id:'sizeDown',     label:'Size -10',            default:''},
-  {id:'toggleUI',     label:'Toggle UI',           default:''},
-  {id:'hoop',         label:'Hoop shot',           default:''},
-  // global
-  {id:'gravFlip',     label:'Reverse gravity',     default:''},
-  {id:'zeroG',        label:'Zero G',              default:''},
+  {id:'hoop',         label:"Ballin'",             default:''},
+  {id:'gravFlip',     label:'Reverse Gravity',     default:''},
+  {id:'zeroG',        label:'Zero Gravity',        default:''},
+  {id:'explode',      label:'Explode Everything',  default:''},
+  {id:'clear',        label:'Reset',               default:''},
+  {id:'burst',        label:'Burst spawn',         default:''},
+  {id:'vibrate',      label:'Toggle vibrate',      default:''},
   {id:'freeze',       label:'Toggle freeze',       default:''},
-  {id:'explode',      label:'Explode everything',  default:''},
-  // viewers
-  {id:'viewerToggle', label:'Toggle viewers',      default:''},
-  {id:'viewerBounce', label:'Bounce viewers',      default:''},
-  // builder
-  {id:'builderToggle',label:'Toggle builder mode', default:''},
 ];
 let hotkeys={};
 ACTIONS.forEach(a=>hotkeys[a.id]=a.default);
 
 const LS_C='lpp_c5',LS_A='lpp_a5',LS_H='lpp_h5',LS_HK='lpp_hk5',LS_PREFS='lpp_prefs5';
 const LS_SND='lpp_snd5',LS_VSND='lpp_vsnd5',LS_RSND='lpp_rsnd5';
+const LS_BSND='lpp_bsnd5',LS_HSND='lpp_hsnd5',LS_KOSND='lpp_kosnd5',LS_WINSND='lpp_winsnd5',LS_STOMPSND='lpp_stompsnd5',LS_DVDSND='lpp_dvdsnd5';
 
 // Volume uses a square curve: slider value s ∈ [0,1] → actual vol = s² * 0.04
 // So actual vol 0.02 → s = sqrt(0.02/0.04) = sqrt(0.5) ≈ 0.707 (midpoint of slider)
@@ -630,6 +705,12 @@ function loadSoundsFromLS(){
   loadAudioBuffer(LS_SND,buf=>{collisionBuffer=buf;document.getElementById('soundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_VSND,buf=>{victoryBuffer=buf;document.getElementById('victorySoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_RSND,buf=>{resizeBuffer=buf;document.getElementById('resizeSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_BSND,buf=>{battleStartBuffer=buf;document.getElementById('battleStartSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_HSND,buf=>{hitBuffer=buf;document.getElementById('hitSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_KOSND,buf=>{koBuffer=buf;document.getElementById('koSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_WINSND,buf=>{winBuffer=buf;document.getElementById('winSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_STOMPSND,buf=>{stompBuffer=buf;document.getElementById('stompSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_DVDSND,buf=>{dvdBounceBuffer=buf;document.getElementById('dvdBounceSoundName').textContent='✓ (saved)';});
 }
 
 class Spire{
@@ -644,7 +725,7 @@ class Spire{
     this.isHoopBall=false;
   }
 }
-function spawnAt(x,y,r){if(spires.length>=300)return null;const s=new Spire(x,y,r);spires.push(s);return s;}
+function spawnAt(x,y,r){if(spires.length>=maxSprites)return null;const s=new Spire(x,y,r);spires.push(s);return s;}
 
 function applySquash(s,nx,ny,intensity){
   if(config.bounce===0)return;
@@ -913,7 +994,7 @@ function update(now){
 
 function draw(now){
   const W=canvas.width,H=canvas.height;
-  ctx.fillStyle=bgColor;ctx.fillRect(0,0,W,H);
+  if(bgTransparent){ctx.clearRect(0,0,W,H);}else{ctx.fillStyle=bgColor;ctx.fillRect(0,0,W,H);}
   drawHoop(now);
 
   for(let s of spires){
@@ -1024,10 +1105,9 @@ document.addEventListener('keydown',e=>{
     if(e.code!==key)continue;
     e.preventDefault();
     switch(action){
-      case 'clear': spires=[];break;
+      case 'clear': document.getElementById('resetBtn').click();break;
       case 'burst': for(let i=0;i<20;i++)setTimeout(()=>spawnAt(canvas.width/2+(Math.random()-.5)*200,canvas.height/2+(Math.random()-.5)*200),i*30);break;
       case 'vibrate': toggleVibrate();break;
-      case 'toggleUI': toggleUI();break;
       case 'hoop': ensureAudio();fireHoopShot();break;
       case 'bounce': bounceAll();break;
       case 'sizeUp': ensureAudio();adjustSize(10);break;
@@ -1038,7 +1118,7 @@ document.addEventListener('keydown',e=>{
       case 'explode': document.getElementById('explosionBtn').click();break;
       case 'viewerToggle': document.getElementById('viewerToggleBtn').click();break;
       case 'viewerBounce': document.getElementById('petScatterBtn').click();break;
-      case 'builderToggle': document.getElementById('builderBtn').click();break;
+      case 'freeze': document.getElementById('freezeBtn').click();break;
     }
   }
 });
@@ -1080,6 +1160,11 @@ document.getElementById('viewerSize').addEventListener('input',function(){
 });
 document.getElementById('bounceBtn').addEventListener('click',bounceAll);
 document.getElementById('resetBtn').addEventListener('click',()=>{
+  // end all active events
+  if(battleRoyaleActive)endBattleRoyale();
+  if(warActive)endWar();
+  if(kaijuActive)endKaiju();
+  if(dvdActive)endDvd();
   spires=[];
   clearTimeout(hoopTimer);
   hoopTimer=null;hoopVisible=false;hoopSlideDir=0;hoopSlideX=HOOP_W+40;
@@ -1090,6 +1175,11 @@ document.getElementById('resetBtn').addEventListener('click',()=>{
   document.getElementById('bounce').value=0.7;document.getElementById('bv').textContent='0.70';
   document.getElementById('friction').value=0;document.getElementById('fv').textContent='0.00';
   document.getElementById('size').value=24;document.getElementById('sv').textContent='24';
+  // reset viewer size
+  petSize=48;
+  document.getElementById('viewerSize').value=48;document.getElementById('vsv').textContent='48';
+  const namePx=Math.max(8,Math.round(48*0.22))+'px';
+  pets.forEach(p=>{p.w=48;p.h=48;p.spriteEl.width=48;p.spriteEl.height=48;p.el.style.width='48px';p.nameEl.style.fontSize=namePx;});
   // reset gravity flip toggle state
   gravReversed=false;
   document.getElementById('gravFlipBtn').classList.remove('active');
@@ -1101,6 +1191,90 @@ document.getElementById('hoopShotBtn').addEventListener('click',()=>{ensureAudio
 document.getElementById('brTopBtn').addEventListener('click',startBattleRoyale);
 document.getElementById('warTopBtn').addEventListener('click',startWar);
 document.getElementById('kaijuTopBtn').addEventListener('click',startKaiju);
+document.getElementById('dvdBtn').addEventListener('click',toggleDvd);
+
+// ── DVD MODE ─────────────────────────────────────────────
+let dvdActive=false, dvdSpire=null;
+let dvdVx=3, dvdVy=2;
+const DVD_COLORS=['#ff4444','#44aaff','#44ff88','#ffaa22','#cc44ff'];
+let dvdColorIdx=0;
+
+function toggleDvd(){
+  if(dvdActive){endDvd();return;}
+  if(battleRoyaleActive)endBattleRoyale();
+  if(warActive)endWar();
+  if(kaijuActive)endKaiju();
+  dvdActive=true;
+  const r=config.size||24;
+  dvdSpire=spawnAt(canvas.width/2,canvas.height/2,r);
+  if(!dvdSpire){dvdActive=false;return;}
+  // use the currently selected costume
+  dvdSpire.costumeId=activeCostumeId;
+  dvdColorIdx=Math.floor(Math.random()*DVD_COLORS.length);
+  dvdSpire.color=DVD_COLORS[dvdColorIdx];
+  dvdSpire.vx=0;dvdSpire.vy=0;
+  dvdVx=(Math.random()<0.5?-1:1)*(3+Math.random()*2);
+  dvdVy=(Math.random()<0.5?-1:1)*(2+Math.random()*2);
+  setGravity(0);
+  document.getElementById('dvdBtn').classList.add('active');
+  document.getElementById('dvdBtn').textContent='\uD83D\uDCBF Stop DVD';
+}
+
+function endDvd(){
+  dvdActive=false;
+  if(dvdSpire){
+    // drop to ground — restore gravity and let it fall naturally
+    dvdSpire.vx=(Math.random()-.5)*3;
+    dvdSpire.vy=0;
+    dvdSpire=null;
+  }
+  document.getElementById('dvdBtn').classList.remove('active');
+  document.getElementById('dvdBtn').textContent='\uD83D\uDCBF DVD';
+  setGravity(1);
+}
+
+// DVD canvas update — called each frame from draw
+function updateDvd(){
+  if(!dvdActive||!dvdSpire)return;
+  dvdSpire.vx=dvdVx;dvdSpire.vy=dvdVy;
+  const W=canvas.width,H=canvas.height,r=dvdSpire.r;
+  let bounced=false;
+  if(dvdSpire.x-r<=0){dvdSpire.x=r;dvdVx=Math.abs(dvdVx);bounced=true;}
+  if(dvdSpire.x+r>=W){dvdSpire.x=W-r;dvdVx=-Math.abs(dvdVx);bounced=true;}
+  if(dvdSpire.y-r<=0){dvdSpire.y=r;dvdVy=Math.abs(dvdVy);bounced=true;}
+  if(dvdSpire.y+r>=H){dvdSpire.y=H-r;dvdVy=-Math.abs(dvdVy);bounced=true;}
+  if(bounced){
+    dvdColorIdx=(dvdColorIdx+1)%DVD_COLORS.length;
+    dvdSpire.color=DVD_COLORS[dvdColorIdx];
+  }
+  dvdSpire.x+=dvdVx;dvdSpire.y+=dvdVy;
+}
+
+
+// ── BLOCK IMAGE UPLOAD ────────────────────────────────────
+const LS_BLOCK_IMGS='lpp_bimgs5';
+let blockImgMap={}; // index → {src, img}
+(function(){try{const r=localStorage.getItem(LS_BLOCK_IMGS);if(r){const d=JSON.parse(r);Object.keys(d).forEach(k=>{const img=new Image();img.src=d[k];blockImgMap[k]={src:d[k],img};});}}catch(e){}})();
+function saveBlockImgs(){try{const d={};Object.keys(blockImgMap).forEach(k=>{d[k]=blockImgMap[k].src;});localStorage.setItem(LS_BLOCK_IMGS,JSON.stringify(d));}catch(e){}}
+
+document.getElementById('blockImgUploadBtn').addEventListener('click',()=>document.getElementById('blockImgFileInput').click());
+document.getElementById('blockImgFileInput').addEventListener('change',function(){
+  const file=this.files[0];if(!file||blockMenuTarget===null)return;
+  const idx=blockMenuTarget;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{blockImgMap[idx]={src:ev.target.result,img};saveBlockImgs();};
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);this.value='';
+});
+document.getElementById('blockImgClearBtn').addEventListener('click',()=>{
+  if(blockMenuTarget===null)return;
+  delete blockImgMap[blockMenuTarget];
+  saveBlockImgs();
+});
+
 
 document.getElementById('settingsBtn').addEventListener('click',()=>document.getElementById('settingsPanel').classList.add('open'));
 document.getElementById('closeSettings').addEventListener('click',()=>document.getElementById('settingsPanel').classList.remove('open'));
@@ -1113,8 +1287,27 @@ document.querySelectorAll('.stab').forEach(btn=>{
   });
 });
 document.getElementById('bgColor').addEventListener('input',function(){bgColor=this.value;savePrefs();});
+document.getElementById('bgTransparent').addEventListener('change',function(){
+  bgTransparent=this.checked;
+  document.body.style.background=bgTransparent?'transparent':bgColor;
+  canvas.style.background='transparent';
+});
 document.getElementById('fps').addEventListener('input',function(){fps=Math.max(1,parseInt(this.value)||12);frameTime=1000/fps;savePrefs();});
 document.getElementById('viewerFpsInput').addEventListener('input',function(){viewerFps=Math.max(1,parseInt(this.value)||12);viewerFrameTime=1000/viewerFps;});
+document.getElementById('defaultPetSize').addEventListener('input',function(){
+  const v=Math.max(10,parseInt(this.value)||24);
+  config.size=v;
+  document.getElementById('size').value=v;
+  document.getElementById('sv').textContent=v;
+});
+document.getElementById('defaultViewerSize').addEventListener('input',function(){
+  const v=Math.max(8,parseInt(this.value)||48);
+  petSize=v;
+  document.getElementById('viewerSize').value=v;
+  document.getElementById('vsv').textContent=v;
+  const namePx=Math.max(8,Math.round(v*0.22))+'px';
+  pets.forEach(p=>{p.w=v;p.h=v;p.spriteEl.width=v;p.spriteEl.height=v;p.el.style.width=v+'px';p.nameEl.style.fontSize=namePx;});
+});
 document.getElementById('hoopSizeSlider').addEventListener('input',function(){
   HOOP_W=parseInt(this.value);
   HOOP_H=Math.round(HOOP_W*0.75); // maintain 4:3 ratio
@@ -1242,10 +1435,24 @@ function wireAudio(btnId,inputId,labelId,onLoad){
 wireAudio('soundUpBtn','soundInput','soundName',buf=>{collisionBuffer=buf;saveAudioBuffer(LS_SND,buf);});
 wireAudio('victorySoundUpBtn','victorySoundInput','victorySoundName',buf=>{victoryBuffer=buf;saveAudioBuffer(LS_VSND,buf);});
 wireAudio('resizeSoundUpBtn','resizeSoundInput','resizeSoundName',buf=>{resizeBuffer=buf;saveAudioBuffer(LS_RSND,buf);});
+wireAudio('battleStartSoundUpBtn','battleStartSoundInput','battleStartSoundName',buf=>{battleStartBuffer=buf;saveAudioBuffer(LS_BSND,buf);});
+wireAudio('hitSoundUpBtn','hitSoundInput','hitSoundName',buf=>{hitBuffer=buf;saveAudioBuffer(LS_HSND,buf);});
+wireAudio('koSoundUpBtn','koSoundInput','koSoundName',buf=>{koBuffer=buf;saveAudioBuffer(LS_KOSND,buf);});
+wireAudio('winSoundUpBtn','winSoundInput','winSoundName',buf=>{winBuffer=buf;saveAudioBuffer(LS_WINSND,buf);});
+wireAudio('stompSoundUpBtn','stompSoundInput','stompSoundName',buf=>{stompBuffer=buf;saveAudioBuffer(LS_STOMPSND,buf);});
+wireAudio('dvdBounceSoundUpBtn','dvdBounceSoundInput','dvdBounceSoundName',buf=>{dvdBounceBuffer=buf;saveAudioBuffer(LS_DVDSND,buf);});
 
 document.getElementById('soundClearBtn').addEventListener('click',()=>{collisionBuffer=null;localStorage.removeItem(LS_SND);document.getElementById('soundName').textContent='No sound loaded';});
-document.getElementById('victorySoundClearBtn').addEventListener('click',()=>{victoryBuffer=null;localStorage.removeItem(LS_VSND);document.getElementById('victorySoundName').textContent='No victory sound loaded';});
-document.getElementById('resizeSoundClearBtn').addEventListener('click',()=>{resizeBuffer=null;localStorage.removeItem(LS_RSND);document.getElementById('resizeSoundName').textContent='No resize sound loaded';});
+document.getElementById('victorySoundClearBtn').addEventListener('click',()=>{victoryBuffer=null;localStorage.removeItem(LS_VSND);document.getElementById('victorySoundName').textContent='No sound loaded';});
+document.getElementById('resizeSoundClearBtn').addEventListener('click',()=>{resizeBuffer=null;localStorage.removeItem(LS_RSND);document.getElementById('resizeSoundName').textContent='No sound loaded';});
+document.getElementById('battleStartSoundClearBtn').addEventListener('click',()=>{battleStartBuffer=null;localStorage.removeItem(LS_BSND);document.getElementById('battleStartSoundName').textContent='No sound loaded';});
+document.getElementById('hitSoundClearBtn').addEventListener('click',()=>{hitBuffer=null;localStorage.removeItem(LS_HSND);document.getElementById('hitSoundName').textContent='No sound loaded';});
+document.getElementById('koSoundClearBtn').addEventListener('click',()=>{koBuffer=null;localStorage.removeItem(LS_KOSND);document.getElementById('koSoundName').textContent='No sound loaded';});
+document.getElementById('winSoundClearBtn').addEventListener('click',()=>{winBuffer=null;localStorage.removeItem(LS_WINSND);document.getElementById('winSoundName').textContent='No sound loaded';});
+document.getElementById('stompSoundClearBtn').addEventListener('click',()=>{stompBuffer=null;localStorage.removeItem(LS_STOMPSND);document.getElementById('stompSoundName').textContent='No sound loaded';});
+document.getElementById('dvdBounceSoundClearBtn').addEventListener('click',()=>{dvdBounceBuffer=null;localStorage.removeItem(LS_DVDSND);document.getElementById('dvdBounceSoundName').textContent='No sound loaded';});
+
+
 document.getElementById('soundVol').addEventListener('input',function(){soundVol=sliderToVol(parseFloat(this.value));savePrefs();});
 document.getElementById('soundThresh').addEventListener('input',function(){soundThresh=parseFloat(this.value)||3;savePrefs();});
 document.addEventListener('pointerdown',()=>ensureAudio());
@@ -1418,7 +1625,7 @@ class ChatPet{
     }
 
     // update DOM health bar
-    if((battleRoyaleActive||warActive||kaijuActive)&&this.alive){
+    if((battleRoyaleActive||warActive||kaijuActive||this._inDuel)&&this.alive){
       this.healthBarWrap.style.display='block';
       const ratio=Math.max(0,this.hp/this.maxHp);
       this.healthBarFill.style.width=(ratio*100)+'%';
@@ -1613,8 +1820,35 @@ function getOrCreatePet(username,color){
   petMap[username]=pet;
   pets.push(pet);
   applyViewerImgToPet(pet);
+  if(!viewersVisible){pet.el.style.display='none';pet._hidden=true;}
   return pet;
 }
+// ── PINNED SWING + DVD: comprehensive ChatPet.prototype.update override ──────
+const _origPetUpdate=ChatPet.prototype.update;
+ChatPet.prototype.update=function(now){
+  if(this.pinned&&!this.grabbed){
+    if(this._swingAngle===undefined){this._swingAngle=0.3*(Math.random()<0.5?1:-1);this._swingVel=0;}
+    const g=0.008, damping=0.995;
+    this._swingVel+=(-g*Math.sin(this._swingAngle));
+    this._swingVel*=damping;
+    this._swingAngle+=this._swingVel;
+    const len=this.h;
+    const pivotX=this.x+this.w/2;
+    this.x=pivotX+Math.sin(this._swingAngle)*len-this.w/2;
+    const H=window.innerHeight;
+    this.el.style.left=this.x+'px';
+    this.el.style.bottom=(H-this.y-this.h)+'px';
+    this.el.style.transform='rotate('+this._swingAngle+'rad)';
+    this.el.style.transformOrigin='top center';
+    this.drawSprite(now);return;
+  }
+  if(!this.pinned&&this._swingAngle!==undefined){
+    this._swingAngle=undefined;this._swingVel=undefined;
+    this.el.style.transform='none';this.el.style.transformOrigin='';
+  }
+  _origPetUpdate.call(this,now);
+};
+
 function clearAllPets(){
   pets.forEach(p=>p.destroy());
   pets=[];
@@ -1762,7 +1996,7 @@ function startBattleRoyale(){
     // check win condition
     if(alive.length<=1){
       if(alive.length===1){
-        alive[0].say('👑 I WIN!');
+        alive[0].say('👑 I WIN!');ensureAudio();playEventSound(winBuffer);
         alive[0].brAngleTarget=0;
       }
       endBattleRoyale();
@@ -1799,19 +2033,18 @@ function startBattleRoyale(){
           const nx=dx/dist, ny=dy/dist;
           nearest.vx+=nx*5;nearest.vy-=4;nearest.airborne=true;
           p.brCooldown=35+Math.floor(Math.random()*25);
-          // spin attacker briefly
           p.brAngleTarget+=Math.PI*0.5*(Math.random()<0.5?1:-1);
+          ensureAudio();playEventSound(hitBuffer);
           if(nearest.hp<=0){
             nearest.alive=false;
             if(nearest.bubble){nearest.bubble.remove();nearest.bubble=null;}
             nearest.healthBarWrap.style.display='none';
             nearest.brAngleTarget=Math.PI*4*(Math.random()<0.5?1:-1);
-            // fade and fly off, then hide completely
             nearest.vx=(Math.random()<0.5?-1:1)*(10+Math.random()*8);
             nearest.vy=-(8+Math.random()*5);
             nearest.airborne=true;
-            nearest.el.style.transition='opacity 0.8s';
-            nearest.el.style.opacity='0';
+            nearest.el.style.transition='opacity 0.8s'; nearest.el.style.opacity='0';
+            playEventSound(koBuffer);
             setTimeout(()=>{if(!nearest.alive)nearest.el.style.display='none';},900);
           }
         } else {
@@ -1860,6 +2093,8 @@ function startWar(){
   if(pets.length<2)return;
   if(warActive)endWar();
   if(battleRoyaleActive)endBattleRoyale();
+  if(kaijuActive)endKaiju();
+  if(dvdActive)endDvd();
   warActive=true;
   spires=[];
 
@@ -1905,7 +2140,7 @@ function startWar(){
       const winner=aliveA.length>0?'A':'B';
       const emoji=winner==='A'?teamAEmoji:teamBEmoji;
       const winTeam=winner==='A'?aliveA:aliveB;
-      winTeam.forEach(p=>p.say(`${emoji} VICTORY!`));
+      winTeam.forEach(p=>p.say(`${emoji} VICTORY!`));ensureAudio();playEventSound(winBuffer);
       endWar();
       return;
     }
@@ -2056,19 +2291,22 @@ function _doConnect(){
         const color=tags['color']||null;
         const pet=getOrCreatePet(username,color||undefined);
         if(pet&&!text.startsWith('!'))pet.say(text);
-        // battle royale command — only channel owner (matches channel name)
-        if(text.toLowerCase()==='!battleroyale'&&twitchChannel&&username.toLowerCase()===twitchChannel.toLowerCase()){
-          setTimeout(startBattleRoyale,500);
+        const cmdText=text.trim().toLowerCase();
+        const cmdParts=cmdText.split(/\s+/);
+        const cmdTrigger=cmdParts[0];
+        const cmdArgs=cmdParts.slice(1);
+        const isOwner=twitchChannel&&username.toLowerCase()===twitchChannel.toLowerCase();
+        // owner-only commands
+        if(isOwner){
+          if(cmdTrigger===cmd('battleroyale'))setTimeout(startBattleRoyale,500);
+          if(cmdTrigger===cmd('war'))setTimeout(startWar,500);
+          if(cmdTrigger===cmd('kaiju'))setTimeout(startKaiju,500);
         }
-        if(text.toLowerCase()==='!war'&&twitchChannel&&username.toLowerCase()===twitchChannel.toLowerCase()){
-          setTimeout(startWar,500);
-        }
-        if(text.toLowerCase()==='!kaiju'&&twitchChannel&&username.toLowerCase()===twitchChannel.toLowerCase()){
-          setTimeout(startKaiju,500);
-        }
-        if(text.toLowerCase()==='!attack'&&kaijuActive){
-          kaijuTakeDamage(10,username);
-        }
+        // viewer commands
+        if(cmdTrigger===cmd('attack'))execViewerCmd('attack',username,cmdArgs);
+        if(cmdTrigger===cmd('jump'))execViewerCmd('jump',username,cmdArgs);
+        if(cmdTrigger===cmd('duel'))execViewerCmd('duel',username,cmdArgs);
+        if(cmdTrigger===cmd('punch'))execViewerCmd('punch',username,cmdArgs);
       }
     }
   };
@@ -2107,7 +2345,12 @@ document.getElementById('testPetBtn').addEventListener('click',()=>{
   const names=['StreamerFan','CoolViewer','PixelDude','ChatBot42','GamerGal'];
   const name=names[Math.floor(Math.random()*names.length)]+'_'+Math.floor(Math.random()*99);
   const pet=getOrCreatePet(name);
-  if(pet)pet.say('Hello! I am a test pet 👋');
+  if(pet){pet._isTest=true;pet.say('Hello! I am a test viewer \uD83D\uDC4B');}
+});
+document.getElementById('clearTestPetsBtn').addEventListener('click',()=>{
+  const toRemove=pets.filter(p=>p._isTest);
+  toRemove.forEach(p=>{if(p.username&&petMap[p.username])delete petMap[p.username];p.destroy();});
+  pets=pets.filter(p=>!p._isTest);
 });
 // ── row-2 viewer buttons ──────────────────────────────────
 // helper: sync gravity slider
@@ -2303,11 +2546,20 @@ function drawBlocks(){
   if(!builderMode&&!moverMode&&!showingBlockPreview)return;
   ctx.save();
   const active=builderMode||moverMode;
-  ctx.strokeStyle=active?'rgba(127,119,221,0.8)':'rgba(127,119,221,0.35)';
-  ctx.fillStyle=active?'rgba(127,119,221,0.13)':'rgba(127,119,221,0.06)';
   ctx.lineWidth=builderMode?1.5:1;ctx.setLineDash([5,4]);
-  for(const b of blocks){ctx.fillRect(b.x,b.y,b.w,b.h);ctx.strokeRect(b.x,b.y,b.w,b.h);}
+  blocks.forEach((b,bi)=>{
+    const bimg=blockImgMap&&blockImgMap[bi];
+    if(bimg&&bimg.img&&bimg.img.complete){
+      ctx.setLineDash([]);ctx.drawImage(bimg.img,b.x,b.y,b.w,b.h);ctx.setLineDash([5,4]);
+      if(active){ctx.strokeStyle='rgba(127,119,221,0.5)';ctx.strokeRect(b.x,b.y,b.w,b.h);}
+    } else {
+      ctx.strokeStyle=active?'rgba(127,119,221,0.8)':'rgba(127,119,221,0.35)';
+      ctx.fillStyle=active?'rgba(127,119,221,0.13)':'rgba(127,119,221,0.06)';
+      ctx.fillRect(b.x,b.y,b.w,b.h);ctx.strokeRect(b.x,b.y,b.w,b.h);
+    }
+  });
   if(buildDrag){
+    ctx.strokeStyle='rgba(127,119,221,0.8)';ctx.fillStyle='rgba(127,119,221,0.13)';
     const x=Math.min(buildDrag.startX,buildDrag.curX),y=Math.min(buildDrag.startY,buildDrag.curY);
     const w=Math.abs(buildDrag.curX-buildDrag.startX),h=Math.abs(buildDrag.curY-buildDrag.startY);
     ctx.fillRect(x,y,w,h);ctx.strokeRect(x,y,w,h);
@@ -2316,7 +2568,7 @@ function drawBlocks(){
 }
 
 const __drawPre=draw,__updatePre=update;
-window.draw=function(now){__drawPre(now);drawBlocks();};
+window.draw=function(now){__drawPre(now);updateDvd();drawBlocks();};
 window.update=function(now){
   if(frozen){mouseVX=mouseX-prevMouseX;mouseVY=mouseY-prevMouseY;prevMouseX=mouseX;prevMouseY=mouseY;if(drag){const s=drag.spire;s.x+=(mouseX-drag.grabOffsetX-s.x)*0.5;s.y+=(mouseY-drag.grabOffsetY-s.y)*0.5;s.vx=mouseVX;s.vy=mouseVY;}return;}
   __updatePre(now);applyBlockCollisions();
@@ -2474,6 +2726,7 @@ function startKaiju(){
     setTimeout(()=>{
       if(!kaijuActive||!kaijuSpire)return;
       // flash kaiju green on stomp
+      ensureAudio();playEventSound(stompBuffer);
       kaijuSpire.color='#80ffb0';
       setTimeout(()=>{if(kaijuSpire)kaijuSpire.color='#50e090';},250);
       const stomped=pets.filter(p=>{
@@ -2527,7 +2780,7 @@ function kaijuTakeDamage(dmg,username){
   const attacker=pets.find(p=>p.username===username&&p.alive);
   if(attacker)attacker.say('HIT!');
   if(kaijuHp<=0){
-    pets.filter(p=>p.alive).forEach(p=>p.say('WE WIN!'));
+    pets.filter(p=>p.alive).forEach(p=>p.say('WE WIN!'));ensureAudio();playEventSound(winBuffer);
     // fling kaiju spire off screen
     if(kaijuSpire){kaijuSpire.vx=(Math.random()-.5)*20;kaijuSpire.vy=-15;}
     endKaiju();
@@ -2558,7 +2811,219 @@ function endKaiju(){
   },2500);
 }
 
-// Twitch online indicator
+// ══════════════════════════════════════════════════════════
+// COMMAND SYSTEM
+// ══════════════════════════════════════════════════════════
+const LS_CMDS='lpp_cmds5';
+
+// Command definitions: id, label, default trigger, who can use
+const CMD_DEFS=[
+  // owner-only
+  {id:'battleroyale', label:'Battle Royale',    def:'!battleroyale', owner:true},
+  {id:'war',          label:'Start War',        def:'!war',          owner:true},
+  {id:'kaiju',        label:'Kaiju Battle',     def:'!kaiju',        owner:true},
+  // viewer commands
+  {id:'attack',       label:'Attack Kaiju',     def:'!attack',       owner:false},
+  {id:'jump',         label:'Jump',             def:'!jump',         owner:false},
+  {id:'duel',         label:'Duel someone',     def:'!duel',         owner:false},
+  {id:'punch',        label:'Punch someone',    def:'!punch',        owner:false},
+];
+
+// Live command map: id → current trigger string (lowercase, with !)
+let cmdMap={};
+(function initCmds(){
+  let saved={};
+  try{const r=localStorage.getItem(LS_CMDS);if(r)saved=JSON.parse(r);}catch(e){}
+  CMD_DEFS.forEach(c=>{cmdMap[c.id]=saved[c.id]??c.def;});
+})();
+function saveCmds(){try{localStorage.setItem(LS_CMDS,JSON.stringify(cmdMap));}catch(e){}}
+function cmd(id){return cmdMap[id]||'';}
+
+// Build the Commands settings UI
+function buildCmdsUI(){
+  ['ownerCmdsGrid','viewerCmdsGrid'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;el.innerHTML='';
+  });
+  CMD_DEFS.forEach(c=>{
+    const container=document.getElementById(c.owner?'ownerCmdsGrid':'viewerCmdsGrid');
+    if(!container)return;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    const lbl=document.createElement('span');
+    lbl.style.cssText='flex:1;font-size:12px;color:rgba(255,255,255,0.65);';
+    lbl.textContent=c.label;
+    const inp=document.createElement('input');
+    inp.type='text';inp.value=cmdMap[c.id]||'';inp.placeholder='!'+c.id;
+    inp.style.cssText='width:130px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 8px;color:#fff;font-size:12px;font-family:inherit;';
+    inp.addEventListener('input',()=>{
+      cmdMap[c.id]=inp.value.trim().toLowerCase()||c.def;
+      saveCmds();
+    });
+    const reset=document.createElement('button');
+    reset.textContent='↺';reset.title='Reset to default';
+    reset.style.cssText='background:transparent;border:0.5px solid rgba(255,255,255,0.15);border-radius:5px;color:rgba(255,255,255,0.4);cursor:pointer;padding:4px 7px;font-size:12px;';
+    reset.addEventListener('click',()=>{cmdMap[c.id]=c.def;inp.value=c.def;saveCmds();});
+    row.appendChild(lbl);row.appendChild(inp);row.appendChild(reset);
+    container.appendChild(row);
+  });
+}
+
+// Build UI when commands tab is opened
+document.querySelectorAll('.stab[data-tab="commands"]').forEach(btn=>{
+  btn.addEventListener('click',buildCmdsUI);
+});
+
+// ── New viewer command implementations ────────────────────
+// active duels: map of pet username → {target, hp, maxHp, oppHp, oppMaxHp, interval}
+const activeDuels=new Map();
+
+function startDuel(pet,target){
+  if(!pet||!target)return;
+  // end any existing duel for these pets
+  [pet.username,target.username].forEach(u=>{
+    if(activeDuels.has(u)){clearInterval(activeDuels.get(u).interval);activeDuels.delete(u);}
+  });
+  const hp=50;
+  const duelState={
+    petA:pet,petB:target,
+    hpA:hp,hpB:hp,maxHp:hp,
+    interval:null
+  };
+  pet.say('\u2694 DUEL!');target.say('\u2694 DUEL!');
+  // show health bars
+  pet.hp=hp;pet.maxHp=hp;pet.alive=true;pet._inDuel=true;pet.healthBarWrap.style.display='block';
+  target.hp=hp;target.maxHp=hp;target.alive=true;target._inDuel=true;target.healthBarWrap.style.display='block';
+
+  // approach each other
+  pet._duelTarget=target;target._duelTarget=pet;
+
+  // combat loop
+  const interval=setInterval(()=>{
+    if(!pets.includes(pet)||!pets.includes(target)){
+      clearInterval(interval);activeDuels.delete(pet.username);activeDuels.delete(target.username);return;
+    }
+    const dx=(target.x+target.w/2)-(pet.x+pet.w/2);
+    const dist=Math.abs(dx);
+    // walk toward each other
+    if(dist>pet.w*1.5){
+      pet.vx=Math.sign(dx)*petSpeed*1.5;
+      target.vx=-Math.sign(dx)*petSpeed*1.5;
+    } else {
+      // in range — exchange blows 50/50
+      if(Math.random()<0.5){
+        const dmg=8+Math.floor(Math.random()*10);
+        duelState.hpA=Math.max(0,duelState.hpA-dmg);
+        pet.hp=duelState.hpA;pet.maxHp=hp;
+        target.vx=Math.sign(-dx)*3;target.vy=-2;target.airborne=true;
+        ensureAudio();playEventSound(hitBuffer);
+      } else {
+        const dmg=8+Math.floor(Math.random()*10);
+        duelState.hpB=Math.max(0,duelState.hpB-dmg);
+        target.hp=duelState.hpB;target.maxHp=hp;
+        pet.vx=Math.sign(dx)*3;pet.vy=-2;pet.airborne=true;
+        ensureAudio();playEventSound(hitBuffer);
+      }
+      // check win
+      if(duelState.hpA<=0||duelState.hpB<=0){
+        clearInterval(interval);
+        activeDuels.delete(pet.username);activeDuels.delete(target.username);
+        pet._duelTarget=null;target._duelTarget=null;
+        const winner=duelState.hpA>0?pet:target;
+        const loser=duelState.hpA>0?target:pet;
+        winner.say('\uD83C\uDFC6 I WIN!');
+        loser.vx=(Math.random()<0.5?-1:1)*8;loser.vy=-6;loser.airborne=true;
+        ensureAudio();playEventSound(winBuffer);
+        setTimeout(()=>{
+          pet.healthBarWrap.style.display='none';target.healthBarWrap.style.display='none';
+          pet.hp=0;target.hp=0;pet._inDuel=false;target._inDuel=false;
+        },2000);
+      }
+    }
+  },600);
+  duelState.interval=interval;
+  activeDuels.set(pet.username,duelState);
+  activeDuels.set(target.username,duelState);
+}
+
+// active punches: username → timeout
+const activePunches=new Map();
+
+function startPunch(pet,target){
+  if(!pet||!target)return;
+  // walk toward target first
+  pet.say('\uD83D\uDCA5');
+  const walkInterval=setInterval(()=>{
+    if(!pets.includes(pet)||!pets.includes(target)){clearInterval(walkInterval);return;}
+    const dx=(target.x+target.w/2)-(pet.x+pet.w/2);
+    const dist=Math.abs(dx);
+    if(dist>pet.w*1.2){
+      // keep walking
+      pet.vx=Math.sign(dx)*petSpeed*2;
+    } else {
+      // landed next to target — punch!
+      clearInterval(walkInterval);
+      pet.vx=0;
+      const nx=Math.sign(dx)||1;
+      target.vx=nx*14;target.vy=-7;target.airborne=true;
+      target.say('OW!');
+      ensureAudio();playEventSound(hitBuffer);
+      // stumble back slightly
+      pet.vx=-nx*3;pet.vy=-2;pet.airborne=true;
+    }
+  },50);
+  activePunches.set(pet.username,walkInterval);
+}
+
+function execViewerCmd(cmdId,username,args){
+  const pet=pets.find(p=>p.username===username);
+  switch(cmdId){
+    case 'jump':
+      if(pet){pet.vy=-(8+Math.random()*4);pet.airborne=true;}
+      break;
+    case 'attack':
+      kaijuTakeDamage(10,username);
+      break;
+    case 'duel':{
+      const targetName=args&&args[0];
+      const target=targetName
+        ?pets.find(p=>p.username.toLowerCase()===targetName.toLowerCase()&&p!==pet)
+        :pets.find(p=>p!==pet&&!activeDuels.has(p.username));
+      if(pet&&target)startDuel(pet,target);
+      else if(pet)pet.say('Who should I duel?');
+      break;
+    }
+    case 'punch':{
+      const targetName2=args&&args[0];
+      const target2=targetName2
+        ?pets.find(p=>p.username.toLowerCase()===targetName2.toLowerCase()&&p!==pet)
+        :pets.find(p=>p!==pet);
+      if(pet&&target2)startPunch(pet,target2);
+      break;
+    }
+  }
+}
+
+function playEventSound(buf){if(buf&&audioCtx)playSound(buf,soundVol);}
+
+// Hook battle start sound — called when any event starts
+const _origStartBR=startBattleRoyale,_origStartWar=startWar,_origStartKaiju=startKaiju;
+startBattleRoyale=function(){ensureAudio();playEventSound(battleStartBuffer);_origStartBR();};
+startWar=function(){ensureAudio();playEventSound(battleStartBuffer);_origStartWar();};
+startKaiju=function(){ensureAudio();playEventSound(battleStartBuffer);_origStartKaiju();};
+
+// DVD bounce sound
+const _origUpdateDvd=updateDvd;
+updateDvd=function(){
+  if(dvdActive&&dvdSpire){
+    const W=canvas.width,H=canvas.height,r=dvdSpire.r;
+    const wasLeft=dvdSpire.x-r<=0,wasRight=dvdSpire.x+r>=W,wasTop=dvdSpire.y-r<=0,wasBot=dvdSpire.y+r>=H;
+    _origUpdateDvd();
+    const nowLeft=dvdSpire.x-r<=1,nowRight=dvdSpire.x+r>=W-1,nowTop=dvdSpire.y-r<=1,nowBot=dvdSpire.y+r>=H-1;
+    if((nowLeft&&!wasLeft)||(nowRight&&!wasRight)||(nowTop&&!wasTop)||(nowBot&&!wasBot)){
+      ensureAudio();playEventSound(dvdBounceBuffer);
+    }
+  } else {_origUpdateDvd();}
+};
 setInterval(()=>{
   const ind=document.getElementById('twitchIndicator');
   if(!ind)return;
@@ -2566,7 +3031,6 @@ setInterval(()=>{
   else{ind.textContent='⬤ offline';ind.style.color='rgba(255,255,255,0.25)';}
 },1000);
 
-document.getElementById('petSize').addEventListener('input',function(){petSize=parseInt(this.value)||48;pets.forEach(p=>{p.w=petSize;p.h=petSize;p.spriteEl.width=petSize;p.spriteEl.height=petSize;p.el.style.width=petSize+'px';});});
 document.getElementById('petSpeed').addEventListener('input',function(){
   petSpeed=6*(parseInt(this.value)/100); // 100% = 6 units/frame (noticeable), 0% = 0, 500% = 30
   document.getElementById('petSpeedVal').textContent=this.value+'%';
