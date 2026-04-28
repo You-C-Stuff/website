@@ -8,6 +8,24 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans-serif;}
 #canvas{display:block;position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;}
+/* small/hallway: scale the whole canvas+pets container down, origin top-centre */
+#canvasWrap{position:fixed;inset:0;transform-origin:top center;pointer-events:none;}
+body.mode-small #canvasWrap,body.mode-hallway #canvasWrap{
+  transform-origin:top center;
+  border:1px solid rgba(255,255,255,0.1);
+  box-sizing:border-box;
+}
+#canvas{display:block;position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;pointer-events:all;}
+.chat-pet-el{pointer-events:none;}
+/* hallway strip sits below the scaled canvas */
+#hallwayContainer{
+  display:none;position:fixed;
+  background:#0a0a14;border:1px solid rgba(255,255,255,0.08);
+  border-top:none;overflow:hidden;z-index:14;
+  position:fixed;/* overridden inline */
+}
+body.mode-hallway #hallwayContainer{display:block;}
+#hallwayCanvas{display:block;}
 #topbar{
   position:fixed;top:0;left:0;right:0;height:82px;
   background:rgba(15,15,15,0.88);border-bottom:0.5px solid rgba(255,255,255,0.1);
@@ -36,7 +54,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
 #spriteCount strong{color:#fff;font-weight:500;}
 #costumeSelect{background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.18);border-radius:6px;color:#fff;font-size:11px;font-family:inherit;padding:3px 6px;cursor:pointer;max-width:110px;flex-shrink:0;}
 #costumeSelect option{background:#1c1c1c;}
-#settingsPanel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;align-items:flex-start;justify-content:center;padding-top:92px;}
+#settingsPanel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:flex-start;justify-content:center;padding-top:92px;}
 #settingsPanel.open{display:flex;}
 #settingsBox{background:#1c1c1c;border:0.5px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px;width:460px;max-height:calc(100vh - 75px);overflow-y:scroll;color:#fff;scrollbar-color:rgba(255,255,255,0.4) #1c1c1c;scrollbar-width:thin;}
 #settingsBox::-webkit-scrollbar{width:6px;}
@@ -88,7 +106,8 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
 </style>
 </head>
 <body>
-<canvas id="canvas"></canvas>
+<div id="canvasWrap"><canvas id="canvas"></canvas></div>
+<div id="hallwayContainer"><canvas id="hallwayCanvas"></canvas></div>
 
 <div id="topbar">
   <!-- Row 1: physics sliders + core buttons -->
@@ -119,11 +138,12 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <select id="blockLayoutSelect" style="background:#1a1a2e;border:0.5px solid rgba(127,119,221,0.35);border-radius:6px;color:rgba(255,255,255,0.75);font-size:11px;font-family:inherit;padding:3px 8px;cursor:pointer;max-width:120px;flex-shrink:0;height:28px;accent-color:#7F77DD;">
         <option value="" style="background:#1a1a2e;color:rgba(255,255,255,0.4);">— Layouts —</option>
       </select>
-      <button class="tbbtn" id="saveBlockLayoutBtn" title="Save current blocks as a named layout">💾 Save layout</button>
-      <button class="tbbtn" id="deleteBlockLayoutBtn" title="Delete selected layout" style="color:rgba(220,80,80,0.8);">🗑</button>
+      <button class="tbbtn" id="saveBlockLayoutBtn" title="Save current blocks as a named layout">💾</button>
+      <button class="tbbtn" id="deleteBlockLayoutBtn" title="Delete selected layout" style="color:rgba(220,80,80,0.8);">❌</button>
     </div>
     <div class="tbsep"></div>
-    <div class="tbgroup">
+    <div style="flex:1;"></div>
+    <div class="tbgroup" style="padding-right:8px;">
       <button class="tbbtn" id="settingsBtn">Settings</button>
       <button class="tbbtn" id="hideUIBtn">Hide UI</button>
     </div>
@@ -163,6 +183,10 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
     <div class="tbgroup">
       <span class="tblabel">Twitch</span>
       <span id="twitchIndicator" style="font-size:11px;color:rgba(255,255,255,0.3);padding:0 6px;white-space:nowrap;">⬤ offline</span>
+    </div>
+    <div style="flex:1;"></div>
+    <div class="tbgroup" style="padding-right:8px;">
+      <button class="tbbtn" id="viewModeBtn" title="Cycle view mode">⛶ Fullscreen</button>
     </div>
   </div>
 </div>
@@ -396,7 +420,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
     </div>
 
     <div class="stabpanel" id="tab-fights">
-      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Configure War teams (2–4). Viewers use <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge</code> + team emoji to join. Owner triggers <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!war</code> to start.</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Configure War teams (2–4). Viewers type <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge Red</code> / <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge Blue</code> etc. to join. Owner triggers <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!war</code> to start.</p>
       <div class="sdivider"></div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
         <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);">⚔️ War teams</span>
@@ -444,7 +468,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
 <style>
 /* ── chat pet styles ── */
 .chat-pet-el{
-  position:fixed;bottom:0;pointer-events:none;z-index:15;
+  position:absolute;bottom:0;pointer-events:none;z-index:15;
   display:flex;flex-direction:column;align-items:center;
 }
 .chat-pet-sprite{image-rendering:pixelated;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));}
@@ -532,8 +556,201 @@ document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 const canvas=document.getElementById('canvas');
 const ctx=canvas.getContext('2d');
 let bgColor='#111111';
-function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+// declare early so resize() and listeners can reference it safely
+let pets=[], petMap={}, viewersVisible=true;
+
+// ── VIEW MODES ────────────────────────────────────────────
+// 0=fullscreen  1=small(16:9)  2=hallway
+const VIEW_MODES=['fullscreen','small','hallway'];
+const VIEW_LABELS={fullscreen:'⛶ Fullscreen',small:'▣ Small',hallway:'▤ Hallway'};
+let currentViewMode='fullscreen';
+
+const hallwayContainer=document.getElementById('hallwayContainer');
+const hallwayCanvas=document.getElementById('hallwayCanvas');
+const hallwayCtx=hallwayCanvas.getContext('2d');
+const HALLWAY_HEIGHT=140; // fits 67px walker + name tag + bubble
+
+// viewers queued for hallway entry
+let hallwayWalkers=[]; // {pet, x, targetX, speed, done}
+
+const canvasWrap=document.getElementById('canvasWrap');
+
+function applyViewMode(mode){
+  currentViewMode=mode;
+  document.body.className=document.body.className.replace(/\bmode-\S+/g,'').trim();
+  document.body.classList.add('mode-'+mode);
+  document.getElementById('viewModeBtn').textContent=VIEW_LABELS[mode];
+  resize();
+}
+
+function resize(){
+  // Canvas always fills the full window — physics never changes
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+
+  if(currentViewMode==='fullscreen'){
+    canvasWrap.style.transform='';
+    canvasWrap.style.width='';canvasWrap.style.height='';
+    canvasWrap.style.top='';canvasWrap.style.left='';
+    canvasWrap.style.maxHeight='';canvasWrap.style.overflow='';
+    hallwayContainer.style.display='none';
+    return;
+  }
+
+  const topH=82;
+  const availW=window.innerWidth;
+  const availH=window.innerHeight-topH;
+  const hwH=currentViewMode==='hallway'?HALLWAY_HEIGHT:0;
+
+  let vpW=availW, vpH=Math.round(availW*9/16);
+  if(vpH>availH-hwH){vpH=availH-hwH; vpW=Math.round(vpH*16/9);}
+  if(vpW>availW){vpW=availW; vpH=Math.round(vpW*9/16);}
+
+  const scale=vpW/window.innerWidth;
+  const leftX=Math.round((availW-vpW)/2);
+
+  canvasWrap.style.transformOrigin='top left';
+  canvasWrap.style.transform=`translate(${leftX}px,${topH}px) scale(${scale})`;
+  canvasWrap.style.width=window.innerWidth+'px';
+  canvasWrap.style.height=window.innerHeight+'px';
+  canvasWrap.style.maxHeight='';canvasWrap.style.overflow='';
+
+  if(currentViewMode==='hallway'){
+    const hwTop=topH+vpH;
+    hallwayContainer.style.display='block';
+    hallwayContainer.style.left=leftX+'px';
+    hallwayContainer.style.top=hwTop+'px';
+    hallwayContainer.style.width=vpW+'px';
+    hallwayContainer.style.height=HALLWAY_HEIGHT+'px';
+    hallwayCanvas.width=vpW; hallwayCanvas.height=HALLWAY_HEIGHT;
+  } else {
+    hallwayContainer.style.display='none';
+  }
+}
 resize();window.addEventListener('resize',resize);
+// Helper: position a pet DOM element accounting for canvas offset in small/hallway modes
+function placePetEl(p){
+  // canvasWrap handles all scaling/offset via CSS transform
+  // so pet DOM positions are just canvas-local coords
+  p.el.style.left=p.x+'px';
+  p.el.style.bottom=(canvas.height-p.y-p.h)+'px';
+}
+
+
+
+// cycle view modes
+document.getElementById('viewModeBtn').addEventListener('click',()=>{
+  const idx=(VIEW_MODES.indexOf(currentViewMode)+1)%VIEW_MODES.length;
+  applyViewMode(VIEW_MODES[idx]);
+});
+
+// hallway draw loop — walkers move left→right then spawn above
+function drawHallway(){
+  if(currentViewMode!=='hallway'||!hallwayCanvas.width)return;
+  const W=hallwayCanvas.width, H=hallwayCanvas.height;
+
+  // clear hallway canvas (background only — pets are DOM elements)
+  hallwayCtx.fillStyle=bgColor;
+  hallwayCtx.fillRect(0,0,W,H);
+  hallwayCtx.strokeStyle='rgba(255,255,255,0.15)';hallwayCtx.lineWidth=1;
+  hallwayCtx.beginPath();hallwayCtx.moveTo(0,H-1);hallwayCtx.lineTo(W,H-1);hallwayCtx.stroke();
+
+  const now=performance.now();
+  const g=config.gravity*0.4; // same gravity as main screen
+  const ground=H; // hallway floor
+
+  hallwayWalkers=hallwayWalkers.filter(w=>{
+    if(w.done)return false;
+    const pet=w.pet;
+    const pw=pet.w, ph=pet.h;
+
+    // physics — same as main screen
+    if(!w.grabbed){
+      w.vy+=g;
+      w.x+=w.vx;
+      w.y+=w.vy;
+      // floor collision
+      if(w.y+ph>=ground){w.y=ground-ph;w.vy=0;w.airborne=false;}
+      else{w.airborne=true;}
+      // ceiling
+      if(w.y<0){w.y=0;w.vy=Math.abs(w.vy)*0.4;}
+      // left wall
+      if(w.x<0){w.x=0;w.vx=Math.abs(w.vx)*0.5;}
+      // rightward base push — always nudge toward right
+      if(w.vx<w.speed)w.vx+=(w.speed-w.vx)*0.06;
+      // friction when on ground
+      if(!w.airborne)w.vx*=0.92;
+    }
+
+    // position pet DOM element inside hallwayContainer (absolute, not fixed)
+    pet.el.style.display='flex';
+    pet.el.style.position='absolute';
+    pet.el.style.left=w.x+'px';
+    pet.el.style.bottom=(H-w.y-ph)+'px';
+    pet.el.style.width=pw+'px';
+    pet.el.style.transform='none';
+    pet.facingLeft=w.vx<-0.1;
+    pet.drawSprite(now);
+
+    // arrived at right edge — enter main canvas
+    if(w.x+pw>W){
+      w.done=true;
+      pet._inHallway=false;
+      canvasWrap.appendChild(pet.el); // move back to main canvas layer
+      pet.el.style.position='';pet.el.style.left='';pet.el.style.bottom='';
+      // restore normal viewer size
+      pet.w=petSize;pet.h=petSize;pet.spriteEl.width=petSize;pet.spriteEl.height=petSize;pet.el.style.width=petSize+'px';
+      pet.x=canvas.width+pet.w;
+      pet.y=canvas.height-pet.h;
+      pet.vx=-(1+Math.random()*petSpeed);
+      pet.vy=0;pet.airborne=false;
+      pet.el.style.display='flex';
+    }
+    return !w.done;
+  });
+}
+
+// hallway mouse drag — click and throw walkers
+let hallwayDrag=null, hallwayDragOX=0, hallwayDragOY=0;
+let hallwayLastMX=0, hallwayLastMY=0, hallwayVelX=0, hallwayVelY=0;
+
+hallwayContainer.addEventListener('mousedown',e=>{
+  const hwRect=hallwayContainer.getBoundingClientRect();
+  const mx=e.clientX-hwRect.left, my=e.clientY-hwRect.top;
+  const H=hallwayCanvas.height;
+  for(const w of hallwayWalkers){
+    if(w.done)continue;
+    if(mx>=w.x&&mx<=w.x+w.pet.w&&my>=w.y&&my<=w.y+w.pet.h){
+      hallwayDrag=w;w.grabbed=true;w.vx=0;w.vy=0;
+      hallwayDragOX=mx-w.x;hallwayDragOY=my-w.y;
+      hallwayLastMX=mx;hallwayLastMY=my;
+      hallwayVelX=0;hallwayVelY=0;
+      break;
+    }
+  }
+});
+window.addEventListener('mousemove',e=>{
+  if(!hallwayDrag)return;
+  const hwRect=hallwayContainer.getBoundingClientRect();
+  const mx=e.clientX-hwRect.left, my=e.clientY-hwRect.top;
+  hallwayVelX=mx-hallwayLastMX;hallwayVelY=my-hallwayLastMY;
+  hallwayLastMX=mx;hallwayLastMY=my;
+  hallwayDrag.x=mx-hallwayDragOX;
+  hallwayDrag.y=my-hallwayDragOY;
+});
+window.addEventListener('mouseup',()=>{
+  if(!hallwayDrag)return;
+  hallwayDrag.vx=hallwayVelX*0.8;
+  hallwayDrag.vy=hallwayVelY*0.8;
+  hallwayDrag.grabbed=false;
+  hallwayDrag=null;
+});
+
+// hook hallway draw into main draw loop
+const _drawBeforeHallway=window.draw||draw;
+window.draw=function(now){
+  _drawBeforeHallway(now);
+  drawHallway();
+};
 
 const PALETTE=['#7F77DD','#534AB7','#1D9E75','#0F6E56','#D85A30','#993C1D','#D4537E','#993556','#378ADD','#185FA5','#EF9F27','#BA7517'];
 
@@ -1481,7 +1698,7 @@ function getPetFramesForDir(fl,mov){
   if(petFramesRight.length)return petFramesRight;if(petFrames.length)return petFrames;return[];
 } // loaded images for walking animation
 let petSize=84, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
-let pets=[]; // array of ChatPet objects
+// pets declared early above
 const LS_PET='lpp_pet5', LS_TCHAN='lpp_tchan5';
 
 const PET_COLORS=['#7F77DD','#1D9E75','#D85A30','#D4537E','#378ADD','#EF9F27','#E24B4A','#9FE1CB'];
@@ -1500,8 +1717,8 @@ class ChatPet{
     this.username=username;
     this.color=color||pickViewerColor();
     this.w=petSize; this.h=petSize;
-    this.x=window.innerWidth+this.w; // spawn off-screen right, walk in
-    this.y=window.innerHeight-this.h; // spawn at ground level
+    this.x=canvas.width+this.w; // spawn off-screen right, walk in
+    this.y=canvas.height-this.h; // spawn at ground level
     this.vx=-(0.5+Math.random()*petSpeed); // always walk left (into screen)
     this.vy=0;
     this.frame=0; this.lastFrame=0;
@@ -1548,7 +1765,7 @@ class ChatPet{
     this.healthBarWrap.appendChild(this.healthBarFill);
     this.el.insertBefore(this.healthBarWrap,this.nameEl);
 
-    document.body.appendChild(this.el);
+    canvasWrap.appendChild(this.el);
     this.el.style.pointerEvents='auto';
 
     this.el.addEventListener('mousedown',e=>{e.preventDefault();startGrabPet(this,e.clientX,e.clientY);});
@@ -1644,8 +1861,7 @@ class ChatPet{
     // pinned or menu-frozen — stay put, just draw
     if(this.pinned||this._menuFrozen){
       this.vx=0;this.vy=0;
-      this.el.style.left=this.x+'px';
-      this.el.style.bottom=(H-this.y-this.h)+'px';
+      placePetEl(this);
       this.drawSprite(now);
       return;
     }
@@ -1750,8 +1966,7 @@ class ChatPet{
     }
 
     // position DOM
-    this.el.style.left=this.x+'px';
-    this.el.style.bottom=(H-this.y-this.h)+'px';
+    placePetEl(this);
     this.drawSprite(now);
   }
   destroy(){this.el.remove();}
@@ -1759,33 +1974,47 @@ class ChatPet{
 
 // ── grab logic ────────────────────────────────────────────
 let grabbedPet=null, petGrabOffX=0, petGrabOffY=0, petPrevX=0, petPrevY=0, petVX=0, petVY=0;
+// Convert window clientX/Y to canvas-space coords (accounts for CSS scale in small/hallway)
+function windowToCanvas(cx,cy){
+  const r=canvas.getBoundingClientRect();
+  return{
+    x:(cx-r.left)*(canvas.width/r.width),
+    y:(cy-r.top)*(canvas.height/r.height)
+  };
+}
+
 function startGrabPet(pet,cx,cy){
   grabbedPet=pet;pet.grabbed=true;
-  petGrabOffX=cx-pet.x; petGrabOffY=cy-pet.y;
+  const cp=windowToCanvas(cx,cy);
+  petGrabOffX=cp.x-pet.x; petGrabOffY=cp.y-pet.y;
   petPrevX=cx;petPrevY=cy;
   pet.el.style.zIndex=50;
   pet.el.style.transition='none';
 }
 document.addEventListener('mousemove',e=>{
   if(!grabbedPet)return;
+  const cp=windowToCanvas(e.clientX,e.clientY);
   petVX=e.clientX-petPrevX;petVY=e.clientY-petPrevY;
   petPrevX=e.clientX;petPrevY=e.clientY;
-  grabbedPet.x=e.clientX-petGrabOffX;
-  grabbedPet.y=e.clientY-petGrabOffY;
+  grabbedPet.x=cp.x-petGrabOffX;
+  grabbedPet.y=cp.y-petGrabOffY;
 });
 document.addEventListener('touchmove',e=>{
   if(!grabbedPet)return;
   const t=e.touches[0];
+  const cp=windowToCanvas(t.clientX,t.clientY);
   petVX=t.clientX-petPrevX;petVY=t.clientY-petPrevY;
   petPrevX=t.clientX;petPrevY=t.clientY;
-  grabbedPet.x=t.clientX-petGrabOffX;
-  grabbedPet.y=t.clientY-petGrabOffY;
+  grabbedPet.x=cp.x-petGrabOffX;
+  grabbedPet.y=cp.y-petGrabOffY;
 },{passive:true});
 function releasePet(){
   if(!grabbedPet)return;
   grabbedPet.grabbed=false;
-  grabbedPet.vx=petVX*1.2;
-  grabbedPet.vy=petVY*1.2;
+  const r=canvas.getBoundingClientRect();
+  const scaleX=canvas.width/r.width, scaleY=canvas.height/r.height;
+  grabbedPet.vx=petVX*scaleX*1.2;
+  grabbedPet.vy=petVY*scaleY*1.2;
   grabbedPet.airborne=true;
   grabbedPet.el.style.zIndex=15;
   grabbedPet=null;
@@ -1812,7 +2041,8 @@ const __drawOrig=draw;
 })();
 
 // ── pet management ────────────────────────────────────────
-const petMap={}; // username → ChatPet
+// petMap declared early above
+const _petMapAlias=petMap; // keep ref
 function getOrCreatePet(username,color){
   if(petMap[username])return petMap[username];
   if(Object.keys(petMap).length>=maxPets)return null;
@@ -1821,11 +2051,30 @@ function getOrCreatePet(username,color){
   pets.push(pet);
   applyViewerImgToPet(pet);
   if(!viewersVisible){pet.el.style.display='none';pet._hidden=true;}
+  // hallway mode: queue viewer to walk through before entering main canvas
+  if(currentViewMode==='hallway'&&!pet._hallwayDone){
+    pet._hallwayDone=true;
+    pet.x=canvas.width+pet.w; pet.y=canvas.height-pet.h;
+    pet.vx=0; pet.vy=0; pet.airborne=false;
+    pet._inHallway=true; // skip main physics update
+    // move el to hallwayContainer so it renders in the strip
+    hallwayContainer.appendChild(pet.el);
+    pet.el.style.position='absolute';
+    pet.el.style.display='flex';
+    const hwH=hallwayCanvas.height||HALLWAY_HEIGHT;
+    const HW_SIZE=42; // fixed hallway display size
+    pet.w=HW_SIZE;pet.h=HW_SIZE;
+    pet.spriteEl.width=HW_SIZE;pet.spriteEl.height=HW_SIZE;
+    pet.el.style.width=HW_SIZE+'px';
+    hallwayWalkers.push({pet,x:0,y:hwH-HW_SIZE,vx:1.5+Math.random()*1.5,vy:0,speed:1.5+Math.random()*1.5,airborne:false,grabbed:false,done:false,hwSize:HW_SIZE});
+  }
   return pet;
 }
 // ── PINNED SWING + DVD: comprehensive ChatPet.prototype.update override ──────
 const _origPetUpdate=ChatPet.prototype.update;
 ChatPet.prototype.update=function(now){
+  // hallway pets are managed entirely by drawHallway
+  if(this._inHallway)return;
   if(this.pinned&&!this.grabbed){
     // initialise swing state — starts with a gentle random sway
     if(this._swingAngle===undefined){
@@ -1870,8 +2119,7 @@ ChatPet.prototype.update=function(now){
     }
 
     const H=window.innerHeight;
-    this.el.style.left=this.x+'px';
-    this.el.style.bottom=(H-this.y-this.h)+'px';
+    placePetEl(this);
     this.el.style.transform='rotate('+this._swingAngle+'rad)';
     this.el.style.transformOrigin='top center';
     this.drawSprite(now);return;
@@ -1920,9 +2168,10 @@ document.body.appendChild(vip);
 let petImgTarget=null;
 function openPetImagePicker(pet,cx,cy){
   petImgTarget=pet;
-  // freeze in place while menu is open so it doesn't fall away
-  pet._menuFrozen=true;
-  pet.vx=0;pet.vy=0;pet.airborne=false;
+  if(!pet._inHallway){
+    pet._menuFrozen=true;
+    pet.vx=0;pet.vy=0;pet.airborne=false;
+  }
   const pinBtn=document.getElementById('petPinBtn');
   pinBtn.style.background=pet.pinned?'rgba(127,119,221,0.4)':'rgba(127,119,221,0.1)';
   pinBtn.style.borderColor=pet.pinned?'#7F77DD':'rgba(127,119,221,0.4)';
@@ -1932,19 +2181,18 @@ function openPetImagePicker(pet,cx,cy){
 }
 function closePetImagePicker(){
   if(petImgTarget){
-    petImgTarget._menuFrozen=false;
-    // if not pinned, let gravity take over again
-    if(!petImgTarget.pinned)petImgTarget.airborne=true;
+    if(!petImgTarget._inHallway)petImgTarget._menuFrozen=false;
+    if(!petImgTarget.pinned&&!petImgTarget._inHallway)petImgTarget.airborne=true;
   }
   vip.style.display='none';petImgTarget=null;
 }
 
 document.getElementById('petPinBtn').addEventListener('click',()=>{
   if(!petImgTarget)return;
+  if(petImgTarget._inHallway){closePetImagePicker();return;} // no pinning in hallway
   petImgTarget.pinned=!petImgTarget.pinned;
   if(petImgTarget.pinned){
     petImgTarget.vx=0;petImgTarget.vy=0;petImgTarget.airborne=false;
-    // add a small pin indicator on the name
     petImgTarget.nameEl.textContent='📌 '+petImgTarget.username;
   } else {
     petImgTarget.nameEl.textContent=petImgTarget.username;
@@ -2102,8 +2350,8 @@ function endBattleRoyale(){
       p.el.style.filter='none';
       p.brAngle=0;p.brAngleTarget=0;
       p.healthBarWrap.style.display='none';
-      p.x=Math.random()*(window.innerWidth-p.w);
-      p.y=window.innerHeight-p.h;
+      p.x=Math.random()*(canvas.width-p.w);
+      p.y=canvas.height-p.h;
       p.vx=(Math.random()-.5)*3;
       p.vy=-2-Math.random()*2;
       p.airborne=true;
@@ -2115,15 +2363,14 @@ function endBattleRoyale(){
 // ── FIGHT SETTINGS ────────────────────────────────────────
 // ── Multi-team war ─────────────────────────────────────────
 const WAR_DEFAULTS=[
-  {id:'A', emoji:'⚔️',  cry:'For glory!',    color:'#5588ff'},
-  {id:'B', emoji:'🛡️', cry:'Hold the line!', color:'#ff5555'},
-  {id:'C', emoji:'💥',  cry:'Charge!',        color:'#ffaa22'},
-  {id:'D', emoji:'🔥',  cry:'Burn it all!',   color:'#aa44ff'},
+  {id:'A', name:'Red',    emoji:'⚔️',  cry:'For glory!',    color:'#5588ff'},
+  {id:'B', name:'Blue',   emoji:'🛡️', cry:'Hold the line!', color:'#ff5555'},
+  {id:'C', name:'Gold',   emoji:'💥',  cry:'Charge!',        color:'#ffaa22'},
+  {id:'D', name:'Purple', emoji:'🔥',  cry:'Burn it all!',   color:'#aa44ff'},
 ];
 let warTeams=WAR_DEFAULTS.slice(0,2).map(t=>Object.assign({},t));
 let numWarTeamsCount=2;
 
-// returns the x spawn anchor for team index tIdx out of n teams
 function getWarSpawnX(tIdx,n,petW){
   if(n<=1)return window.innerWidth/2-petW/2;
   return tIdx*(window.innerWidth-petW)/(n-1);
@@ -2136,15 +2383,23 @@ function buildTeamConfigUI(){
   warTeams.forEach((team,ti)=>{
     const row=document.createElement('div');
     row.style.cssText='margin-bottom:10px;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;border:0.5px solid rgba(255,255,255,0.08);';
-    const eid='wte'+ti, cid='wtc'+ti;
+    const eid='wte'+ti, nid='wtn'+ti, cid='wtc'+ti;
     row.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:8px;font-weight:600;">Team '+team.id+'</div>'+
-      '<div style="display:flex;gap:8px;">'+
+      '<div style="display:flex;gap:8px;margin-bottom:6px;">'+
       '<div><label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">Emoji</label>'+
-      '<input type="text" id="'+eid+'" value="'+team.emoji+'" maxlength="4" style="width:60px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px;color:#fff;font-size:15px;font-family:inherit;text-align:center;"></div>'+
-      '<div style="flex:1"><label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">War cry</label>'+
-      '<input type="text" id="'+cid+'" value="'+team.cry+'" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;"></div></div>';
+      '<input type="text" id="'+eid+'" value="'+team.emoji+'" maxlength="4" style="width:56px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px;color:#fff;font-size:15px;font-family:inherit;text-align:center;"></div>'+
+      '<div style="flex:1"><label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">Team name <span style="color:rgba(255,255,255,0.25);font-size:10px;">(viewers type !pledge '+team.name+')</span></label>'+
+      '<input type="text" id="'+nid+'" value="'+team.name+'" placeholder="e.g. Red" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;"></div></div>'+
+      '<div><label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">War cry</label>'+
+      '<input type="text" id="'+cid+'" value="'+team.cry+'" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;"></div>';
     grid.appendChild(row);
     document.getElementById(eid).addEventListener('input',function(){warTeams[ti].emoji=this.value||WAR_DEFAULTS[ti].emoji;});
+    document.getElementById(nid).addEventListener('input',function(){
+      warTeams[ti].name=this.value.trim()||WAR_DEFAULTS[ti].name;
+      // update the hint label live
+      const hint=this.closest('div').querySelector('span');
+      if(hint)hint.textContent='(viewers type !pledge '+warTeams[ti].name+')';
+    });
     document.getElementById(cid).addEventListener('input',function(){warTeams[ti].cry=this.value;});
   });
 }
@@ -2283,8 +2538,8 @@ function endWar(){
       const pledgePrefix=pledgeTeam?pledgeTeam.emoji+' ':'';
       p.nameEl.textContent=pinPrefix+pledgePrefix+p.username;
       p.nameEl.style.color=p.color;
-      p.x=Math.random()*(window.innerWidth-p.w);
-      p.y=window.innerHeight-p.h;
+      p.x=Math.random()*(canvas.width-p.w);
+      p.y=canvas.height-p.h;
       p.vx=(Math.random()-.5)*3;p.vy=-2-Math.random()*2;p.airborne=true;
       requestAnimationFrame(()=>{p.el.style.opacity='1';});
     });
@@ -2457,7 +2712,7 @@ function setGravity(v){
 }
 
 // row-2 viewer buttons
-let viewersVisible=true;
+// viewersVisible declared early above
 document.getElementById('viewerToggleBtn').addEventListener('click',()=>{
   viewersVisible=!viewersVisible;
   pets.forEach(p=>{p.el.style.display=viewersVisible?'flex':'none';p._hidden=!viewersVisible;});
@@ -2892,7 +3147,7 @@ function startKaiju(){
   pets.forEach(p=>{
     p.hp=hitHP; p.maxHp=hitHP; p.alive=true; p.brCooldown=0; p.brAngle=0; p.brAngleTarget=0;
     p.el.style.display='flex'; p.el.style.opacity='1'; p.el.style.filter='none'; p.el.style.transition='none';
-    p.x=Math.random()*(window.innerWidth-p.w); p.y=window.innerHeight-p.h;
+    p.x=Math.random()*(canvas.width-p.w); p.y=canvas.height-p.h;
     p.vx=(Math.random()-.5)*4; p.vy=-2-Math.random()*2; p.airborne=true;
     p.nameEl.textContent='⚔ '+p.username; p.nameEl.style.color=p.color;
   });
@@ -2952,7 +3207,7 @@ function startKaiju(){
   // splash text — dead centre of screen, no background
   const kaijuSplashEl=document.createElement('div');
   kaijuSplashEl.id='kaijuSplash';
-  kaijuSplashEl.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;pointer-events:none;text-align:center;transition:opacity 1.5s;';
+  kaijuSplashEl.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:50;pointer-events:none;text-align:center;transition:opacity 1.5s;';
   kaijuSplashEl.innerHTML='<div style="font-size:44px;font-weight:900;color:#000;letter-spacing:0.06em;line-height:1.25;font-family:\'Courier New\',monospace;">TYPE !attack<br>TO DAMAGE<br>THE KAIJU!</div>';
   document.body.appendChild(kaijuSplashEl);
   setTimeout(()=>{kaijuSplashEl.style.opacity='0';},3000);
@@ -2996,25 +3251,29 @@ function endKaiju(){
   kaijuActive=false;
   clearInterval(kaijuStompTimer); kaijuStompTimer=null;
   if(kaijuBarEl){kaijuBarEl.remove();kaijuBarEl=null;}
-  // remove kaiju spire after a moment
+  const _savedSpire=kaijuSpire;
+  const _savedPet=kaijuPet;
+  // remove kaiju spire after a moment — but only if no new event started
   setTimeout(()=>{
-    if(kaijuSpire){spires=spires.filter(s=>s!==kaijuSpire);kaijuSpire=null;}
+    if(kaijuActive)return; // new kaiju/raid started, don't interfere
+    if(_savedSpire){spires=spires.filter(s=>s!==_savedSpire);}
+    kaijuSpire=null;
   },2000);
-  // respawn all viewers (restore raider size if they were the raid boss)
+  // respawn all viewers — but only if no new event started
   setTimeout(()=>{
+    if(kaijuActive||battleRoyaleActive||warActive)return;
     pets.forEach(p=>{
       p.alive=true; p.hp=p.maxHp||100;
       p.el.style.transition='opacity 0.6s'; p.el.style.display='flex';
       p.el.style.opacity='1'; p.el.style.filter='none';
       p.brAngle=0; p.brAngleTarget=0; p.healthBarWrap.style.display='none';
-      p.nameEl.textContent=(p.pinned?'📌 ':'')+p.username; p.nameEl.style.color=p.color;
-      p.x=Math.random()*(window.innerWidth-p.w); p.y=window.innerHeight-p.h;
+      p.nameEl.textContent=(p.pinned?'\uD83D\uDCCC ':'')+p.username; p.nameEl.style.color=p.color;
+      p.x=Math.random()*(canvas.width-p.w); p.y=canvas.height-p.h;
       p.vx=(Math.random()-.5)*2; p.vy=-2; p.airborne=true;
-      // restore normal size if this pet was the raid boss
-      if(p===kaijuPet){p.w=petSize;p.h=petSize;p.spriteEl.width=petSize;p.spriteEl.height=petSize;p.el.style.width=petSize+'px';}
+      if(p===_savedPet){p.w=petSize;p.h=petSize;p.spriteEl.width=petSize;p.spriteEl.height=petSize;p.el.style.width=petSize+'px';}
       requestAnimationFrame(()=>{p.el.style.opacity='1';});
     });
-    kaijuSpire=null; kaijuPet=null;
+    if(!kaijuActive){kaijuSpire=null;kaijuPet=null;}
   },2500);
 }
 
@@ -3030,6 +3289,10 @@ function startRaidKaiju(raiderName, raidViewers){
 
   // raider spawns as a giant ChatPet viewer
   const raiderPet=getOrCreatePet(raiderName);
+  // pull raider out of hallway immediately if they were queued there
+  const hwIdx=hallwayWalkers.findIndex(w=>w.pet===raiderPet&&!w.done);
+  if(hwIdx>=0){hallwayWalkers[hwIdx].done=true;hallwayWalkers.splice(hwIdx,1);}
+  if(raiderPet)raiderPet.el.style.display='flex';
   if(!raiderPet){kaijuActive=false;return;}
   kaijuPet=raiderPet;
   kaijuPet.w=raidSize; kaijuPet.h=raidSize;
@@ -3052,7 +3315,7 @@ function startRaidKaiju(raiderName, raidViewers){
     if(p===kaijuPet)return;
     p.hp=hitHP; p.maxHp=hitHP; p.alive=true; p.brCooldown=0; p.brAngle=0; p.brAngleTarget=0;
     p.el.style.display='flex'; p.el.style.opacity='1'; p.el.style.filter='none'; p.el.style.transition='none';
-    p.x=Math.random()*(window.innerWidth-p.w); p.y=window.innerHeight-p.h;
+    p.x=Math.random()*(canvas.width-p.w); p.y=canvas.height-p.h;
     p.vx=(Math.random()-.5)*4; p.vy=-2-Math.random()*2; p.airborne=true;
     p.nameEl.textContent='\u2694 '+p.username; p.nameEl.style.color=p.color;
   });
@@ -3098,7 +3361,7 @@ function startRaidKaiju(raiderName, raidViewers){
 
   // centre splash
   const splash=document.createElement('div');
-  splash.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;pointer-events:none;text-align:center;transition:opacity 1.5s;';
+  splash.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:50;pointer-events:none;text-align:center;transition:opacity 1.5s;';
   splash.innerHTML='<div style="font-size:40px;font-weight:900;color:#000;letter-spacing:0.04em;line-height:1.3;font-family:\'Courier New\',monospace;">'+raiderName+' has raided!<br>Fight back with !attack</div>';
   document.body.appendChild(splash);
   setTimeout(()=>{splash.style.opacity='0';},4000);
@@ -3305,7 +3568,7 @@ function execViewerCmd(cmdId,username,args){
       if(ns){
         if(costumes.length>0)ns.costumeId=costumes[Math.floor(Math.random()*costumes.length)].id;
         ns.vx=(Math.random()-.5)*6;ns.vy=-(4+Math.random()*4);
-        if(pet)pet.say('Ball summoned!');
+        if(pet)pet.say('Give birth!');
       }
       break;
     }
@@ -3322,10 +3585,17 @@ function execViewerCmd(cmdId,username,args){
       break;
     }
     case 'float':{
-      // toggle zero G for 8 seconds
-      setGravity(0);
-      if(pet)pet.say('Zero G!');
-      setTimeout(()=>setGravity(1),8000);
+      // toggle zero gravity — permanent until triggered again
+      if(config.gravity===0){
+        setGravity(1);
+        if(pet)pet.say('Back to earth!');
+      } else {
+        setGravity(0);
+        // push all viewers and balls off the ground
+        pets.forEach(p=>{if(!p.pinned){p.vy=-(4+Math.random()*4);p.airborne=true;}});
+        spires.forEach(s=>{s.vy=-(4+Math.random()*4);});
+        if(pet)pet.say('Zero G!');
+      }
       break;
     }
     case 'shrink':{
@@ -3347,16 +3617,16 @@ function execViewerCmd(cmdId,username,args){
       break;
     }
     case 'pledge':{
-      const pledgeEmoji=args&&args[0];
-      if(!pledgeEmoji){if(pet)pet.say('Use !pledge + team emoji');break;}
-      const matchTeam=warTeams.find(t=>t.emoji.trim()===pledgeEmoji.trim()||t.emoji.replace(/\uFE0F/g,'')===pledgeEmoji.replace(/\uFE0F/g,''));
-      if(!matchTeam){if(pet)pet.say('Unknown team!');break;}
+      const pledgeName=args&&args.join(' ');
+      if(!pledgeName){if(pet)pet.say('Use !pledge '+warTeams.map(t=>t.name).join(' / '));break;}
+      const matchTeam=warTeams.find(t=>t.name.toLowerCase()===pledgeName.toLowerCase());
+      if(!matchTeam){if(pet)pet.say('Teams: '+warTeams.map(t=>t.name).join(', '));break;}
       if(pet){
         pet._pledgedTeam=matchTeam.id;
         const pinPrefix=pet.pinned?'\uD83D\uDCCC ':'';
         pet.nameEl.textContent=pinPrefix+matchTeam.emoji+' '+pet.username;
         pet.nameEl.style.color=matchTeam.color;
-        pet.say('Pledged to '+matchTeam.emoji+'!');
+        pet.say('Pledged to '+matchTeam.name+'!');
       }
       break;
     }
