@@ -203,6 +203,7 @@ body.mode-hallway #hallwayContainer{display:block;}
       <button class="stab" data-tab="hotkeys">Hotkeys</button>
       <button class="stab" data-tab="fights">Fights</button>
       <button class="stab" data-tab="commands">Commands</button>
+      <button class="stab" data-tab="redeems">Redeems</button>
     </div>
 
     <div class="stabpanel" id="tab-twitch">
@@ -222,6 +223,15 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button id="clearTestPetsBtn" style="flex:1;padding:6px;border-radius:7px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.7);font-size:11px;cursor:pointer;font-family:inherit;">Clear test viewers</button>
         </div>
         <button id="simulateRaidBtn" style="width:100%;margin-top:6px;padding:6px;border-radius:7px;border:0.5px solid rgba(255,150,50,0.4);background:transparent;color:rgba(255,160,60,0.8);font-size:11px;cursor:pointer;font-family:inherit;">⚡ Simulate test raid</button>
+      </div>
+      <div class="srow">
+        <label>OAuth token <span style="font-size:10px;color:rgba(255,255,255,0.3);">(optional — enables redeems)</span></label>
+        <div style="display:flex;gap:6px;">
+          <input type="password" id="twitchOAuth" placeholder="oauth:xxxxxxxx" style="flex:1;font-family:monospace;">
+          <button id="twitchOAuthConnectBtn" style="padding:6px 10px;border-radius:7px;border:0.5px solid rgba(60,200,120,0.4);background:rgba(60,200,120,0.08);color:rgba(80,220,140,0.9);font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">+Auth</button>
+        </div>
+        <p style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:4px;">Get a token at <code style="background:rgba(255,255,255,0.06);padding:1px 4px;border-radius:3px;">twitchapps.com/tmi</code></p>
+        <div id="twitchPubSubStatus" style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;"></div>
       </div>
       <div class="srow">
         <label>Walk speed</label>
@@ -284,6 +294,25 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button class="addFrameBtn" id="addPetFrameIdleBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
           <input type="file" id="petFileIdle" multiple accept="image/*" style="display:none;">
         </div>
+        <div class="costume-row">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">💬⬅ Talk — left</div>
+          <div class="costume-frames" id="petFrameLeftTalk"></div>
+          <button class="addFrameBtn" id="addPetFrameLeftTalkBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
+          <input type="file" id="petFileLeftTalk" multiple accept="image/*" style="display:none;">
+        </div>
+        <div class="costume-row">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">💬⬤ Talk — idle</div>
+          <div class="costume-frames" id="petFrameTalk"></div>
+          <button class="addFrameBtn" id="addPetFrameTalkBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
+          <input type="file" id="petFileTalk" multiple accept="image/*" style="display:none;">
+        </div>
+        <div class="costume-row">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">💬➡ Talk — right</div>
+          <div class="costume-frames" id="petFrameRightTalk"></div>
+          <button class="addFrameBtn" id="addPetFrameRightTalkBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
+          <input type="file" id="petFileRightTalk" multiple accept="image/*" style="display:none;">
+        </div>
+
       </div>
       <div class="srow" style="margin-top:8px;"><label>Animation fps</label><input type="number" id="viewerFpsInput" value="12" min="1" max="120"></div>
       <div class="srow"><label>Default viewer size (px)</label><input type="number" id="defaultViewerSize" value="84" min="8" max="300"></div>
@@ -460,6 +489,12 @@ body.mode-hallway #hallwayContainer{display:block;}
       <div id="viewerCmdsGrid"></div>
     </div>
 
+    <div class="stabpanel" id="tab-redeems">
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Map channel point redeems to actions. Requires OAuth token in Twitch settings. Click <strong>Fetch redeems</strong> after connecting.</p>
+      <button id="fetchRedeemsBtn" style="width:100%;padding:7px;border-radius:7px;border:0.5px solid rgba(60,200,120,0.4);background:rgba(60,200,120,0.08);color:rgba(80,220,140,0.85);font-size:12px;cursor:pointer;font-family:inherit;margin-bottom:12px;">Fetch channel redeems</button>
+      <div id="redeemMappingGrid"></div>
+    </div>
+
     <button class="sclose" id="closeSettings">Done</button>
   </div>
 </div>
@@ -601,8 +636,9 @@ function resize(){
   const availH=window.innerHeight-topH;
   const hwH=currentViewMode==='hallway'?HALLWAY_HEIGHT:0;
 
-  let vpW=availW, vpH=Math.round(availW*9/16);
-  if(vpH>availH-hwH){vpH=availH-hwH; vpW=Math.round(vpH*16/9);}
+  // True 16:9 — fit height first so on a 1920x1080 monitor you get full 1920x1080
+  const maxH=availH-hwH;
+  let vpH=maxH, vpW=Math.round(vpH*16/9);
   if(vpW>availW){vpW=availW; vpH=Math.round(vpW*9/16);}
 
   const scale=vpW/window.innerWidth;
@@ -855,6 +891,9 @@ function saveCostumes(){
       frames:(c.frames||[]).map(f=>({id:f.id,src:f.img?f.img.src:f.src})),
       framesLeft:(c.framesLeft||[]).map(f=>({id:f.id,src:f.img?f.img.src:f.src})),
       framesRight:(c.framesRight||[]).map(f=>({id:f.id,src:f.img?f.img.src:f.src})),
+      framesTalk:(c.framesTalk||[]).map(f=>({id:f.id,src:f.img?f.img.src:f.src})),
+      framesLeftTalk:(c.framesLeftTalk||[]).map(f=>({id:f.id,src:f.img?f.img.src:f.src})),
+      framesRightTalk:(c.framesRightTalk||[]).map(f=>({id:f.id,src:f.img?f.img.src:f.src})),
     }))));
     localStorage.setItem(LS_A,activeCostumeId||'');
   }catch(e){}
@@ -894,6 +933,9 @@ function loadAll(){
           {arr:c.frames,data:cd.frames||[]},
           {arr:c.framesLeft,data:cd.framesLeft||[]},
           {arr:c.framesRight,data:cd.framesRight||[]},
+          {arr:(c.framesTalk=(c.framesTalk||[])),data:cd.framesTalk||[]},
+          {arr:(c.framesLeftTalk=(c.framesLeftTalk||[])),data:cd.framesLeftTalk||[]},
+          {arr:(c.framesRightTalk=(c.framesRightTalk||[])),data:cd.framesRightTalk||[]},
         ];
         allDirs.forEach(({arr,data})=>data.forEach(fd=>{
           const img=new Image();
@@ -1117,10 +1159,15 @@ function playResize(){
   if(resizeBuffer&&audioCtx)playSound(resizeBuffer,soundVol);
 }
 
-function getCostumeFrames(costumeId,facingLeft,isMoving){
+function getCostumeFrames(costumeId,facingLeft,isMoving,isTalking){
   const c=costumes.find(c=>c.id===costumeId);
   if(!c)return[];
   const hasDir=(c.framesLeft&&c.framesLeft.length)||(c.framesRight&&c.framesRight.length);
+  if(isTalking){
+    if(!isMoving&&c.framesTalk&&c.framesTalk.length)return c.framesTalk.map(f=>f.img);
+    if(isMoving&&facingLeft&&c.framesLeftTalk&&c.framesLeftTalk.length)return c.framesLeftTalk.map(f=>f.img);
+    if(isMoving&&!facingLeft&&c.framesRightTalk&&c.framesRightTalk.length)return c.framesRightTalk.map(f=>f.img);
+  }
   if(!hasDir)return(c.frames||[]).map(f=>f.img);
   if(!isMoving)return(c.frames&&c.frames.length?c.frames:c.framesLeft||c.framesRight||[]).map(f=>f.img);
   if(facingLeft)return((c.framesLeft&&c.framesLeft.length?c.framesLeft:c.frames)||[]).map(f=>f.img);
@@ -1220,7 +1267,7 @@ function draw(now){
       ctx.fill();ctx.restore();
     }
 
-    const framesD=getCostumeFrames(s.costumeId,s.facingLeft,Math.abs(s.vx)>0.3);
+    const framesD=getCostumeFrames(s.costumeId,s.facingLeft,Math.abs(s.vx)>0.3,false);
     const frame=framesD.length>0?framesD[s.frame%framesD.length]:null;
     const c2=costumes.find(c=>c.id===s.costumeId);
     const hasDirFrames=c2&&((c2.framesLeft&&c2.framesLeft.length)||(c2.framesRight&&c2.framesRight.length));
@@ -1387,12 +1434,16 @@ document.getElementById('resetBtn').addEventListener('click',()=>{
   document.getElementById('gravity').value=1;document.getElementById('gv').textContent='1.0';
   document.getElementById('bounce').value=0.7;document.getElementById('bv').textContent='0.70';
   document.getElementById('friction').value=0;document.getElementById('fv').textContent='0.00';
-  document.getElementById('size').value=40;document.getElementById('sv').textContent='40';
+  // reset to default sizes set in Visuals settings
+  const _defPet=parseInt(document.getElementById('defaultPetSize').value)||40;
+  const _defViewer=parseInt(document.getElementById('defaultViewerSize').value)||84;
+  config.size=_defPet;
+  document.getElementById('size').value=_defPet;document.getElementById('sv').textContent=_defPet;
   // reset viewer size
-  petSize=84;
-  document.getElementById('viewerSize').value=84;document.getElementById('vsv').textContent='84';
-  const namePx=Math.max(8,Math.round(48*0.22))+'px';
-  pets.forEach(p=>{p.w=48;p.h=48;p.spriteEl.width=48;p.spriteEl.height=48;p.el.style.width='48px';p.nameEl.style.fontSize=namePx;});
+  petSize=_defViewer;
+  document.getElementById('viewerSize').value=_defViewer;document.getElementById('vsv').textContent=_defViewer;
+  const namePx=Math.max(8,Math.round(_defViewer*0.22))+'px';
+  pets.forEach(p=>{p.w=_defViewer;p.h=_defViewer;p.spriteEl.width=_defViewer;p.spriteEl.height=_defViewer;p.el.style.width=_defViewer+'px';p.nameEl.style.fontSize=namePx;});
   // reset gravity flip toggle state
   gravReversed=false;
   document.getElementById('gravFlipBtn').classList.remove('active');
@@ -1692,9 +1743,19 @@ buildHotkeyTable(); // rebuild after load so restored keys are shown
 // ── pet state ─────────────────────────────────────────────
 let petFrames=[];
 let petFramesLeft=[],petFramesRight=[],petFramesIdle=[];
-function getPetFramesForDir(fl,mov){
-  if(!mov){if(petFramesIdle.length)return petFramesIdle;if(petFrames.length)return petFrames;return[];}
-  if(fl){if(petFramesLeft.length)return petFramesLeft;if(petFrames.length)return petFrames;return[];}
+// petFramesTalk: viewer costume talk state frames
+let petFramesTalk=[];
+let petFramesLeftTalk=[], petFramesRightTalk=[];
+function getPetFramesForDir(fl,mov,talking){
+  if(!mov){
+    if(talking&&petFramesTalk.length)return petFramesTalk;
+    if(petFramesIdle.length)return petFramesIdle;if(petFrames.length)return petFrames;return[];
+  }
+  if(fl){
+    if(talking&&petFramesLeftTalk.length)return petFramesLeftTalk;
+    if(petFramesLeft.length)return petFramesLeft;if(petFrames.length)return petFrames;return[];
+  }
+  if(talking&&petFramesRightTalk.length)return petFramesRightTalk;
   if(petFramesRight.length)return petFramesRight;if(petFrames.length)return petFrames;return[];
 } // loaded images for walking animation
 let petSize=84, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
@@ -1774,16 +1835,21 @@ class ChatPet{
     // right-click → assign custom image
     this.el.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();openPetImagePicker(this,e.clientX,e.clientY);});
   }
-  say(msg){
+  say(msg,emoteTag){
     if(!bubblesEnabled)return;
     if(this.bubble)this.bubble.remove();
     this.bubble=document.createElement('div');
     this.bubble.className='speech-bubble';
     const scaledFont=Math.max(8,Math.round(bubbleFontSize*(this.w/48)));
     this.bubble.style.fontSize=scaledFont+"px";
-    this.bubble.textContent=msg;
+    if(emoteTag&&emoteTag!==''){
+      renderWithEmotes(msg,emoteTag,scaledFont).forEach(s=>this.bubble.appendChild(s));
+    } else {
+      this.bubble.textContent=msg;
+    }
     this.el.appendChild(this.bubble);
     this.bubbleTimer=bubbleDur*60;
+    this._talking=true;
   }
   drawSprite(now){
     const ctx2=this.spriteEl.getContext('2d');
@@ -1792,18 +1858,27 @@ class ChatPet{
     // pick directional custom image first, then directional frames, then fallback
     const isMoving=Math.abs(this.vx)>0.3;
     let customFrame=null;
-    if(this.customImgLeft||this.customImgRight||this.customImgForward){
-      if(!isMoving) customFrame=this.customImgForward||this.customImgLeft||this.customImgRight;
-      else if(this.facingLeft) customFrame=this.customImgLeft||this.customImgForward||this.customImgRight;
-      else customFrame=this.customImgRight||this.customImgForward||this.customImgLeft;
+    const hasTalkImgs=this.customImgForwardTalk||this.customImgLeftTalk||this.customImgRightTalk;
+    if(this.customImgLeft||this.customImgRight||this.customImgForward||hasTalkImgs){
+      if(!isMoving){
+        customFrame=(isTalking&&this.customImgForwardTalk)||this.customImgForward||this.customImgLeft||this.customImgRight;
+      } else if(this.facingLeft){
+        customFrame=(isTalking&&this.customImgLeftTalk)||this.customImgLeft||(isTalking&&this.customImgForwardTalk)||this.customImgForward||this.customImgRight;
+      } else {
+        customFrame=(isTalking&&this.customImgRightTalk)||this.customImgRight||(isTalking&&this.customImgForwardTalk)||this.customImgForward||this.customImgLeft;
+      }
     } else if(this.customImg){ customFrame=this.customImg; }
 
-    const dirFrames=customFrame?null:getPetFramesForDir(this.facingLeft,isMoving);
+    const isTalking=!!(this.bubble&&this.bubbleTimer>0);
+    const dirFrames=customFrame?null:getPetFramesForDir(this.facingLeft,isMoving,isTalking);
     const frames=customFrame?[customFrame]:(dirFrames&&dirFrames.length>0?dirFrames:[]);
     const hasDir=(petFramesLeft.length>0||petFramesRight.length>0||petFramesIdle.length>0);
 
     if(frames.length>0){
-      if(frames.length>1&&now-this.lastFrame>viewerFrameTime){this.frame=(this.frame+1)%frames.length;this.lastFrame=now;}
+      // hold on talk frame while talking — only cycle when not talking
+      if(frames.length>1&&!this._talking&&now-this.lastFrame>viewerFrameTime){this.frame=(this.frame+1)%frames.length;this.lastFrame=now;}
+      // reset to frame 0 when switching to/from talk state to avoid stale frame
+      if(this._talkStatePrev!==this._talking){this.frame=0;this._talkStatePrev=this._talking;}
       const img=frames[this.frame%frames.length];
       ctx2.save();
       // only auto-flip when using shared single set, not directional sets or custom images
@@ -1835,10 +1910,22 @@ class ChatPet{
       ctx2.fillRect(cx-eGap-eW*0.5,eY,eW,eH);
       ctx2.strokeStyle='#111';ctx2.lineWidth=lw*0.55;ctx2.strokeRect(cx-eGap-eW*0.5,eY,eW,eH);
       ctx2.fillRect(cx+eGap-eW*0.5,eY,eW,eH);ctx2.strokeRect(cx+eGap-eW*0.5,eY,eW,eH);
-      // smile: tiny V at 72% down head
+      // mouth: V smile when silent, filled downward triangle (open mouth) when talking
       const smY=hy+hh*0.72;
-      ctx2.strokeStyle='#111';ctx2.lineWidth=lw*0.75;ctx2.lineJoin='round';ctx2.lineCap='round';
-      ctx2.beginPath();ctx2.moveTo(cx-w*0.038,smY);ctx2.lineTo(cx,smY+h*0.022);ctx2.lineTo(cx+w*0.038,smY);ctx2.stroke();
+      const _isTalkingNow=!!(this.bubble&&this.bubbleTimer>0);
+      if(_isTalkingNow){
+        // downward triangle — wider and deeper than V smile for prominence
+        ctx2.fillStyle='#1a1a1a';
+        ctx2.beginPath();
+        ctx2.moveTo(cx-w*0.07, smY);           // top-left (wider)
+        ctx2.lineTo(cx+w*0.07, smY);           // top-right (wider)
+        ctx2.lineTo(cx, smY+h*0.045);          // bottom-centre point (deeper)
+        ctx2.closePath();
+        ctx2.fill();
+      } else {
+        ctx2.strokeStyle='#111';ctx2.lineWidth=lw*0.75;ctx2.lineJoin='round';ctx2.lineCap='round';
+        ctx2.beginPath();ctx2.moveTo(cx-w*0.038,smY);ctx2.lineTo(cx,smY+h*0.022);ctx2.lineTo(cx+w*0.038,smY);ctx2.stroke();
+      }
     }
 
     // update DOM health bar
@@ -1923,7 +2010,7 @@ class ChatPet{
     // speech bubble countdown
     if(this.bubbleTimer>0){
       this.bubbleTimer--;
-      if(this.bubbleTimer<=0&&this.bubble){this.bubble.remove();this.bubble=null;}
+      if(this.bubbleTimer<=0&&this.bubble){this.bubble.remove();this.bubble=null;this._talking=false;}
     }
 
     // push from physics spires AND push spires back (Newton 3rd law)
@@ -1984,6 +2071,7 @@ function windowToCanvas(cx,cy){
 }
 
 function startGrabPet(pet,cx,cy){
+  if(pet.pinned)return; // pinned viewers can't be dragged to new position
   grabbedPet=pet;pet.grabbed=true;
   const cp=windowToCanvas(cx,cy);
   petGrabOffX=cp.x-pet.x; petGrabOffY=cp.y-pet.y;
@@ -2150,19 +2238,34 @@ function saveViewerImgs(){try{localStorage.setItem(LS_VIEWER_IMGS,JSON.stringify
 // Inject picker popup HTML
 const vip=document.createElement('div');
 vip.id='petImgPicker';
-vip.style.cssText='display:none;position:fixed;z-index:400;background:#1c1c1c;border:0.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:8px;min-width:130px;box-shadow:0 4px 20px rgba(0,0,0,0.7);';
-vip.innerHTML=`<div style="margin-bottom:6px;">
-<button id="petPinBtn" title="Pin / Unpin" style="width:100%;padding:7px;border-radius:6px;border:0.5px solid rgba(127,119,221,0.4);background:rgba(127,119,221,0.1);color:#b8b2ff;font-size:16px;cursor:pointer;font-family:inherit;">📌</button>
+vip.style.cssText='display:none;position:fixed;z-index:400;background:#141420;border:0.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px;box-shadow:0 6px 28px rgba(0,0,0,0.85);min-width:200px;font-family:inherit;';
+vip.innerHTML=`<div style="margin-bottom:8px;">
+  <button id="petPinBtn" title="Pin / Unpin" style="width:100%;padding:6px;border-radius:6px;border:0.5px solid rgba(127,119,221,0.45);background:rgba(127,119,221,0.1);color:#b8b2ff;font-size:18px;cursor:pointer;font-family:inherit;line-height:1;">📌</button>
 </div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:6px;">
-<button id="petImgLeftBtn" title="Upload left-facing" style="padding:5px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit;">⬅</button>
-<button id="petImgFwdBtn" title="Upload forward/idle" style="padding:5px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit;">⬤</button>
-<button id="petImgRightBtn" title="Upload right-facing" style="padding:5px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.7);font-size:13px;cursor:pointer;font-family:inherit;">➡</button>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;">
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <span style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:2px;">⬅ Left</span>
+    <button id="petImgLeftBtn" title="Idle — left" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
+    <button id="petImgLeftTalkBtn" title="Talk — left" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">💬</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <span style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:2px;">⬤ Idle</span>
+    <button id="petImgFwdBtn" title="Idle — forward" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
+    <button id="petImgFwdTalkBtn" title="Talk — idle" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">💬</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:3px;">
+    <span style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:2px;">➡ Right</span>
+    <button id="petImgRightBtn" title="Idle — right" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
+    <button id="petImgRightTalkBtn" title="Talk — right" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">💬</button>
+  </div>
 </div>
-<button id="petImgClearBtn" style="width:100%;padding:5px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);font-size:11px;cursor:pointer;font-family:inherit;">Clear all</button>
+<button id="petImgClearBtn" style="width:100%;margin-top:8px;padding:5px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.35);background:transparent;color:rgba(220,80,80,0.75);font-size:10px;cursor:pointer;font-family:inherit;">🗑 Clear all</button>
 <input type="file" id="petImgFileInputFwd" accept="image/*" style="display:none;">
 <input type="file" id="petImgFileInputLeft" accept="image/*" style="display:none;">
-<input type="file" id="petImgFileInputRight" accept="image/*" style="display:none;">`;
+<input type="file" id="petImgFileInputRight" accept="image/*" style="display:none;">
+<input type="file" id="petImgFileInputFwdTalk" accept="image/*" style="display:none;">
+<input type="file" id="petImgFileInputLeftTalk" accept="image/*" style="display:none;">
+<input type="file" id="petImgFileInputRightTalk" accept="image/*" style="display:none;">`
 document.body.appendChild(vip);
 
 let petImgTarget=null;
@@ -2175,9 +2278,13 @@ function openPetImagePicker(pet,cx,cy){
   const pinBtn=document.getElementById('petPinBtn');
   pinBtn.style.background=pet.pinned?'rgba(127,119,221,0.4)':'rgba(127,119,221,0.1)';
   pinBtn.style.borderColor=pet.pinned?'#7F77DD':'rgba(127,119,221,0.4)';
-  vip.style.left=Math.min(cx,window.innerWidth-160)+'px';
-  vip.style.top=Math.min(cy,window.innerHeight-100)+'px';
-  vip.style.display='block';
+  vip.style.display='block'; // show first to measure height
+  const _vpW=vip.offsetWidth||210, _vpH=vip.offsetHeight||160;
+  // position above the viewer, centred on their x
+  const _x=Math.max(4,Math.min(cx-_vpW/2, window.innerWidth-_vpW-4));
+  const _y=Math.max(4,cy-_vpH-8); // 8px above click point
+  vip.style.left=_x+'px';
+  vip.style.top=_y+'px';
 }
 function closePetImagePicker(){
   if(petImgTarget){
@@ -2208,6 +2315,9 @@ function loadViewerImgDir(file,target,dir){
     img.onload=()=>{
       if(dir==='left')target.customImgLeft=img;
       else if(dir==='right')target.customImgRight=img;
+      else if(dir==='fwdTalk')target.customImgForwardTalk=img;
+      else if(dir==='leftTalk')target.customImgLeftTalk=img;
+      else if(dir==='rightTalk')target.customImgRightTalk=img;
       else target.customImgForward=img;
       if(!viewerImgMap[target.username])viewerImgMap[target.username]={};
       viewerImgMap[target.username][dir]=ev.target.result;
@@ -2228,10 +2338,14 @@ function wireVipInput(btnId,fileId,dir){
 wireVipInput('petImgFwdBtn','petImgFileInputFwd','fwd');
 wireVipInput('petImgLeftBtn','petImgFileInputLeft','left');
 wireVipInput('petImgRightBtn','petImgFileInputRight','right');
+wireVipInput('petImgFwdTalkBtn','petImgFileInputFwdTalk','fwdTalk');
+wireVipInput('petImgLeftTalkBtn','petImgFileInputLeftTalk','leftTalk');
+wireVipInput('petImgRightTalkBtn','petImgFileInputRightTalk','rightTalk');
 document.getElementById('petImgClearBtn').addEventListener('click',()=>{
   if(!petImgTarget)return;
   petImgTarget.customImg=null;
   petImgTarget.customImgLeft=null;petImgTarget.customImgRight=null;petImgTarget.customImgForward=null;
+  petImgTarget.customImgLeftTalk=null;petImgTarget.customImgRightTalk=null;petImgTarget.customImgForwardTalk=null;
   delete viewerImgMap[petImgTarget.username];
   saveViewerImgs();
   closePetImagePicker();
@@ -2246,6 +2360,9 @@ function applyViewerImgToPet(pet){
   if(data.fwd){const img=new Image();img.onload=()=>{pet.customImgForward=img;};img.src=data.fwd;}
   if(data.left){const img=new Image();img.onload=()=>{pet.customImgLeft=img;};img.src=data.left;}
   if(data.right){const img=new Image();img.onload=()=>{pet.customImgRight=img;};img.src=data.right;}
+  if(data.fwdTalk){const img=new Image();img.onload=()=>{pet.customImgForwardTalk=img;};img.src=data.fwdTalk;}
+  if(data.leftTalk){const img=new Image();img.onload=()=>{pet.customImgLeftTalk=img;};img.src=data.leftTalk;}
+  if(data.rightTalk){const img=new Image();img.onload=()=>{pet.customImgRightTalk=img;};img.src=data.rightTalk;}
 }
 
 // ── BATTLE ROYALE ─────────────────────────────────────────
@@ -2570,6 +2687,191 @@ document.getElementById('kaijuHitsToDie').addEventListener('input',function(){ka
 // Instead we implement a minimal IRC parser directly —
 // this works because wss://irc-ws.chat.twitch.tv supports
 // browser WebSockets when connecting anonymously (justinfan).
+// ── TWITCH EMOTE RENDERING ────────────────────────────────
+function renderWithEmotes(text,emoteTag,fontSize){
+  const ranges=[];
+  (emoteTag||'').split('/').forEach(part=>{
+    const sep=part.indexOf(':');if(sep<0)return;
+    const id=part.slice(0,sep);
+    part.slice(sep+1).split(',').forEach(pos=>{
+      const dash=pos.indexOf('-');if(dash<0)return;
+      ranges.push({id,start:parseInt(pos),end:parseInt(pos.slice(dash+1))});
+    });
+  });
+  ranges.sort((a,b)=>a.start-b.start);
+  const result=[];let cursor=0;
+  ranges.forEach(r=>{
+    if(r.start>cursor){const s=document.createElement('span');s.textContent=text.slice(cursor,r.start);result.push(s);}
+    const img=document.createElement('img');
+    img.src='https://static-cdn.jtvnw.net/emoticons/v2/'+r.id+'/default/dark/1.0';
+    img.style.cssText='height:'+Math.max(16,fontSize+4)+'px;width:auto;vertical-align:middle;margin:0 2px;';
+    img.alt=text.slice(r.start,r.end+1);
+    result.push(img);cursor=r.end+1;
+  });
+  if(cursor<text.length){const s=document.createElement('span');s.textContent=text.slice(cursor);result.push(s);}
+  return result.length?result:[Object.assign(document.createElement('span'),{textContent:text})];
+}
+
+
+// ══════════════════════════════════════════════════════════
+// TWITCH PUBSUB (channel point redeems via OAuth)
+// ══════════════════════════════════════════════════════════
+const LS_OAUTH='lpp_oauth5';
+const LS_REDEEMS='lpp_redeems5';
+let pubSubWS=null, pubSubPingInterval=null;
+let oauthToken='', channelId='';
+let redeemMap={}; // redeemTitle → actionId
+let knownRedeems=[]; // [{id,title}]
+
+(function(){
+  try{oauthToken=localStorage.getItem(LS_OAUTH)||'';}catch(e){}
+  try{const r=localStorage.getItem(LS_REDEEMS);if(r)redeemMap=JSON.parse(r);}catch(e){}
+  if(oauthToken){document.getElementById('twitchOAuth').value=oauthToken;}
+})();
+
+function saveRedeemMap(){try{localStorage.setItem(LS_REDEEMS,JSON.stringify(redeemMap));}catch(e){}}
+
+async function getChannelId(channelName,token){
+  try{
+    const r=await fetch('https://api.twitch.tv/helix/users?login='+channelName,{
+      headers:{'Client-Id':'kimne78kx3ncx6brgo4mv6wki5h1ko','Authorization':'Bearer '+token.replace('oauth:','')}
+    });
+    const d=await r.json();
+    return d.data&&d.data[0]?d.data[0].id:'';
+  }catch(e){return '';}
+}
+
+async function fetchRedeems(token,chId){
+  try{
+    const r=await fetch('https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id='+chId,{
+      headers:{'Client-Id':'kimne78kx3ncx6brgo4mv6wki5h1ko','Authorization':'Bearer '+token.replace('oauth:','')}
+    });
+    const d=await r.json();
+    return(d.data||[]).map(x=>({id:x.id,title:x.title}));
+  }catch(e){return[];}
+}
+
+function connectPubSub(token,chId){
+  if(pubSubWS){pubSubWS.close();}
+  clearInterval(pubSubPingInterval);
+  const ws=new WebSocket('wss://pubsub-edge.twitch.tv');
+  pubSubWS=ws;
+  ws.onopen=()=>{
+    ws.send(JSON.stringify({type:'LISTEN',data:{topics:['channel-points-channel-v1.'+chId],auth_token:token.replace('oauth:','')}}));
+    pubSubPingInterval=setInterval(()=>{if(ws.readyState===1)ws.send(JSON.stringify({type:'PING'}));},240000);
+    document.getElementById('twitchPubSubStatus').textContent='\u2B24 PubSub connected';
+    document.getElementById('twitchPubSubStatus').style.color='rgba(80,220,140,0.8)';
+  };
+  ws.onmessage=e=>{
+    try{
+      const msg=JSON.parse(e.data);
+      if(msg.type==='MESSAGE'&&msg.data){
+        const inner=JSON.parse(msg.data.message);
+        if(inner.type==='reward-redeemed'){
+          const title=inner.data.redemption.reward.title;
+          const username=inner.data.redemption.user.display_name||inner.data.redemption.user.login;
+          handleRedeem(title,username);
+        }
+      }
+    }catch(ex){}
+  };
+  ws.onerror=()=>{document.getElementById('twitchPubSubStatus').textContent='PubSub error';};
+  ws.onclose=()=>{clearInterval(pubSubPingInterval);document.getElementById('twitchPubSubStatus').textContent='PubSub disconnected';};
+}
+
+function handleRedeem(title,username){
+  const actionId=redeemMap[title];
+  if(!actionId)return;
+  // dispatch to the same action system as hotkeys
+  const pet=pets.find(p=>p.username===username);
+  switch(actionId){
+    case 'bounce':if(pet){pet.vy=-(8+Math.random()*4);pet.airborne=true;}break;
+    case 'viewerBounce':pets.forEach(p=>{p.vy=-(8+Math.random()*4);p.airborne=true;});break;
+    case 'sizeUp':adjustSize(10);break;
+    case 'sizeDown':adjustSize(-10);break;
+    case 'hoop':fireHoopShot();break;
+    case 'gravFlip':document.getElementById('gravFlipBtn').click();break;
+    case 'zeroG':document.getElementById('zeroGBtn').click();break;
+    case 'explode':document.getElementById('explosionBtn').click();break;
+    case 'clear':document.getElementById('resetBtn').click();break;
+    case 'burst':document.getElementById('burstBtn').click();break;
+    case 'vibrate':document.getElementById('vibeBtn').click();break;
+    case 'freeze':document.getElementById('freezeBtn').click();break;
+    case 'viewerToggle':document.getElementById('viewerToggleBtn').click();break;
+    default:execViewerCmd(actionId,username,[]);
+  }
+}
+
+document.getElementById('twitchOAuthConnectBtn').addEventListener('click',async()=>{
+  const tok=document.getElementById('twitchOAuth').value.trim();
+  const ch=document.getElementById('twitchChannel').value.trim();
+  if(!tok||!ch){alert('Enter both channel name and OAuth token first.');return;}
+  oauthToken=tok;
+  try{localStorage.setItem(LS_OAUTH,tok);}catch(e){}
+  document.getElementById('twitchPubSubStatus').textContent='Fetching channel ID...';
+  const id=await getChannelId(ch,tok);
+  if(!id){document.getElementById('twitchPubSubStatus').textContent='Could not find channel ID. Check token/channel.';return;}
+  channelId=id;
+  connectPubSub(tok,id);
+});
+
+document.getElementById('fetchRedeemsBtn').addEventListener('click',async()=>{
+  if(!oauthToken||!channelId){
+    document.getElementById('redeemMappingGrid').innerHTML='<p style="font-size:12px;color:rgba(255,100,100,0.7);">Connect with OAuth token first.</p>';return;
+  }
+  document.getElementById('redeemMappingGrid').innerHTML='<p style="font-size:11px;color:rgba(255,255,255,0.4);">Fetching...</p>';
+  knownRedeems=await fetchRedeems(oauthToken,channelId);
+  buildRedeemMappingUI();
+});
+
+function buildRedeemMappingUI(){
+  const grid=document.getElementById('redeemMappingGrid');
+  if(!grid)return;
+  if(!knownRedeems.length){grid.innerHTML='<p style="font-size:11px;color:rgba(255,255,255,0.4);">No redeems found.</p>';return;}
+  grid.innerHTML='';
+  const actionOpts=[
+    {id:'',label:'-- No action --'},
+    {id:'bounce',label:'Bounce viewer'},
+    {id:'viewerBounce',label:'Bounce all viewers'},
+    {id:'sizeUp',label:'Size +10'},
+    {id:'sizeDown',label:'Size -10'},
+    {id:'hoop',label:'Ballin\u2019'},
+    {id:'gravFlip',label:'Reverse gravity'},
+    {id:'zeroG',label:'Zero gravity'},
+    {id:'explode',label:'Explode everything'},
+    {id:'clear',label:'Reset'},
+    {id:'burst',label:'Burst spawn'},
+    {id:'vibrate',label:'Toggle vibrate'},
+    {id:'freeze',label:'Toggle freeze'},
+    {id:'viewerToggle',label:'Toggle viewers'},
+    {id:'jump',label:'Viewer jump'},
+    {id:'float',label:'Float (zero G)'},
+    {id:'spawn',label:'Spawn ball'},
+    {id:'ballin',label:'Viewer Ballin\u2019'},
+    {id:'grow',label:'Grow ball'},
+    {id:'shrink',label:'Shrink ball'},
+  ];
+  knownRedeems.forEach(redeem=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    const lbl=document.createElement('span');
+    lbl.style.cssText='flex:1;font-size:12px;color:rgba(255,255,255,0.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    lbl.textContent=redeem.title;lbl.title=redeem.title;
+    const sel=document.createElement('select');
+    sel.style.cssText='background:#1a1a2e;border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:4px 6px;color:#fff;font-size:11px;font-family:inherit;cursor:pointer;';
+    actionOpts.forEach(opt=>{
+      const o=document.createElement('option');o.value=opt.id;o.textContent=opt.label;
+      if(redeemMap[redeem.title]===opt.id)o.selected=true;
+      sel.appendChild(o);
+    });
+    sel.addEventListener('change',function(){
+      if(this.value)redeemMap[redeem.title]=this.value;else delete redeemMap[redeem.title];
+      saveRedeemMap();
+    });
+    row.appendChild(lbl);row.appendChild(sel);grid.appendChild(row);
+  });
+}
+
 let tmiClient=null, twitchWS=null, twitchChannel='', twitchConnected=false;
 let _twitchReconnectTimer=null;
 
@@ -2627,7 +2929,7 @@ function _doConnect(){
         const text=pm[2].trim();
         const color=tags['color']||null;
         const pet=getOrCreatePet(username,color||undefined);
-        if(pet&&!text.startsWith('!'))pet.say(text);
+        if(pet&&!text.startsWith('!'))pet.say(text,tags['emotes']||'');
         const cmdText=text.trim().toLowerCase();
         const cmdParts=cmdText.split(/\s+/);
         const cmdTrigger=cmdParts[0];
@@ -2700,8 +3002,10 @@ document.getElementById('clearTestPetsBtn').addEventListener('click',()=>{
 document.getElementById('simulateRaidBtn').addEventListener('click',()=>{
   const raidNames=['TestRaider','GhostRaid','StreamRaid','PixelInvasion','ChaosCrew'];
   const name=raidNames[Math.floor(Math.random()*raidNames.length)]+'_'+Math.floor(Math.random()*99);
-  const count=5+Math.floor(Math.random()*20); // 5–24 raiders
+  const count=5+Math.floor(Math.random()*20);
   startRaidKaiju(name,count);
+  // mark the raider as a test viewer so "Clear test viewers" removes them
+  setTimeout(()=>{const p=petMap[name];if(p)p._isTest=true;},500);
 });
 // ── row-2 viewer buttons ──────────────────────────────────
 // helper: sync gravity slider
@@ -2987,8 +3291,11 @@ function drawBlocks(){
   blocks.forEach((b,bi)=>{
     const bimg=blockImgMap&&blockImgMap[bi];
     if(bimg&&bimg.img&&bimg.img.complete){
-      ctx.setLineDash([]);ctx.drawImage(bimg.img,b.x,b.y,b.w,b.h);ctx.setLineDash([5,4]);
-      if(active){ctx.strokeStyle='rgba(127,119,221,0.5)';ctx.strokeRect(b.x,b.y,b.w,b.h);}
+      ctx.save();ctx.setLineDash([]);
+      // stretch-fit image to fill entire block
+      ctx.drawImage(bimg.img,b.x,b.y,b.w,b.h);
+      if(active){ctx.strokeStyle='rgba(127,119,221,0.5)';ctx.lineWidth=1;ctx.setLineDash([]);ctx.strokeRect(b.x,b.y,b.w,b.h);}
+      ctx.restore();
     } else {
       ctx.strokeStyle=active?'rgba(127,119,221,0.8)':'rgba(127,119,221,0.35)';
       ctx.fillStyle=active?'rgba(127,119,221,0.13)':'rgba(127,119,221,0.06)';
@@ -3288,10 +3595,30 @@ function startRaidKaiju(raiderName, raidViewers){
   kaijuMaxHp=Math.max(50,raidViewers*5); kaijuHp=kaijuMaxHp;
 
   // raider spawns as a giant ChatPet viewer
-  const raiderPet=getOrCreatePet(raiderName);
-  // pull raider out of hallway immediately if they were queued there
+  // pre-flag so getOrCreatePet skips hallway queue for raider
+  const _raidKey='__raidSkip_'+raiderName;
+  const raiderPet=(()=>{
+    if(petMap[raiderName])return petMap[raiderName];
+    // create with _hallwayDone pre-set to skip hallway
+    const p=new ChatPet(raiderName,pickViewerColor());
+    petMap[raiderName]=p; pets.push(p); applyViewerImgToPet(p);
+    p._hallwayDone=true; // already walked in via raid
+    p._isRaidBoss=false; // will be set later
+    canvasWrap.appendChild(p.el);
+    return p;
+  })();
+  // rescue from hallway if already queued
   const hwIdx=hallwayWalkers.findIndex(w=>w.pet===raiderPet&&!w.done);
-  if(hwIdx>=0){hallwayWalkers[hwIdx].done=true;hallwayWalkers.splice(hwIdx,1);}
+  if(hwIdx>=0){
+    const w=hallwayWalkers[hwIdx];
+    w.done=true; raiderPet._inHallway=false;
+    canvasWrap.appendChild(raiderPet.el);
+    raiderPet.el.style.position='';raiderPet.el.style.left='';raiderPet.el.style.bottom='';
+    raiderPet.w=petSize;raiderPet.h=petSize;
+    raiderPet.spriteEl.width=petSize;raiderPet.spriteEl.height=petSize;
+    raiderPet.el.style.width=petSize+'px';
+    hallwayWalkers.splice(hwIdx,1);
+  }
   if(raiderPet)raiderPet.el.style.display='flex';
   if(!raiderPet){kaijuActive=false;return;}
   kaijuPet=raiderPet;
@@ -3723,6 +4050,9 @@ function wireViewerFrameBtn(btnId,fileId,arr){
 wireViewerFrameBtn('addPetFrameLeftBtn','petFileLeft',petFramesLeft);
 wireViewerFrameBtn('addPetFrameRightBtn','petFileRight',petFramesRight);
 wireViewerFrameBtn('addPetFrameIdleBtn','petFileIdle',petFramesIdle);
+wireViewerFrameBtn('addPetFrameLeftTalkBtn','petFileLeftTalk',petFramesLeftTalk);
+wireViewerFrameBtn('addPetFrameTalkBtn','petFileTalk',petFramesTalk);
+wireViewerFrameBtn('addPetFrameRightTalkBtn','petFileRightTalk',petFramesRightTalk);
 // load saved directional frames
 (function(){
   [[LS_PFL,petFramesLeft],[LS_PFR,petFramesRight],[LS_PFI,petFramesIdle]].forEach(([key,arr])=>{
