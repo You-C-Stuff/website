@@ -116,6 +116,11 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <button class="tbbtn" id="builderBtn">Builder mode</button>
       <button class="tbbtn" id="moverBtn">Move blocks</button>
       <button class="tbbtn" id="clearBlocksBtn">Clear blocks</button>
+      <select id="blockLayoutSelect" style="background:#1a1a2e;border:0.5px solid rgba(127,119,221,0.35);border-radius:6px;color:rgba(255,255,255,0.75);font-size:11px;font-family:inherit;padding:3px 8px;cursor:pointer;max-width:120px;flex-shrink:0;height:28px;accent-color:#7F77DD;">
+        <option value="" style="background:#1a1a2e;color:rgba(255,255,255,0.4);">— Layouts —</option>
+      </select>
+      <button class="tbbtn" id="saveBlockLayoutBtn" title="Save current blocks as a named layout">💾 Save layout</button>
+      <button class="tbbtn" id="deleteBlockLayoutBtn" title="Delete selected layout" style="color:rgba(220,80,80,0.8);">🗑</button>
     </div>
     <div class="tbsep"></div>
     <div class="tbgroup">
@@ -134,7 +139,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
     <div class="tbsep"></div>
     <div class="tbgroup">
       <span class="tblabel">Viewers</span>
-      <div class="tbslider"><span class="name">Size</span><input type="range" id="viewerSize" min="8" max="300" step="1" value="48"><span class="val" id="vsv">48</span></div>
+      <div class="tbslider"><span class="name">Size</span><input type="range" id="viewerSize" min="8" max="300" step="1" value="84"><span class="val" id="vsv">84</span></div>
       <button class="tbbtn" id="viewerToggleBtn">Hide viewers</button>
       <button class="tbbtn" id="bubbleToggleBtn">Bubbles on</button>
       <button class="tbbtn" id="petScatterBtn">Bounce</button>
@@ -142,7 +147,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
     <div class="tbsep"></div>
     <div class="tbgroup">
       <span class="tblabel">Pets</span>
-      <div class="tbslider"><span class="name">Size</span><input type="range" id="size" min="10" max="300" step="1" value="24"><span class="val" id="sv">24</span></div>
+      <div class="tbslider"><span class="name">Size</span><input type="range" id="size" min="10" max="300" step="1" value="40"><span class="val" id="sv">40</span></div>
       <button class="tbbtn" id="sizeUpBtn">Size +10</button>
       <button class="tbbtn" id="sizeDnBtn">Size -10</button>
       <button class="tbbtn" id="bounceBtn">Bounce</button>
@@ -153,7 +158,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <select id="costumeSelect"><option value="">— none —</option></select>
     </div>
     <div class="tbsep"></div>
-    <div class="tbgroup"><span id="spriteCount"><strong id="count">0</strong> pets</span></div>
+    <div class="tbgroup"><span id="spriteCount"><strong id="count">0</strong> pets</span> &nbsp; <span id="viewerCount" style="font-size:11px;color:rgba(255,255,255,0.4);white-space:nowrap;"><strong id="vcount">0</strong> viewers</span></div>
     <div class="tbsep"></div>
     <div class="tbgroup">
       <span class="tblabel">Twitch</span>
@@ -192,6 +197,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
           <button id="testPetBtn" style="flex:1;padding:6px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;font-family:inherit;">+ Spawn test viewer</button>
           <button id="clearTestPetsBtn" style="flex:1;padding:6px;border-radius:7px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.7);font-size:11px;cursor:pointer;font-family:inherit;">Clear test viewers</button>
         </div>
+        <button id="simulateRaidBtn" style="width:100%;margin-top:6px;padding:6px;border-radius:7px;border:0.5px solid rgba(255,150,50,0.4);background:transparent;color:rgba(255,160,60,0.8);font-size:11px;cursor:pointer;font-family:inherit;">⚡ Simulate test raid</button>
       </div>
       <div class="srow">
         <label>Walk speed</label>
@@ -221,10 +227,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
     <div class="stabpanel active" id="tab-costumes">
       <!-- ── Background ── -->
       <div class="srow"><label>Background colour</label><input type="color" id="bgColor" value="#111111"></div>
-      <div class="srow" style="display:flex;align-items:center;gap:10px;">
-        <label style="margin:0;">Transparent BG</label>
-        <input type="checkbox" id="bgTransparent" style="width:16px;height:16px;accent-color:#7F77DD;cursor:pointer;">
-      </div>
+
       <hr class="sdivider">
       <!-- ── Pet costumes ── -->
       <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Pet costumes</div>
@@ -232,7 +235,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <div id="costumeGrid"></div>
       <button class="addCostumeBtn" id="addCostumeBtn">+ New costume</button>
       <div class="srow" style="margin-top:14px;"><label>Animation fps</label><input type="number" id="fps" value="12" min="1" max="60"></div>
-      <div class="srow"><label>Default pet size (px)</label><input type="number" id="defaultPetSize" value="24" min="10" max="300"></div>
+      <div class="srow"><label>Default pet size (px)</label><input type="number" id="defaultPetSize" value="40" min="10" max="300"></div>
       <hr class="sdivider">
 
       <!-- ── Viewer Costume ── -->
@@ -259,7 +262,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
         </div>
       </div>
       <div class="srow" style="margin-top:8px;"><label>Animation fps</label><input type="number" id="viewerFpsInput" value="12" min="1" max="120"></div>
-      <div class="srow"><label>Default viewer size (px)</label><input type="number" id="defaultViewerSize" value="48" min="8" max="300"></div>
+      <div class="srow"><label>Default viewer size (px)</label><input type="number" id="defaultViewerSize" value="84" min="8" max="300"></div>
       <hr class="sdivider">
 
       <!-- ── Hoop sprite ── -->
@@ -393,25 +396,18 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
     </div>
 
     <div class="stabpanel" id="tab-fights">
-      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Configure Battle Royale and War modes. War splits viewers into two teams. Triggered by <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!war</code> from the channel owner.</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Configure War teams (2–4). Viewers use <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge</code> + team emoji to join. Owner triggers <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!war</code> to start.</p>
       <div class="sdivider"></div>
-      <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);margin-bottom:10px;">⚔️ War teams</div>
-      <div class="srow">
-        <label>Team A emoji</label>
-        <input type="text" id="teamAEmoji" value="⚔️" maxlength="4" style="width:80px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+        <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);">⚔️ War teams</span>
+        <label style="font-size:11px;color:rgba(255,255,255,0.4);margin:0 0 0 auto;">Number of teams</label>
+        <select id="numWarTeams" style="background:#1a1a2e;border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:4px 8px;color:#fff;font-size:12px;font-family:inherit;">
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
       </div>
-      <div class="srow">
-        <label>Team A war cry</label>
-        <input type="text" id="teamACry" value="For glory!" placeholder="Team A battle cry">
-      </div>
-      <div class="srow">
-        <label>Team B emoji</label>
-        <input type="text" id="teamBEmoji" value="🛡️" maxlength="4" style="width:80px;">
-      </div>
-      <div class="srow">
-        <label>Team B war cry</label>
-        <input type="text" id="teamBCry" value="Hold the line!" placeholder="Team B battle cry">
-      </div>
+      <div id="teamConfigGrid"></div>
       <div class="sdivider"></div>
       <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);margin-bottom:10px;">🏆 Battle Royale &amp; War</div>
       <div class="srow">
@@ -425,7 +421,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
       <div class="sdivider"></div>
       <div style="font-size:12px;font-weight:500;color:rgba(80,220,140,0.8);margin-bottom:10px;">🦖 Kaiju Battle</div>
       <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:10px;">All viewers vs 1 giant Kaiju. Chat types <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!attack</code> to damage it. Owner types <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!kaiju</code> to start.</p>
-      <div class="srow"><label>Kaiju size (px)</label><input type="number" id="kaijuSize" value="200" min="80" max="500"></div>
+      <div class="srow"><label>Kaiju size (px)</label><input type="number" id="kaijuSize" value="400" min="80" max="500"></div>
       <div class="srow"><label>Stomp interval (ms)</label><input type="number" id="kaijuStompInterval" value="3000" min="500" max="10000" step="100"></div>
       <div class="srow"><label>Stomp fling force</label><input type="number" id="kaijuFlingForce" value="18" min="5" max="50"></div>
       <div class="srow"><label>Hits to kill a viewer (stomps)</label><input type="number" id="kaijuHitsToDie" value="4" min="1" max="20"></div>
@@ -465,8 +461,7 @@ html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans
   border-radius:0;
   padding:4px 7px;
   font-size:11px;font-family:'Courier New',monospace;font-weight:700;
-  color:#fff;white-space:nowrap;max-width:220px;
-  overflow:hidden;text-overflow:ellipsis;
+  color:#fff;white-space:nowrap;max-width:600px;overflow:visible;
   image-rendering:pixelated;
   box-shadow:3px 3px 0 #000,inset -1px -1px 0 rgba(255,255,255,0.15);
   pointer-events:none;
@@ -536,7 +531,7 @@ document.addEventListener('touchmove',e=>e.preventDefault(),{passive:false});
 
 const canvas=document.getElementById('canvas');
 const ctx=canvas.getContext('2d');
-let bgColor='#111111', bgTransparent=false;
+let bgColor='#111111';
 function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
 resize();window.addEventListener('resize',resize);
 
@@ -544,7 +539,7 @@ const PALETTE=['#7F77DD','#534AB7','#1D9E75','#0F6E56','#D85A30','#993C1D','#D45
 
 // config — friction: -1=super slippery, 0=neutral, 1=full stop
 // bounce: 0=no bounce, 1=perfect, 2+=energised
-let config={gravity:1,bounce:0.7,friction:0,size:24};
+let config={gravity:1,bounce:0.7,friction:0,size:40};
 
 let spires=[],vibrating=false,drag=null,frozen=false;
 let maxSprites=500;
@@ -994,7 +989,7 @@ function update(now){
 
 function draw(now){
   const W=canvas.width,H=canvas.height;
-  if(bgTransparent){ctx.clearRect(0,0,W,H);}else{ctx.fillStyle=bgColor;ctx.fillRect(0,0,W,H);}
+  ctx.fillStyle=bgColor;ctx.fillRect(0,0,W,H);
   drawHoop(now);
 
   for(let s of spires){
@@ -1028,6 +1023,7 @@ function draw(now){
   }
 
   document.getElementById('count').textContent=spires.length;
+  document.getElementById('vcount').textContent=pets.length;
 }
 
 function loop(now){update(now);draw(now);requestAnimationFrame(loop);}
@@ -1170,14 +1166,14 @@ document.getElementById('resetBtn').addEventListener('click',()=>{
   hoopTimer=null;hoopVisible=false;hoopSlideDir=0;hoopSlideX=HOOP_W+40;
   hoopBall=null;hoopShotActive=false;savedPhysics=null;
   // reset physics to defaults
-  config.gravity=1;config.bounce=0.7;config.friction=0;config.size=24;
+  config.gravity=1;config.bounce=0.7;config.friction=0;config.size=40;
   document.getElementById('gravity').value=1;document.getElementById('gv').textContent='1.0';
   document.getElementById('bounce').value=0.7;document.getElementById('bv').textContent='0.70';
   document.getElementById('friction').value=0;document.getElementById('fv').textContent='0.00';
-  document.getElementById('size').value=24;document.getElementById('sv').textContent='24';
+  document.getElementById('size').value=40;document.getElementById('sv').textContent='40';
   // reset viewer size
-  petSize=48;
-  document.getElementById('viewerSize').value=48;document.getElementById('vsv').textContent='48';
+  petSize=84;
+  document.getElementById('viewerSize').value=84;document.getElementById('vsv').textContent='84';
   const namePx=Math.max(8,Math.round(48*0.22))+'px';
   pets.forEach(p=>{p.w=48;p.h=48;p.spriteEl.width=48;p.spriteEl.height=48;p.el.style.width='48px';p.nameEl.style.fontSize=namePx;});
   // reset gravity flip toggle state
@@ -1287,11 +1283,6 @@ document.querySelectorAll('.stab').forEach(btn=>{
   });
 });
 document.getElementById('bgColor').addEventListener('input',function(){bgColor=this.value;savePrefs();});
-document.getElementById('bgTransparent').addEventListener('change',function(){
-  bgTransparent=this.checked;
-  document.body.style.background=bgTransparent?'transparent':bgColor;
-  canvas.style.background='transparent';
-});
 document.getElementById('fps').addEventListener('input',function(){fps=Math.max(1,parseInt(this.value)||12);frameTime=1000/fps;savePrefs();});
 document.getElementById('viewerFpsInput').addEventListener('input',function(){viewerFps=Math.max(1,parseInt(this.value)||12);viewerFrameTime=1000/viewerFps;});
 document.getElementById('defaultPetSize').addEventListener('input',function(){
@@ -1489,16 +1480,25 @@ function getPetFramesForDir(fl,mov){
   if(fl){if(petFramesLeft.length)return petFramesLeft;if(petFrames.length)return petFrames;return[];}
   if(petFramesRight.length)return petFramesRight;if(petFrames.length)return petFrames;return[];
 } // loaded images for walking animation
-let petSize=48, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
+let petSize=84, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
 let pets=[]; // array of ChatPet objects
 const LS_PET='lpp_pet5', LS_TCHAN='lpp_tchan5';
 
 const PET_COLORS=['#7F77DD','#1D9E75','#D85A30','#D4537E','#378ADD','#EF9F27','#E24B4A','#9FE1CB'];
 
+function hexToRgb(hex){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return[r,g,b];}
+function colorDistance(a,b){const d=hexToRgb(a).map((v,i)=>v-hexToRgb(b)[i]);return Math.sqrt(d.reduce((s,v)=>s+v*v,0));}
+function pickViewerColor(){
+  // filter out colours too close to bgColor (threshold: 80 out of ~441 max)
+  const available=PET_COLORS.filter(c=>colorDistance(c,bgColor)>80);
+  const pool=available.length>0?available:PET_COLORS;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
 class ChatPet{
   constructor(username,color){
     this.username=username;
-    this.color=color||PET_COLORS[Math.floor(Math.random()*PET_COLORS.length)];
+    this.color=color||pickViewerColor();
     this.w=petSize; this.h=petSize;
     this.x=window.innerWidth+this.w; // spawn off-screen right, walk in
     this.y=window.innerHeight-this.h; // spawn at ground level
@@ -1827,14 +1827,48 @@ function getOrCreatePet(username,color){
 const _origPetUpdate=ChatPet.prototype.update;
 ChatPet.prototype.update=function(now){
   if(this.pinned&&!this.grabbed){
-    if(this._swingAngle===undefined){this._swingAngle=0.3*(Math.random()<0.5?1:-1);this._swingVel=0;}
-    const g=0.008, damping=0.995;
+    // initialise swing state — starts with a gentle random sway
+    if(this._swingAngle===undefined){
+      this._swingAngle=(Math.random()<0.5?1:-1)*(0.05+Math.random()*0.1);
+      this._swingVel=0;
+      this._pivotX=this.x+this.w/2;
+      this._pivotY=this.y;
+    }
+
+    // pendulum physics — free to spin, damping settles it over time
+    const g=0.006, damping=0.97;
     this._swingVel+=(-g*Math.sin(this._swingAngle));
     this._swingVel*=damping;
     this._swingAngle+=this._swingVel;
+
+    // pivot is fixed at the stored pin position
     const len=this.h;
-    const pivotX=this.x+this.w/2;
-    this.x=pivotX+Math.sin(this._swingAngle)*len-this.w/2;
+    this.x=this._pivotX+Math.sin(this._swingAngle)*len-this.w/2;
+    this.y=this._pivotY;
+
+    // accept push from nearby sprites
+    for(const s of spires){
+      const px=this.x+this.w/2, py=this.y+this.h/2;
+      const dx=px-s.x, dy=py-s.y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      const minD=s.r+this.w*0.45;
+      if(dist<minD&&dist>0){
+        const nx=dx/dist;
+        this._swingVel+=nx*s.vx*0.012+s.vy*0.004;
+      }
+    }
+    // accept push from other pets
+    for(const p of pets){
+      if(p===this)continue;
+      const dx=(this.x+this.w/2)-(p.x+p.w/2);
+      const dy=(this.y+this.h/2)-(p.y+p.h/2);
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      const minD=(this.w+p.w)*0.5;
+      if(dist<minD&&dist>0){
+        this._swingVel+=Math.sign(dx)*p.vx*0.008;
+      }
+    }
+
     const H=window.innerHeight;
     this.el.style.left=this.x+'px';
     this.el.style.bottom=(H-this.y-this.h)+'px';
@@ -1843,7 +1877,7 @@ ChatPet.prototype.update=function(now){
     this.drawSprite(now);return;
   }
   if(!this.pinned&&this._swingAngle!==undefined){
-    this._swingAngle=undefined;this._swingVel=undefined;
+    this._swingAngle=undefined;this._swingVel=undefined;this._pivotX=undefined;this._pivotY=undefined;
     this.el.style.transform='none';this.el.style.transformOrigin='';
   }
   _origPetUpdate.call(this,now);
@@ -2079,8 +2113,44 @@ function endBattleRoyale(){
 }
 
 // ── FIGHT SETTINGS ────────────────────────────────────────
-let teamAEmoji='⚔️', teamBEmoji='🛡️';
-let teamACry='For glory!', teamBCry='Hold the line!';
+// ── Multi-team war ─────────────────────────────────────────
+const WAR_DEFAULTS=[
+  {id:'A', emoji:'⚔️',  cry:'For glory!',    color:'#5588ff'},
+  {id:'B', emoji:'🛡️', cry:'Hold the line!', color:'#ff5555'},
+  {id:'C', emoji:'💥',  cry:'Charge!',        color:'#ffaa22'},
+  {id:'D', emoji:'🔥',  cry:'Burn it all!',   color:'#aa44ff'},
+];
+let warTeams=WAR_DEFAULTS.slice(0,2).map(t=>Object.assign({},t));
+let numWarTeamsCount=2;
+
+// returns the x spawn anchor for team index tIdx out of n teams
+function getWarSpawnX(tIdx,n,petW){
+  if(n<=1)return window.innerWidth/2-petW/2;
+  return tIdx*(window.innerWidth-petW)/(n-1);
+}
+
+function buildTeamConfigUI(){
+  const grid=document.getElementById('teamConfigGrid');
+  if(!grid)return;
+  grid.innerHTML='';
+  warTeams.forEach((team,ti)=>{
+    const row=document.createElement('div');
+    row.style.cssText='margin-bottom:10px;padding:10px;background:rgba(255,255,255,0.04);border-radius:8px;border:0.5px solid rgba(255,255,255,0.08);';
+    const eid='wte'+ti, cid='wtc'+ti;
+    row.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:8px;font-weight:600;">Team '+team.id+'</div>'+
+      '<div style="display:flex;gap:8px;">'+
+      '<div><label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">Emoji</label>'+
+      '<input type="text" id="'+eid+'" value="'+team.emoji+'" maxlength="4" style="width:60px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px;color:#fff;font-size:15px;font-family:inherit;text-align:center;"></div>'+
+      '<div style="flex:1"><label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">War cry</label>'+
+      '<input type="text" id="'+cid+'" value="'+team.cry+'" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;"></div></div>';
+    grid.appendChild(row);
+    document.getElementById(eid).addEventListener('input',function(){warTeams[ti].emoji=this.value||WAR_DEFAULTS[ti].emoji;});
+    document.getElementById(cid).addEventListener('input',function(){warTeams[ti].cry=this.value;});
+  });
+}
+
+// legacy compat vars (kept in case other code refs them)
+let teamAEmoji='⚔️', teamBEmoji='🛡️', teamACry='For glory!', teamBCry='Hold the line!';
 let brCheckInterval=180, brAttackRange=2.8;
 
 // ══════════════════════════════════════════════════════════
@@ -2098,51 +2168,51 @@ function startWar(){
   warActive=true;
   spires=[];
 
-  // split into two teams alternately (shuffle first)
-  const shuffled=[...pets].sort(()=>Math.random()-0.5);
-  const mid=Math.floor(shuffled.length/2);
-  const count=pets.length;
-  const maxHP=Math.min(10,count)*10;
+  const n=warTeams.length;
+  const maxHP=Math.min(10,pets.length)*10;
 
-  shuffled.forEach((p,i)=>{
-    p.team=i<mid?'A':'B';
+  // assign teams: respect pledges, balance the rest round-robin
+  const teamCounts=Array(n).fill(0);
+  const shuffled=[...pets].sort(()=>Math.random()-0.5);
+  shuffled.forEach(p=>{
+    const pledgedIdx=p._pledgedTeam?warTeams.findIndex(t=>t.id===p._pledgedTeam):-1;
+    const tIdx=pledgedIdx>=0?pledgedIdx:teamCounts.indexOf(Math.min(...teamCounts));
+    p.team=warTeams[tIdx].id;
+    teamCounts[tIdx]++;
+  });
+
+  // spawn each viewer at their team's proportional zone
+  shuffled.forEach(p=>{
+    const tIdx=warTeams.findIndex(t=>t.id===p.team);
+    const team=warTeams[tIdx];
     p.hp=maxHP;p.maxHp=maxHP;p.alive=true;p.brCooldown=0;p.brAngle=0;p.brAngleTarget=0;
-    p.el.style.display='flex';p.el.style.opacity='1';p.el.style.filter='none';
-    p.el.style.transition='none';
-    // spawn team A from bottom-left corner, team B from bottom-right corner
-    const teamIdx=shuffled.filter((q,j)=>j<i&&q.team===p.team).length;
-    if(p.team==='A'){
-      p.x=teamIdx*p.w*0.4; // stack near left edge
-    } else {
-      p.x=window.innerWidth-(p.w)-(teamIdx*p.w*0.4); // stack near right edge
-    }
+    p.el.style.display='flex';p.el.style.opacity='1';p.el.style.filter='none';p.el.style.transition='none';
+    const baseX=getWarSpawnX(tIdx,n,p.w);
+    const memberIdx=shuffled.filter(q=>q.team===p.team&&shuffled.indexOf(q)<shuffled.indexOf(p)).length;
+    const spread=(tIdx<n/2?1:-1)*memberIdx*p.w*0.4;
+    p.x=Math.max(0,Math.min(window.innerWidth-p.w,baseX+spread));
     p.y=window.innerHeight-p.h;
-    p.vx=(p.team==='A'?1:-1)*(1+Math.random()*petSpeed);
+    const dir=tIdx<n/2?1:-1;
+    p.vx=dir*(1+Math.random()*petSpeed);
     p.vy=-3-Math.random()*3;
     p.airborne=true;
-    // set team name label
-    const emoji=p.team==='A'?teamAEmoji:teamBEmoji;
-    p.nameEl.textContent=emoji+' '+p.username;
-    p.nameEl.style.color=p.team==='A'?'#5588ff':'#ff5555';
-    // war cry with slight stagger so bubbles don't all overlap at once
-    const cry=p.team==='A'?teamACry:teamBCry;
-    if(cry){setTimeout(()=>{if(p.alive)p.say(cry);},300+teamIdx*120);}
+    p.nameEl.textContent=team.emoji+' '+p.username;
+    p.nameEl.style.color=team.color;
+    if(team.cry)setTimeout(()=>{if(p.alive)p.say(team.cry);},300+memberIdx*120);
   });
 
   clearInterval(warInterval);
   warInterval=setInterval(()=>{
     if(!warActive)return;
-    const aliveA=pets.filter(p=>p.alive&&p.team==='A');
-    const aliveB=pets.filter(p=>p.alive&&p.team==='B');
-
-    // win conditions
-    if(aliveA.length===0||aliveB.length===0){
-      const winner=aliveA.length>0?'A':'B';
-      const emoji=winner==='A'?teamAEmoji:teamBEmoji;
-      const winTeam=winner==='A'?aliveA:aliveB;
-      winTeam.forEach(p=>p.say(`${emoji} VICTORY!`));ensureAudio();playEventSound(winBuffer);
-      endWar();
-      return;
+    // check if only one team has survivors
+    const teamsAlive=warTeams.filter(t=>pets.some(p=>p.alive&&p.team===t.id));
+    if(teamsAlive.length<=1){
+      if(teamsAlive.length===1){
+        const wt=teamsAlive[0];
+        pets.filter(p=>p.alive&&p.team===wt.id).forEach(p=>p.say(wt.emoji+' VICTORY!'));
+        ensureAudio();playEventSound(winBuffer);
+      }
+      endWar();return;
     }
 
     // combat: each fighter attacks nearest enemy
@@ -2209,7 +2279,9 @@ function endWar(){
       p.brAngle=0;p.brAngleTarget=0;p.healthBarWrap.style.display='none';
       // restore original name
       const pinPrefix=p.pinned?'📌 ':'';
-      p.nameEl.textContent=pinPrefix+p.username;
+      const pledgeTeam=p._pledgedTeam?warTeams.find(t=>t.id===p._pledgedTeam):null;
+      const pledgePrefix=pledgeTeam?pledgeTeam.emoji+' ':'';
+      p.nameEl.textContent=pinPrefix+pledgePrefix+p.username;
       p.nameEl.style.color=p.color;
       p.x=Math.random()*(window.innerWidth-p.w);
       p.y=window.innerHeight-p.h;
@@ -2224,10 +2296,13 @@ function endWar(){
 const _origBattleCheck=()=>battleRoyaleActive||warActive;
 
 // ── fight settings wiring ─────────────────────────────────
-document.getElementById('teamAEmoji').addEventListener('input',function(){teamAEmoji=this.value||'⚔️';});
-document.getElementById('teamBEmoji').addEventListener('input',function(){teamBEmoji=this.value||'🛡️';});
-document.getElementById('teamACry').addEventListener('input',function(){teamACry=this.value;});
-document.getElementById('teamBCry').addEventListener('input',function(){teamBCry=this.value;});
+document.getElementById('numWarTeams').addEventListener('change',function(){
+  numWarTeamsCount=parseInt(this.value)||2;
+  warTeams=WAR_DEFAULTS.slice(0,numWarTeamsCount).map(t=>Object.assign({},t));
+  buildTeamConfigUI();
+});
+document.querySelectorAll('.stab[data-tab="fights"]').forEach(b=>b.addEventListener('click',buildTeamConfigUI));
+buildTeamConfigUI();
 document.getElementById('brInterval').addEventListener('input',function(){brCheckInterval=Math.max(50,parseInt(this.value)||180);});
 document.getElementById('brRange').addEventListener('input',function(){brAttackRange=Math.max(1,parseFloat(this.value)||2.8);});
 document.getElementById('kaijuSize').addEventListener('input',function(){kaijuSize=Math.max(80,parseInt(this.value)||200);});
@@ -2285,6 +2360,13 @@ function _doConnect(){
       }
       // chat message
       const pm=msg.match(/^:(\w+)!\w+@\S+ PRIVMSG #\S+ :(.+)$/);
+      // raid detection — Twitch sends USERNOTICE with msg-id=raid
+      const un=msg.match(/^:tmi\.twitch\.tv USERNOTICE #\S+/)||msg.match(/USERNOTICE #\S+/);
+      if(un&&tags['msg-id']==='raid'){
+        const raiderName=tags['display-name']||tags['login']||'Raider';
+        const raiderCount=parseInt(tags['msg-param-viewerCount']||'1',10)||1;
+        setTimeout(()=>startRaidKaiju(raiderName,raiderCount),1000);
+      }
       if(pm){
         const username=tags['display-name']||pm[1];
         const text=pm[2].trim();
@@ -2307,6 +2389,14 @@ function _doConnect(){
         if(cmdTrigger===cmd('jump'))execViewerCmd('jump',username,cmdArgs);
         if(cmdTrigger===cmd('duel'))execViewerCmd('duel',username,cmdArgs);
         if(cmdTrigger===cmd('punch'))execViewerCmd('punch',username,cmdArgs);
+        if(cmdTrigger===cmd('pledge'))execViewerCmd('pledge',username,cmdArgs);
+        if(cmdTrigger===cmd('spawn'))execViewerCmd('spawn',username,cmdArgs);
+        if(cmdTrigger===cmd('ballin'))execViewerCmd('ballin',username,cmdArgs);
+        if(cmdTrigger===cmd('bounce'))execViewerCmd('bounce',username,cmdArgs);
+        if(cmdTrigger===cmd('float'))execViewerCmd('float',username,cmdArgs);
+        if(cmdTrigger===cmd('shrink'))execViewerCmd('shrink',username,cmdArgs);
+        if(cmdTrigger===cmd('grow'))execViewerCmd('grow',username,cmdArgs);
+        if(cmdTrigger===cmd('despawn'))execViewerCmd('despawn',username,cmdArgs);
       }
     }
   };
@@ -2351,6 +2441,12 @@ document.getElementById('clearTestPetsBtn').addEventListener('click',()=>{
   const toRemove=pets.filter(p=>p._isTest);
   toRemove.forEach(p=>{if(p.username&&petMap[p.username])delete petMap[p.username];p.destroy();});
   pets=pets.filter(p=>!p._isTest);
+});
+document.getElementById('simulateRaidBtn').addEventListener('click',()=>{
+  const raidNames=['TestRaider','GhostRaid','StreamRaid','PixelInvasion','ChaosCrew'];
+  const name=raidNames[Math.floor(Math.random()*raidNames.length)]+'_'+Math.floor(Math.random()*99);
+  const count=5+Math.floor(Math.random()*20); // 5–24 raiders
+  startRaidKaiju(name,count);
 });
 // ── row-2 viewer buttons ──────────────────────────────────
 // helper: sync gravity slider
@@ -2412,8 +2508,94 @@ document.getElementById('explosionBtn').addEventListener('click',()=>{
 // BUILDER MODE
 let builderMode=false,moverMode=false,blocks=[],buildDrag=null;
 const BLOCK_MIN=10,LS_BLOCKS='lpp_blocks5';
+const LS_BLK_LAYOUTS='lpp_blklayouts5';
 function saveBlocks(){try{localStorage.setItem(LS_BLOCKS,JSON.stringify(blocks));}catch(e){}}
 (function(){try{const r=localStorage.getItem(LS_BLOCKS);if(r)blocks=JSON.parse(r);}catch(e){}})();
+
+// ── Block layout presets ──────────────────────────────────
+let blockLayouts={}; // {name: {blocks:[...], imgs:{...}}}
+(function(){try{const r=localStorage.getItem(LS_BLK_LAYOUTS);if(r)blockLayouts=JSON.parse(r);}catch(e){}})();
+function saveBlockLayouts(){try{localStorage.setItem(LS_BLK_LAYOUTS,JSON.stringify(blockLayouts));}catch(e){}}
+
+function refreshLayoutSelect(){
+  const sel=document.getElementById('blockLayoutSelect');
+  const cur=sel.value;
+  sel.innerHTML='<option value="" style="background:#1a1a2e;color:rgba(255,255,255,0.4);">— Layouts —</option>';
+  Object.keys(blockLayouts).sort().forEach(name=>{
+    const opt=document.createElement('option');
+    opt.value=name;opt.textContent=name;
+    opt.style.cssText='background:#1a1a2e;color:#fff;';
+    if(name===cur)opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+function loadBlockLayout(name){
+  if(!blockLayouts[name])return;
+  const layout=blockLayouts[name];
+  blocks=JSON.parse(JSON.stringify(layout.blocks||[]));
+  // restore images
+  blockImgMap={};
+  if(layout.imgs){
+    Object.keys(layout.imgs).forEach(k=>{
+      const src=layout.imgs[k];
+      const img=new Image();img.src=src;
+      blockImgMap[parseInt(k)]={src,img};
+    });
+  }
+  saveBlocks();
+}
+
+document.getElementById('saveBlockLayoutBtn').addEventListener('click',()=>{
+  // use an inline name — generate default and allow rename via a small popup
+  const defaultName='Layout '+(Object.keys(blockLayouts).length+1);
+  // create a tiny floating input
+  const existing=document.getElementById('layoutNamePopup');
+  if(existing)existing.remove();
+  const popup=document.createElement('div');
+  popup.id='layoutNamePopup';
+  popup.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:9999;background:#1c1c2e;border:1px solid rgba(127,119,221,0.6);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:260px;box-shadow:0 4px 24px rgba(0,0,0,0.8);';
+  popup.innerHTML='<div style="font-size:13px;color:#fff;font-weight:500;">Save block layout</div>'+
+    '<input id="layoutNameInput" type="text" value="'+defaultName+'" style="background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.2);border-radius:6px;padding:7px 10px;color:#fff;font-size:13px;font-family:inherit;outline:none;">'+
+    '<div style="display:flex;gap:8px;">'+
+    '<button id="layoutNameSave" style="flex:1;padding:7px;border-radius:7px;border:0.5px solid rgba(127,119,221,0.5);background:rgba(127,119,221,0.2);color:#b8b2ff;font-size:12px;cursor:pointer;font-family:inherit;">Save</button>'+
+    '<button id="layoutNameCancel" style="flex:1;padding:7px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;font-family:inherit;">Cancel</button>'+
+    '</div>';
+  document.body.appendChild(popup);
+  const inp=document.getElementById('layoutNameInput');
+  inp.focus();inp.select();
+  function doSave(){
+    const n=inp.value.trim();
+    if(!n){popup.remove();return;}
+    const imgs={};
+    Object.keys(blockImgMap).forEach(k=>{if(blockImgMap[k])imgs[k]=blockImgMap[k].src;});
+    blockLayouts[n]={blocks:JSON.parse(JSON.stringify(blocks)),imgs};
+    saveBlockLayouts();
+    refreshLayoutSelect();
+    document.getElementById('blockLayoutSelect').value=n;
+    popup.remove();
+  }
+  document.getElementById('layoutNameSave').addEventListener('click',doSave);
+  document.getElementById('layoutNameCancel').addEventListener('click',()=>popup.remove());
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')doSave();if(e.key==='Escape')popup.remove();});
+});
+
+document.getElementById('blockLayoutSelect').addEventListener('change',function(){
+  if(!this.value||!blockLayouts[this.value])return;
+  loadBlockLayout(this.value);
+});
+
+document.getElementById('deleteBlockLayoutBtn').addEventListener('click',()=>{
+  const sel=document.getElementById('blockLayoutSelect');
+  const name=sel.value;
+  if(!name){return;}
+  delete blockLayouts[name];
+  saveBlockLayouts();
+  refreshLayoutSelect();
+});
+
+// init dropdown on load
+refreshLayoutSelect();
 
 let blockPreviewTimer=null,showingBlockPreview=false;
 function showBlocksPreview(){showingBlockPreview=true;clearTimeout(blockPreviewTimer);blockPreviewTimer=setTimeout(()=>{showingBlockPreview=false;},1500);}
@@ -2678,7 +2860,7 @@ function saveViewerCostumes(){try{localStorage.setItem(LS_VIEWER_COSTUMES,JSON.s
 
 // KAIJU BATTLE SYSTEM
 let kaijuActive=false, kaijuStompTimer=null;
-let kaijuSize=200, kaijuStompInterval=3000, kaijuFlingForce=18, kaijuHitsToDie=4;
+let kaijuSize=400, kaijuStompInterval=3000, kaijuFlingForce=18, kaijuHitsToDie=4;
 let kaijuPet=null, kaijuHp=0, kaijuMaxHp=0, kaijuBarEl=null;
 
 // kaijuSpire: the canvas ball that becomes the Kaiju
@@ -2698,10 +2880,12 @@ function startKaiju(){
   // spawn (or pick existing) a big Spire as the kaiju
   const kr=Math.round(kaijuSize/2);
   spires=[];
-  kaijuSpire=spawnAt(window.innerWidth/2,window.innerHeight-kr,kr);
+  // spawn at centre of screen, give it a downward velocity so it falls naturally
+  kaijuSpire=spawnAt(window.innerWidth/2, window.innerHeight/2, kr);
   if(!kaijuSpire){kaijuActive=false;return;}
   kaijuSpire.color='#50e090';
-  kaijuSpire.vx=0; kaijuSpire.vy=0;
+  kaijuSpire.vx=(Math.random()<0.5?-1:1)*2;
+  kaijuSpire.vy=3; // fall toward ground first
   kaijuSpire.r=kr; kaijuSpire.mass=kr/24;
 
   const hitHP=kaijuHitsToDie*25;
@@ -2718,8 +2902,8 @@ function startKaiju(){
     const alive=pets.filter(p=>p.alive);
     if(!alive.length){endKaiju();return;}
     const cx=alive.reduce((s,p)=>s+(p.x+p.w/2),0)/alive.length;
-    kaijuSpire.vx=Math.sign(cx-kaijuSpire.x)*8;
-    kaijuSpire.vy=-(10+Math.random()*6);
+    kaijuSpire.vx=Math.sign(cx-kaijuSpire.x)*10;
+    kaijuSpire.vy=-(18+Math.random()*8);
     // roar bubble from nearest viewer
     const nearest=alive.reduce((a,b)=>Math.hypot(b.x-kaijuSpire.x,b.y-kaijuSpire.y)<Math.hypot(a.x-kaijuSpire.x,a.y-kaijuSpire.y)?b:a,alive[0]);
     // no roar bubble — kaiju is silent
@@ -2755,11 +2939,24 @@ function startKaiju(){
   kaijuStomp();
   kaijuStompTimer=setInterval(kaijuStomp,kaijuStompInterval);
 
+  // HP bar top-centre
   if(kaijuBarEl)kaijuBarEl.remove();
   kaijuBarEl=document.createElement('div');
-  kaijuBarEl.style.cssText='position:fixed;top:88px;left:50%;transform:translateX(-50%);width:260px;z-index:50;pointer-events:none;text-align:center;';
-  kaijuBarEl.innerHTML='<div style="font-size:11px;font-weight:700;color:#50e090;letter-spacing:0.08em;margin-bottom:4px;">🦖 KAIJU HP</div><div style="height:10px;background:rgba(0,0,0,0.5);border-radius:5px;overflow:hidden;border:0.5px solid rgba(80,220,140,0.4);"><div id="kaijuBarFill" style="height:100%;width:100%;background:linear-gradient(90deg,#50e090,#20c060);border-radius:5px;transition:width 0.2s;"></div></div>';
+  kaijuBarEl.style.cssText='position:fixed;top:88px;left:50%;transform:translateX(-50%);width:500px;z-index:50;pointer-events:none;text-align:center;';
+  kaijuBarEl.innerHTML=
+    '<div style="font-size:13px;font-weight:700;color:#50e090;letter-spacing:0.1em;margin-bottom:6px;font-family:\'Courier New\',monospace;">KAIJU HP</div>'+
+    '<div style="height:26px;background:rgba(0,0,0,0.65);border-radius:4px;overflow:hidden;border:1px solid rgba(80,220,140,0.55);"><div id="kaijuBarFill" style="height:100%;width:100%;background:linear-gradient(90deg,#50e090,#20c060);border-radius:4px;transition:width 0.2s;"></div></div>'+
+    '<div style="font-size:11px;color:#000;font-weight:800;margin-top:7px;font-family:\'Courier New\',monospace;letter-spacing:0.06em;">type !attack in chat to damage the kaiju</div>';
   document.body.appendChild(kaijuBarEl);
+
+  // splash text — dead centre of screen, no background
+  const kaijuSplashEl=document.createElement('div');
+  kaijuSplashEl.id='kaijuSplash';
+  kaijuSplashEl.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;pointer-events:none;text-align:center;transition:opacity 1.5s;';
+  kaijuSplashEl.innerHTML='<div style="font-size:44px;font-weight:900;color:#000;letter-spacing:0.06em;line-height:1.25;font-family:\'Courier New\',monospace;">TYPE !attack<br>TO DAMAGE<br>THE KAIJU!</div>';
+  document.body.appendChild(kaijuSplashEl);
+  setTimeout(()=>{kaijuSplashEl.style.opacity='0';},3000);
+  setTimeout(()=>{kaijuSplashEl.remove();},4500);
 }
 
 function updateKaijuBar(){
@@ -2770,19 +2967,27 @@ function updateKaijuBar(){
 }
 
 function kaijuTakeDamage(dmg,username){
-  if(!kaijuActive||!kaijuSpire)return;
+  if(!kaijuActive)return;
   kaijuHp=Math.max(0,kaijuHp-dmg); updateKaijuBar();
-  kaijuSpire.vx+=(Math.random()-.5)*6; kaijuSpire.vy-=3+Math.random()*3;
-  // flash red briefly
-  const prevColor=kaijuSpire.color;
-  kaijuSpire.color='#ff6060';
-  setTimeout(()=>{if(kaijuSpire)kaijuSpire.color='#50e090';},200);
-  const attacker=pets.find(p=>p.username===username&&p.alive);
+  const attacker=pets.find(p=>p.username===username&&p.alive&&p!==kaijuPet);
   if(attacker)attacker.say('HIT!');
+  ensureAudio();playEventSound(hitBuffer);
+  // knockback spire kaiju or raid-pet kaiju
+  if(kaijuSpire){
+    kaijuSpire.vx+=(Math.random()-.5)*6; kaijuSpire.vy-=3+Math.random()*3;
+    kaijuSpire.color='#ff6060';
+    setTimeout(()=>{if(kaijuSpire)kaijuSpire.color='#50e090';},200);
+  }
+  if(kaijuPet){
+    kaijuPet.vx+=(Math.random()-.5)*4; kaijuPet.vy-=2; kaijuPet.airborne=true;
+    kaijuPet.el.style.filter='drop-shadow(0 0 20px rgba(255,80,80,1))';
+    setTimeout(()=>{if(kaijuPet)kaijuPet.el.style.filter='drop-shadow(0 0 16px rgba(255,80,80,0.9))';},200);
+  }
   if(kaijuHp<=0){
-    pets.filter(p=>p.alive).forEach(p=>p.say('WE WIN!'));ensureAudio();playEventSound(winBuffer);
-    // fling kaiju spire off screen
+    pets.filter(p=>p.alive&&p!==kaijuPet).forEach(p=>p.say('WE WIN!'));
+    ensureAudio();playEventSound(winBuffer);
     if(kaijuSpire){kaijuSpire.vx=(Math.random()-.5)*20;kaijuSpire.vy=-15;}
+    if(kaijuPet){kaijuPet.vx=(Math.random()-.5)*10;kaijuPet.vy=-8;kaijuPet.airborne=true;}
     endKaiju();
   }
 }
@@ -2795,7 +3000,7 @@ function endKaiju(){
   setTimeout(()=>{
     if(kaijuSpire){spires=spires.filter(s=>s!==kaijuSpire);kaijuSpire=null;}
   },2000);
-  // respawn all viewers
+  // respawn all viewers (restore raider size if they were the raid boss)
   setTimeout(()=>{
     pets.forEach(p=>{
       p.alive=true; p.hp=p.maxHp||100;
@@ -2805,10 +3010,101 @@ function endKaiju(){
       p.nameEl.textContent=(p.pinned?'📌 ':'')+p.username; p.nameEl.style.color=p.color;
       p.x=Math.random()*(window.innerWidth-p.w); p.y=window.innerHeight-p.h;
       p.vx=(Math.random()-.5)*2; p.vy=-2; p.airborne=true;
+      // restore normal size if this pet was the raid boss
+      if(p===kaijuPet){p.w=petSize;p.h=petSize;p.spriteEl.width=petSize;p.spriteEl.height=petSize;p.el.style.width=petSize+'px';}
       requestAnimationFrame(()=>{p.el.style.opacity='1';});
     });
-    kaijuSpire=null;
+    kaijuSpire=null; kaijuPet=null;
   },2500);
+}
+
+// ── RAID KAIJU ────────────────────────────────────────────
+function startRaidKaiju(raiderName, raidViewers){
+  if(kaijuActive)endKaiju();
+  if(battleRoyaleActive)endBattleRoyale();
+  if(warActive)endWar();
+  kaijuActive=true; spires=[];
+
+  const raidSize=Math.max(240,Math.min(600,raidViewers*16));
+  kaijuMaxHp=Math.max(50,raidViewers*5); kaijuHp=kaijuMaxHp;
+
+  // raider spawns as a giant ChatPet viewer
+  const raiderPet=getOrCreatePet(raiderName);
+  if(!raiderPet){kaijuActive=false;return;}
+  kaijuPet=raiderPet;
+  kaijuPet.w=raidSize; kaijuPet.h=raidSize;
+  kaijuPet.spriteEl.width=raidSize; kaijuPet.spriteEl.height=raidSize;
+  kaijuPet.el.style.width=raidSize+'px';
+  kaijuPet.pinned=false;
+  kaijuPet.x=window.innerWidth/2-raidSize/2;
+  kaijuPet.y=window.innerHeight*0.3;
+  kaijuPet.vx=(Math.random()<0.5?-1:1)*4; kaijuPet.vy=0; kaijuPet.airborne=false;
+  kaijuPet.el.style.filter='drop-shadow(0 0 16px rgba(255,80,80,0.9))';
+  kaijuPet.nameEl.textContent='[RAID] '+raiderName+' ('+raidViewers+' raiders)';
+  kaijuPet.nameEl.style.color='#ff5050';
+  // mark raider as unkillable via normal health bar checks
+  kaijuPet.hp=kaijuMaxHp; kaijuPet.maxHp=kaijuMaxHp; kaijuPet.alive=true;
+  kaijuPet._isRaidBoss=true; // prevents normal BR/war death logic
+  kaijuPet.healthBarWrap.style.display='none'; // no health bar on raider
+
+  const hitHP=kaijuHitsToDie*25;
+  pets.forEach(p=>{
+    if(p===kaijuPet)return;
+    p.hp=hitHP; p.maxHp=hitHP; p.alive=true; p.brCooldown=0; p.brAngle=0; p.brAngleTarget=0;
+    p.el.style.display='flex'; p.el.style.opacity='1'; p.el.style.filter='none'; p.el.style.transition='none';
+    p.x=Math.random()*(window.innerWidth-p.w); p.y=window.innerHeight-p.h;
+    p.vx=(Math.random()-.5)*4; p.vy=-2-Math.random()*2; p.airborne=true;
+    p.nameEl.textContent='\u2694 '+p.username; p.nameEl.style.color=p.color;
+  });
+
+  // use a local reference so interval keeps working even if kaijuPet changes
+  const _raidPetRef=kaijuPet;
+
+  function raidStomp(){
+    if(!kaijuActive||!_raidPetRef||!_raidPetRef._isRaidBoss)return;
+    const alive=pets.filter(p=>p!==_raidPetRef&&p.alive);
+    if(!alive.length){endKaiju();return;}
+    const cx=alive.reduce((s,p)=>s+(p.x+p.w/2),0)/alive.length;
+    _raidPetRef.vx=Math.sign(cx-(_raidPetRef.x+_raidPetRef.w/2))*5;
+    _raidPetRef.vy=-(7+Math.random()*4); _raidPetRef.airborne=true;
+    _raidPetRef.say('RAID!');
+    setTimeout(()=>{
+      if(!kaijuActive||!_raidPetRef._isRaidBoss)return;
+      _raidPetRef.el.style.filter='drop-shadow(0 0 28px rgba(255,80,80,1))';
+      setTimeout(()=>{if(_raidPetRef._isRaidBoss)_raidPetRef.el.style.filter='drop-shadow(0 0 16px rgba(255,80,80,0.9))';},300);
+      pets.filter(p=>{
+        if(p===_raidPetRef||!p.alive)return false;
+        return Math.hypot((p.x+p.w/2)-(_raidPetRef.x+_raidPetRef.w/2),(p.y+p.h/2)-(_raidPetRef.y+_raidPetRef.h/2))<raidSize*1.5;
+      }).forEach(p=>{
+        const nx=Math.sign((p.x+p.w/2)-(_raidPetRef.x+_raidPetRef.w/2))||1;
+        p.vx+=nx*kaijuFlingForce*(0.7+Math.random()*0.6);
+        p.vy-=kaijuFlingForce*(0.5+Math.random()*0.5);
+        p.airborne=true; p.hp=Math.max(0,p.hp-25);
+        if(p.hp<=0&&p.alive){
+          p.alive=false; if(p.bubble){p.bubble.remove();p.bubble=null;}
+          p.healthBarWrap.style.display='none';
+          p.el.style.transition='opacity 0.8s'; p.el.style.opacity='0';
+          setTimeout(()=>{if(!p.alive)p.el.style.display='none';},900);
+        }
+        if(!pets.some(q=>q!==_raidPetRef&&q.alive)){_raidPetRef.say('RAID WINS!');endKaiju();}
+      });
+    },700);
+  }
+  raidStomp();
+  kaijuStompTimer=setInterval(raidStomp,kaijuStompInterval);
+
+  // no HP bar for raid — viewers just spam !attack
+  if(kaijuBarEl){kaijuBarEl.remove();kaijuBarEl=null;}
+
+  // centre splash
+  const splash=document.createElement('div');
+  splash.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:200;pointer-events:none;text-align:center;transition:opacity 1.5s;';
+  splash.innerHTML='<div style="font-size:40px;font-weight:900;color:#000;letter-spacing:0.04em;line-height:1.3;font-family:\'Courier New\',monospace;">'+raiderName+' has raided!<br>Fight back with !attack</div>';
+  document.body.appendChild(splash);
+  setTimeout(()=>{splash.style.opacity='0';},4000);
+  setTimeout(()=>{splash.remove();},5500);
+
+  ensureAudio(); playEventSound(battleStartBuffer);
 }
 
 // ══════════════════════════════════════════════════════════
@@ -2827,6 +3123,14 @@ const CMD_DEFS=[
   {id:'jump',         label:'Jump',             def:'!jump',         owner:false},
   {id:'duel',         label:'Duel someone',     def:'!duel',         owner:false},
   {id:'punch',        label:'Punch someone',    def:'!punch',        owner:false},
+  {id:'pledge',       label:'Pledge allegiance',def:'!pledge',       owner:false},
+  {id:'spawn',        label:'Spawn a pet ball', def:'!spawn',        owner:false},
+  {id:'ballin',       label:'Shoot a hoop',     def:'!ballin',       owner:false},
+  {id:'bounce',       label:'Bounce pet ball',  def:'!bounce',       owner:false},
+  {id:'float',        label:'Everyone floats',  def:'!float',        owner:false},
+  {id:'shrink',       label:'Shrink pet ball',  def:'!shrink',       owner:false},
+  {id:'grow',         label:'Grow pet ball',    def:'!grow',         owner:false},
+  {id:'despawn',      label:'Despawn a pet ball',def:'!despawn',     owner:false},
 ];
 
 // Live command map: id → current trigger string (lowercase, with !)
@@ -2990,6 +3294,70 @@ function execViewerCmd(cmdId,username,args){
         :pets.find(p=>p!==pet&&!activeDuels.has(p.username));
       if(pet&&target)startDuel(pet,target);
       else if(pet)pet.say('Who should I duel?');
+      break;
+    }
+    case 'spawn':{
+      // spawn a ball pet in a random costume at a random position
+      const r=config.size;
+      const sx=r+Math.random()*(canvas.width-r*2);
+      const sy=canvas.height/2+Math.random()*canvas.height*0.2;
+      const ns=spawnAt(sx,sy,r);
+      if(ns){
+        if(costumes.length>0)ns.costumeId=costumes[Math.floor(Math.random()*costumes.length)].id;
+        ns.vx=(Math.random()-.5)*6;ns.vy=-(4+Math.random()*4);
+        if(pet)pet.say('Ball summoned!');
+      }
+      break;
+    }
+    case 'ballin':{
+      // fire hoop shot
+      ensureAudio();fireHoopShot();
+      if(pet)pet.say('🏀 Ballin!');
+      break;
+    }
+    case 'bounce':{
+      // bounce all balls upward
+      spires.forEach(s=>{s.vy=-(6+Math.random()*4);s.vx+=(Math.random()-.5)*4;});
+      if(pet)pet.say('Boing!');
+      break;
+    }
+    case 'float':{
+      // toggle zero G for 8 seconds
+      setGravity(0);
+      if(pet)pet.say('Zero G!');
+      setTimeout(()=>setGravity(1),8000);
+      break;
+    }
+    case 'shrink':{
+      adjustSize(-10);
+      if(pet)pet.say('Getting smaller...');
+      break;
+    }
+    case 'grow':{
+      adjustSize(10);
+      if(pet)pet.say('Getting bigger!');
+      break;
+    }
+    case 'despawn':{
+      // remove the most recently spawned ball
+      if(spires.length>0){
+        spires.pop();
+        if(pet)pet.say('Poof!');
+      }
+      break;
+    }
+    case 'pledge':{
+      const pledgeEmoji=args&&args[0];
+      if(!pledgeEmoji){if(pet)pet.say('Use !pledge + team emoji');break;}
+      const matchTeam=warTeams.find(t=>t.emoji.trim()===pledgeEmoji.trim()||t.emoji.replace(/\uFE0F/g,'')===pledgeEmoji.replace(/\uFE0F/g,''));
+      if(!matchTeam){if(pet)pet.say('Unknown team!');break;}
+      if(pet){
+        pet._pledgedTeam=matchTeam.id;
+        const pinPrefix=pet.pinned?'\uD83D\uDCCC ':'';
+        pet.nameEl.textContent=pinPrefix+matchTeam.emoji+' '+pet.username;
+        pet.nameEl.style.color=matchTeam.color;
+        pet.say('Pledged to '+matchTeam.emoji+'!');
+      }
       break;
     }
     case 'punch':{
