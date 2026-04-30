@@ -347,11 +347,22 @@ body.mode-hallway #hallwayContainer{display:block;}
     <div class="stabpanel" id="tab-hoop" style="display:none!important;"></div>
 
     <div class="stabpanel" id="tab-sound">
-      <div class="srow"><label>Volume</label><input type="range" id="soundVol" min="0" max="1" step="0.01" value="0.707" style="width:100%;accent-color:#7F77DD;"></div>
+      <div class="srow">
+        <label style="font-weight:600;color:rgba(255,255,255,0.8);">&#x1F50A; Master volume</label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="range" id="soundVol" min="0" max="3" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <span id="soundVolVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
+      </div>
+      <div class="srow"><label>Min velocity to trigger collision sound</label><input type="number" id="soundThresh" value="3" min="0" max="20" step="0.5"></div>
       <hr class="sdivider">
       <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">General</div>
       <div class="srow">
         <label>Collision sound</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volCollision" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <span id="volCollisionVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
         <button class="soundUpBtn" id="soundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="soundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -359,9 +370,12 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button id="soundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
         </div>
       </div>
-      <div class="srow"><label>Min velocity to trigger collision sound</label><input type="number" id="soundThresh" value="3" min="0" max="20" step="0.5"></div>
       <div class="srow">
-        <label>🏀 Hoop scored</label>
+        <label>&#x1F3C0; Hoop scored</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volHoop" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <span id="volHoopVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
         <button class="soundUpBtn" id="victorySoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="victorySoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -370,7 +384,11 @@ body.mode-hallway #hallwayContainer{display:block;}
         </div>
       </div>
       <div class="srow">
-        <label>🔢 Resize (size hotkey)</label>
+        <label>&#x1F522; Resize (size hotkey)</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volResize" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <span id="volResizeVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
         <button class="soundUpBtn" id="resizeSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="resizeSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -381,7 +399,11 @@ body.mode-hallway #hallwayContainer{display:block;}
       <hr class="sdivider">
       <div style="font-size:11px;font-weight:600;color:rgba(239,159,39,0.8);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Events</div>
       <div class="srow">
-        <label>⚔️ Battle / War / Kaiju start</label>
+        <label>&#x2694;&#xFE0F; Battle / War / Kaiju start</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volBattleStart" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <span id="volBattleStartVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
         <button class="soundUpBtn" id="battleStartSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="battleStartSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -390,7 +412,11 @@ body.mode-hallway #hallwayContainer{display:block;}
         </div>
       </div>
       <div class="srow">
-        <label>🥊 Viewer hit (takes damage)</label>
+        <label>&#x1F94A; Viewer hit</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volHit" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <span id="volHitVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
         <button class="soundUpBtn" id="hitSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="hitSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -399,7 +425,11 @@ body.mode-hallway #hallwayContainer{display:block;}
         </div>
       </div>
       <div class="srow">
-        <label>💀 Viewer KO’d</label>
+        <label>&#x1F480; Viewer KO'd</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volKO" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <span id="volKOVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
         <button class="soundUpBtn" id="koSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="koSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -408,7 +438,11 @@ body.mode-hallway #hallwayContainer{display:block;}
         </div>
       </div>
       <div class="srow">
-        <label>🏆 Winner declared</label>
+        <label>&#x1F3C6; Winner declared</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volWin" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <span id="volWinVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
         <button class="soundUpBtn" id="winSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="winSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -417,7 +451,11 @@ body.mode-hallway #hallwayContainer{display:block;}
         </div>
       </div>
       <div class="srow">
-        <label>🦖 Kaiju stomp</label>
+        <label>&#x1F996; Kaiju stomp</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volStomp" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <span id="volStompVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
         <button class="soundUpBtn" id="stompSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="stompSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -426,7 +464,11 @@ body.mode-hallway #hallwayContainer{display:block;}
         </div>
       </div>
       <div class="srow">
-        <label>💿 DVD wall bounce</label>
+        <label>&#x1F4BF; DVD wall bounce</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volDVD" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <span id="volDVDVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
         <button class="soundUpBtn" id="dvdBounceSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="dvdBounceSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
@@ -435,7 +477,6 @@ body.mode-hallway #hallwayContainer{display:block;}
         </div>
       </div>
     </div>
-
     <div class="stabpanel" id="tab-hotkeys">
       <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Click a field then press any key to rebind.</p>
       <table id="hotkeyList"><tr><th>Action</th><th>Key</th></tr></table>
@@ -826,6 +867,20 @@ let hoopSlideDir=0;    // +1 = sliding out, -1 = sliding in
 let collisionBuffer=null,victoryBuffer=null,resizeBuffer=null;
 let battleStartBuffer=null,hitBuffer=null,koBuffer=null,winBuffer=null,stompBuffer=null,dvdBounceBuffer=null;
 let audioCtx=null,soundVol=0.02,soundThresh=3,lastSoundTime=0,lastResizeSound=0,lastVictoryTime=0;
+// per-sound volume multipliers (0–2, default 1)
+const perSoundVol={collision:1,hoop:1,resize:1,battleStart:1,hit:1,ko:1,win:1,stomp:1,dvd:1};
+const LS_PERVOL='lpp_pervol5';
+(function(){try{const r=localStorage.getItem(LS_PERVOL);if(r)Object.assign(perSoundVol,JSON.parse(r));}catch(e){}})();
+function savePerVol(){try{localStorage.setItem(LS_PERVOL,JSON.stringify(perSoundVol));}catch(e){}}
+function pv(key){return soundVol*perSoundVol[key];}
+function wireVolSlider(id,valId,key){
+  const sl=document.getElementById(id),vl=document.getElementById(valId);
+  if(!sl)return;
+  const pct=()=>Math.round(parseFloat(sl.value)*100)+'%';
+  if(vl)vl.textContent=Math.round((perSoundVol[key]||1)*100)+'%';
+  sl.value=perSoundVol[key]||1;
+  sl.addEventListener('input',function(){perSoundVol[key]=parseFloat(this.value);if(vl)vl.textContent=pct();savePerVol();});
+}
 let pickerTargetSpire=null;
 
 // saved physics before hoop shot
@@ -1119,7 +1174,7 @@ function checkHoopScore(s){
     const now=performance.now();
     if(now-lastVictoryTime>400){
       lastVictoryTime=now;
-      playSound(victoryBuffer,1.0);
+      playSound(victoryBuffer,pv('hoop'));
     }
   }
   if(!inZone)s._inHoop=false;
@@ -1160,11 +1215,11 @@ function playSound(buf,vol){
 function playCollision(vel){
   if(!collisionBuffer||!audioCtx)return;
   const now=performance.now();if(now-lastSoundTime<40)return;lastSoundTime=now;
-  playSound(collisionBuffer,Math.min(1,(vel/15)*soundVol));
+  playSound(collisionBuffer,Math.min(pv('collision'),(vel/15)*pv('collision')));
 }
 function playResize(){
   const now=performance.now();if(now-lastResizeSound<150)return;lastResizeSound=now;
-  if(resizeBuffer&&audioCtx)playSound(resizeBuffer,soundVol);
+  if(resizeBuffer&&audioCtx)playSound(resizeBuffer,pv('resize'));
 }
 
 function getCostumeFrames(costumeId,facingLeft,isMoving,isTalking){
@@ -1721,7 +1776,22 @@ document.getElementById('stompSoundClearBtn').addEventListener('click',()=>{stom
 document.getElementById('dvdBounceSoundClearBtn').addEventListener('click',()=>{dvdBounceBuffer=null;localStorage.removeItem(LS_DVDSND);document.getElementById('dvdBounceSoundName').textContent='No sound loaded';});
 
 
-document.getElementById('soundVol').addEventListener('input',function(){soundVol=sliderToVol(parseFloat(this.value));savePrefs();});
+document.getElementById('soundVol').addEventListener('input',function(){
+  soundVol=sliderToVol(parseFloat(this.value));
+  const vl=document.getElementById('soundVolVal');
+  if(vl)vl.textContent=Math.round(parseFloat(this.value)/3*100)+'%';
+  savePrefs();
+});
+// Wire per-sound volume sliders
+wireVolSlider('volCollision','volCollisionVal','collision');
+wireVolSlider('volHoop','volHoopVal','hoop');
+wireVolSlider('volResize','volResizeVal','resize');
+wireVolSlider('volBattleStart','volBattleStartVal','battleStart');
+wireVolSlider('volHit','volHitVal','hit');
+wireVolSlider('volKO','volKOVal','ko');
+wireVolSlider('volWin','volWinVal','win');
+wireVolSlider('volStomp','volStompVal','stomp');
+wireVolSlider('volDVD','volDVDVal','dvd');
 document.getElementById('soundThresh').addEventListener('input',function(){soundThresh=parseFloat(this.value)||3;savePrefs();});
 document.addEventListener('pointerdown',()=>ensureAudio());
 
@@ -2404,7 +2474,7 @@ function startBattleRoyale(){
     // check win condition
     if(alive.length<=1){
       if(alive.length===1){
-        alive[0].say('👑 I WIN!');ensureAudio();playEventSound(winBuffer);
+        alive[0].say('👑 I WIN!');ensureAudio();playEventSound(winBuffer,'win');
         alive[0].brAngleTarget=0;
       }
       endBattleRoyale();
@@ -2442,7 +2512,7 @@ function startBattleRoyale(){
           nearest.vx+=nx*5;nearest.vy-=4;nearest.airborne=true;
           p.brCooldown=35+Math.floor(Math.random()*25);
           p.brAngleTarget+=Math.PI*0.5*(Math.random()<0.5?1:-1);
-          ensureAudio();playEventSound(hitBuffer);
+          ensureAudio();playEventSound(hitBuffer,'hit');
           if(nearest.hp<=0){
             nearest.alive=false;
             if(nearest.bubble){nearest.bubble.remove();nearest.bubble=null;}
@@ -2452,7 +2522,7 @@ function startBattleRoyale(){
             nearest.vy=-(8+Math.random()*5);
             nearest.airborne=true;
             nearest.el.style.transition='opacity 0.8s'; nearest.el.style.opacity='0';
-            playEventSound(koBuffer);
+            playEventSound(koBuffer,'ko');
             setTimeout(()=>{if(!nearest.alive)nearest.el.style.display='none';},900);
           }
         } else {
@@ -2591,7 +2661,7 @@ function startWar(){
       if(teamsAlive.length===1){
         const wt=teamsAlive[0];
         pets.filter(p=>p.alive&&p.team===wt.id).forEach(p=>p.say(wt.emoji+' VICTORY!'));
-        ensureAudio();playEventSound(winBuffer);
+        ensureAudio();playEventSound(winBuffer,'win');
       }
       endWar();return;
     }
@@ -3326,7 +3396,7 @@ function startKaiju(){
     setTimeout(()=>{
       if(!kaijuActive||!kaijuSpire)return;
       // flash kaiju green on stomp
-      ensureAudio();playEventSound(stompBuffer);
+      ensureAudio();playEventSound(stompBuffer,'stomp');
       kaijuSpire.color='#80ffb0';
       setTimeout(()=>{if(kaijuSpire)kaijuSpire.color='#50e090';},250);
       const stomped=pets.filter(p=>{
@@ -3387,7 +3457,7 @@ function kaijuTakeDamage(dmg,username){
   kaijuHp=Math.max(0,kaijuHp-dmg); updateKaijuBar();
   const attacker=pets.find(p=>p.username===username&&p.alive&&p!==kaijuPet);
   if(attacker)attacker.say('HIT!');
-  ensureAudio();playEventSound(hitBuffer);
+  ensureAudio();playEventSound(hitBuffer,'hit');
   // knockback spire kaiju or raid-pet kaiju
   if(kaijuSpire){
     kaijuSpire.vx+=(Math.random()-.5)*6; kaijuSpire.vy-=3+Math.random()*3;
@@ -3401,7 +3471,7 @@ function kaijuTakeDamage(dmg,username){
   }
   if(kaijuHp<=0){
     pets.filter(p=>p.alive&&p!==kaijuPet).forEach(p=>p.say('WE WIN!'));
-    ensureAudio();playEventSound(winBuffer);
+    ensureAudio();playEventSound(winBuffer,'win');
     if(kaijuSpire){kaijuSpire.vx=(Math.random()-.5)*20;kaijuSpire.vy=-15;}
     if(kaijuPet){kaijuPet.vx=(Math.random()-.5)*10;kaijuPet.vy=-8;kaijuPet.airborne=true;}
     endKaiju();
@@ -3548,7 +3618,7 @@ function startRaidKaiju(raiderName, raidViewers){
   setTimeout(()=>{splash.style.opacity='0';},4000);
   setTimeout(()=>{splash.remove();},5500);
 
-  ensureAudio(); playEventSound(battleStartBuffer);
+  ensureAudio(); playEventSound(battleStartBuffer,'battleStart');
 }
 
 // ══════════════════════════════════════════════════════════
@@ -3666,13 +3736,13 @@ function startDuel(pet,target){
         duelState.hpA=Math.max(0,duelState.hpA-dmg);
         pet.hp=duelState.hpA;pet.maxHp=hp;
         target.vx=Math.sign(-dx)*3;target.vy=-2;target.airborne=true;
-        ensureAudio();playEventSound(hitBuffer);
+        ensureAudio();playEventSound(hitBuffer,'hit');
       } else {
         const dmg=8+Math.floor(Math.random()*10);
         duelState.hpB=Math.max(0,duelState.hpB-dmg);
         target.hp=duelState.hpB;target.maxHp=hp;
         pet.vx=Math.sign(dx)*3;pet.vy=-2;pet.airborne=true;
-        ensureAudio();playEventSound(hitBuffer);
+        ensureAudio();playEventSound(hitBuffer,'hit');
       }
       // check win
       if(duelState.hpA<=0||duelState.hpB<=0){
@@ -3683,7 +3753,7 @@ function startDuel(pet,target){
         const loser=duelState.hpA>0?target:pet;
         winner.say('\uD83C\uDFC6 I WIN!');
         loser.vx=(Math.random()<0.5?-1:1)*8;loser.vy=-6;loser.airborne=true;
-        ensureAudio();playEventSound(winBuffer);
+        ensureAudio();playEventSound(winBuffer,'win');
         setTimeout(()=>{
           pet.healthBarWrap.style.display='none';target.healthBarWrap.style.display='none';
           pet.hp=0;target.hp=0;pet._inDuel=false;target._inDuel=false;
@@ -3717,7 +3787,7 @@ function startPunch(pet,target){
       const nx=Math.sign(dx)||1;
       target.vx=nx*14;target.vy=-7;target.airborne=true;
       target.say('OW!');
-      ensureAudio();playEventSound(hitBuffer);
+      ensureAudio();playEventSound(hitBuffer,'hit');
       // stumble back slightly
       pet.vx=-nx*3;pet.vy=-2;pet.airborne=true;
     }
@@ -3871,13 +3941,20 @@ function execViewerCmd(cmdId,username,args){
   }
 }
 
-function playEventSound(buf){if(buf&&audioCtx)playSound(buf,soundVol);}
+function playEventSound(buf,key){if(buf&&audioCtx)playSound(buf,pv(key||'collision'));}
+// named wrappers used throughout
+function playBattleStart(){ensureAudio();playEventSound(battleStartBuffer,'battleStart');}
+function playHit(){ensureAudio();playEventSound(hitBuffer,'hit');}
+function playKO(){ensureAudio();playEventSound(koBuffer,'ko');}
+function playWin(){ensureAudio();playEventSound(winBuffer,'win');}
+function playStomp(){ensureAudio();playEventSound(stompBuffer,'stomp');}
+function playDVDBounce(){ensureAudio();playEventSound(dvdBounceBuffer,'dvd');}
 
 // Hook battle start sound — called when any event starts
 const _origStartBR=startBattleRoyale,_origStartWar=startWar,_origStartKaiju=startKaiju;
-startBattleRoyale=function(){ensureAudio();playEventSound(battleStartBuffer);_origStartBR();};
-startWar=function(){ensureAudio();playEventSound(battleStartBuffer);_origStartWar();};
-startKaiju=function(){ensureAudio();playEventSound(battleStartBuffer);_origStartKaiju();};
+startBattleRoyale=function(){ensureAudio();playEventSound(battleStartBuffer,'battleStart');_origStartBR();};
+startWar=function(){ensureAudio();playEventSound(battleStartBuffer,'battleStart');_origStartWar();};
+startKaiju=function(){ensureAudio();playEventSound(battleStartBuffer,'battleStart');_origStartKaiju();};
 
 // DVD bounce sound
 const _origUpdateDvd=updateDvd;
@@ -3888,7 +3965,7 @@ updateDvd=function(){
     _origUpdateDvd();
     const nowLeft=dvdSpire.x-r<=1,nowRight=dvdSpire.x+r>=W-1,nowTop=dvdSpire.y-r<=1,nowBot=dvdSpire.y+r>=H-1;
     if((nowLeft&&!wasLeft)||(nowRight&&!wasRight)||(nowTop&&!wasTop)||(nowBot&&!wasBot)){
-      ensureAudio();playEventSound(dvdBounceBuffer);
+      ensureAudio();playEventSound(dvdBounceBuffer,'dvd');
     }
   } else {_origUpdateDvd();}
 };

@@ -2,15 +2,14 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compataible" content="IE=Edge">
     <meta name="Keywords" content="2D Animator,YapCreations,Toontuber,Commissions">
-    <meta name="viewport" content="width=device-width,intial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta property="og:title" content="Commission Form">
     <meta property="og:site_name" content="YapCreations">
-    <meta property="og:url" content=yapcreations.com>
+    <meta property="og:url" content="https://yapcreations.com">
     <meta property="og:description" content="Commissions status: CLOSED">
-    <meta property="og:type" content=website>
-    <meta property="og:image" content=https://yapcreations.com/Images/Meta.png>
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://yapcreations.com/Images/Meta.png">
     <!--Website Tab-->
     <title>Commission Forms</title>
     <link rel="icon" type="image/jpg" href="Images/favicon.png">
@@ -21,9 +20,7 @@
     <!--JavaScript-->
     <script src="myScript.js" defer> </script>
     <!--JQuery-->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
 </head>
 
@@ -40,9 +37,25 @@
     <nav class="nav">
         <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
-        <li><a href="portfolio.html">Portfolio</a></li>
-        <li><a class="forced-active" href="commissions.html">Commissions</a></li>
         <li><a href="about.html">About</a></li>
+        <li class="dropdown">
+            <a class="forced-active" href="commissions.html">Commissions</a>
+            <ul class="dropdown-menu">
+                <li><a href="commissions.html#toontubers-prices">Toontuber</a></li>
+                <li><a href="commissions.html#short-animation-prices">Animation</a></li>
+                <li><a href="commissions.html#illustrations-prices">Illustrations</a></li>
+                <li><a href="commissions.html#packages-prices">Packages</a></li>
+            </ul>
+        </li>
+        <li class="dropdown">
+            <a href="portfolio.html">Portfolio</a>
+            <ul class="dropdown-menu">
+                <li><a href="past_works.html">Past Works</a></li>
+                <li><a href="personal_projects.html">Personal Projects</a></li>
+                <li><a href="illustrations.html">Illustrations</a></li>
+                <li><a href="archives.html">Archives</a></li>
+            </ul>
+        </li>
         <li><a href="community.html" >Community</a></li>
         <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
         </ul>
@@ -58,9 +71,31 @@
 <div class="overlay" id="overlay">
     <ul class="overlay-menu">
         <li><a href="index.html">Home</a></li>
-        <li><a href="portfolio.html">Portfolio</a></li>
-        <li><a class="forced-active" href="commissions.html">Commissions</a></li>
         <li><a href="about.html">About</a></li>
+        <li class="overlay-dropdown">
+            <div class="overlay-item-row">
+                <a class="forced-active" href="commissions.html">Commissions</a>
+                <button class="overlay-toggle" aria-expanded="false">&#9660;</button>
+            </div>
+            <ul class="overlay-submenu">
+                <li><a href="commissions.html#toontubers-prices">Toontuber</a></li>
+                <li><a href="commissions.html#short-animation-prices">Animation</a></li>
+                <li><a href="commissions.html#illustrations-prices">Illustrations</a></li>
+                <li><a href="commissions.html#packages-prices">Packages</a></li>
+            </ul>
+        </li>
+        <li class="overlay-dropdown">
+            <div class="overlay-item-row">
+                <a href="portfolio.html">Portfolio</a>
+                <button class="overlay-toggle" aria-expanded="false">&#9660;</button>
+            </div>
+            <ul class="overlay-submenu">
+                <li><a href="past_works.html">Past Works</a></li>
+                <li><a href="personal_projects.html">Personal Projects</a></li>
+                <li><a href="illustrations.html">Illustrations</a></li>
+                <li><a href="archives.html">Archives</a></li>
+            </ul>
+        </li>
         <li><a href="community.html" >Community</a></li>
         <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
     </ul>
@@ -78,18 +113,17 @@
     <section class="form-section">
         <div class="form-content">
             <h1>COMMISSION FORM</h1>
-            <h3>You can send a commission request by filling out this form. Upon recieving the email, I will reach out to you in 1-2 business days.</h3>
-
+            <h3>You can send a commission request by filling out this form. Upon receiving the email, I will reach out to you in 1-2 business days.</h3>
             <h3>Alternatively, you can contact me through Discord via <a href="https://discord.gg/82eQggBY" target="_blank"> yapcreations</a></h3>
-  <h4>or you can also commission me on:</h4>
-                    <div class="buttons">
+   <!--  <h4>or you can also commission me on:</h4>
+                 <div class="buttons">
                     <div class="bottom-button-comms button-container">
                         <a href="https://vgen.co/yapcreations">  <button class="white-button">Vgen</button></a>
                     </div>
                     <div class="bottom-button-comms button-container">
                         <a href="https://ko-fi.com/yapcreations">  <button class="white-button">Kofi</button></a>
                     </div>
-                    </div>
+                    </div>-->
             <div class="content-wrapper">
                     <div class="pricing-box">
                         <div class="base-pricing">
@@ -143,9 +177,6 @@
                    
                     
                 </div>
-            </style>
-        </head>
-        <body>
             <div class="form-box">
                 <form action="https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse" method="POST" id="form" onsubmit="return postToGoogleform();" >
                     <div class="form-grp form-row">
@@ -164,8 +195,8 @@
                     </div>
                     <div class="form-grp">
                         <label>Type of Use*</label>
-                        <label><input type="radio" id="typeofUse" name="entry.2121224666" value="Personal" required> Personal </label>
-                        <label><input type="radio" id="typeofUse" name="entry.2121224666" value="Commercial"> Commercial </label>
+                        <label><input type="radio" id="typeofUse-personal" name="entry.2121224666" value="Personal" required> Personal </label>
+                        <label><input type="radio" id="typeofUse-commercial" name="entry.2121224666" value="Commercial"> Commercial </label>
                     </div>
                     <div class="form-grp">
                         <label for="commissionType">Commission Type*</label>
@@ -237,7 +268,7 @@
                     <div id="packagetypefields" class="hidden">
                         <div class="form-grp">
                             <label for="PackageType">Type*</label>
-                            <select id="Package Type" name="entry.1775762094">
+                            <select id="packageType" name="entry.1775762094">
                                 <option value="">Select</option>
                                 <option value="Minimum">Minimum</option>
                                 <option value="Lite">Lite</option>
@@ -283,14 +314,14 @@
                     <div id="packageAddOns" class="hidden">
                         <div class="form-grp">
                             <label>Add Ons</label>
-                            <label><input type="checkbox" id="packageaddonTITS" name="entry.769825924" value="TITS"> Toontuber Intergrated Throwing System </label>
-                            <label><input type="checkbox" id="packageaddonAI" name="entry.769825924" value="AI"> Adds AI to Mascot</label>
+                            <label><input type="checkbox" id="packageaddonTITS2" name="entry.769825924" value="TITS"> Toontuber Intergrated Throwing System </label>
+                            <label><input type="checkbox" id="packageaddonAI2" name="entry.769825924" value="AI"> Adds AI to Mascot</label>
                             <label><input type="checkbox" id="packageaddonPC" name="entry.769825924" value="Personal Consultation"> Personal Consultation"</label>
                         </div>
                     </div>
                     
 
-                    <div id="referenceLink" class="hidden">
+                    <div id="referenceSection" class="hidden">
                         <div class="form-grp">
                             <label for="referenceLink">Link to Reference</label>
                             <input type="url" id="referenceLink" name="entry.459108534">
@@ -332,6 +363,4 @@
 
 </body>
 
-</html>
-</body>
 </html>

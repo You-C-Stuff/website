@@ -608,4 +608,13 @@ document.addEventListener('keydown', (event) => {
     }
 });
  });
+
+/*-------------------------------DROPDOWN OVERLAY--------------------------------*/
+document.querySelectorAll('.overlay-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const parent = btn.closest('.overlay-dropdown');
+        parent.classList.toggle('open');
+        btn.setAttribute('aria-expanded', parent.classList.contains('open'));
+    });
+});
  

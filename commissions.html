@@ -2,15 +2,14 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compataible" content="IE=Edge">
     <meta name="Keywords" content="2D Animator,YapCreations,Toontuber,Commissions">
-    <meta name="viewport" content="width=device-width,intial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <meta property="og:title" content="Commissions">
     <meta property="og:site_name" content="YapCreations">
-    <meta property="og:url" content=yapcreations.com>
+    <meta property="og:url" content="https://yapcreations.com">
     <meta property="og:description" content="Commissions status: CLOSED">
-    <meta property="og:type" content=website>
-    <meta property="og:image" content=https://yapcreations.com/Images/Meta.png>
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://yapcreations.com/Images/Meta.png">
     <!--Website Tab-->
     <title>Commissions</title>
     <link rel="icon" type="image/jpg" href="Images/favicon.png">
@@ -38,9 +37,25 @@
     <nav class="nav">
         <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
-        <li><a href="portfolio.html">Portfolio</a></li>
-        <li><a href="commissions.html">Commissions</a></li>
         <li><a href="about.html">About</a></li>
+        <li class="dropdown">
+            <a href="commissions.html">Commissions</a>
+            <ul class="dropdown-menu">
+                <li><a href="commissions.html#toontubers-prices">Toontuber</a></li>
+                <li><a href="commissions.html#short-animation-prices">Animation</a></li>
+                <li><a href="commissions.html#illustrations-prices">Illustrations</a></li>
+                <li><a href="commissions.html#packages-prices">Packages</a></li>
+            </ul>
+        </li>
+        <li class="dropdown">
+            <a href="portfolio.html">Portfolio</a>
+            <ul class="dropdown-menu">
+                <li><a href="past_works.html">Past Works</a></li>
+                <li><a href="personal_projects.html">Personal Projects</a></li>
+                <li><a href="illustrations.html">Illustrations</a></li>
+                <li><a href="archives.html">Archives</a></li>
+            </ul>
+        </li>
         <li><a href="community.html" >Community</a></li>
         <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
         </ul>
@@ -58,10 +73,32 @@
 
 <div class="overlay" id="overlay">
     <ul class="overlay-menu">
-    <li><a href="index.html">Home</a></li>
-        <li><a href="portfolio.html">Portfolio</a></li>
-        <li><a href="commissions.html">Commissions</a></li>
+        <li><a href="index.html">Home</a></li>
         <li><a href="about.html">About</a></li>
+        <li class="overlay-dropdown">
+            <div class="overlay-item-row">
+                <a href="commissions.html">Commissions</a>
+                <button class="overlay-toggle" aria-expanded="false">&#9660;</button>
+            </div>
+            <ul class="overlay-submenu">
+                <li><a href="commissions.html#toontubers-prices">Toontuber</a></li>
+                <li><a href="commissions.html#short-animation-prices">Animation</a></li>
+                <li><a href="commissions.html#illustrations-prices">Illustrations</a></li>
+                <li><a href="commissions.html#packages-prices">Packages</a></li>
+            </ul>
+        </li>
+        <li class="overlay-dropdown">
+            <div class="overlay-item-row">
+                <a href="portfolio.html">Portfolio</a>
+                <button class="overlay-toggle" aria-expanded="false">&#9660;</button>
+            </div>
+            <ul class="overlay-submenu">
+                <li><a href="past_works.html">Past Works</a></li>
+                <li><a href="personal_projects.html">Personal Projects</a></li>
+                <li><a href="illustrations.html">Illustrations</a></li>
+                <li><a href="archives.html">Archives</a></li>
+            </ul>
+        </li>
         <li><a href="community.html" >Community</a></li>
         <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
     </ul>
@@ -73,16 +110,16 @@
     </div>
 </div>
 
-<!--
+
 <nav class="dot-nav">
     <ul>
+        <li><a href="#toontubers-prices" data-label="Toontubers"></a></li>
       <li><a href="#short-animation-prices" data-label="Short Animation"></a></a></li>
       <li><a href="#long-animation-prices" data-label="Long Animation"></a></li>
-      <li><a href="#toontubers-prices" data-label="Toontubers"></a></li>
       <li><a href="#illustrations-prices" data-label="Illustrations"></a></li>
       <li><a href="#packages-prices" data-label="Packages"></a></li>
     </ul>
-  </nav>-->
+  </nav>
 <!--Main-->
 <main> 
     <div class="home-page">
@@ -108,11 +145,11 @@
         <div class="row commission-static-page" id="row6">
             <div class="commission-text-container">
                 <h2>COMMISSION STATUS:</h2>
-                <h1>CLOSED</h1>
-                <!--Top Header
+                <h1>OPEN</h1>
+
                 <div class="button-container">
                     <a href="commission_form.html"><button class="black-button">Order Now</button></a>
-                </div>-->
+                </div>
                 <div class="button-container">
                     <a href="https://trello.com/b/4MoLJyEa/commission-board"  target="_blank"><button class="black-button">To-do List</button></a>
                 </div>
@@ -120,7 +157,6 @@
             <div class="commission-empty-container"></div>
         </div>
 
- <!--Top Header
     <div class="row reminder-page" id="row7">        
         <h1>REMINDERS</h1>
         <div class="will">
@@ -156,11 +192,166 @@
             </ol> 
         </div>
     </div>
--->
 
-<!-- Commission Prices Section 
+
+<section class="toon" id="toontubers-prices">
+
+<div class="toontubers">
+    <h1>TOONTUBER </h1>
+    <h2>WHAT'S A TOONTUBER?</h2>
+    <p>ToonTubers are cartoony avatars for streaming & content creation! </p>
+    <p>[ Compatible with <a href="https://www.youtube.com/watch?v=oICHBZaz2To" target="_blank">Toontuber Guide</a> | <a href="https://reactive.fugi.tech/" target="_blank">Discord Reactive</a> | <a href="https://olmewe.itch.io/veadotube-mini" target="_blank">Veadotube-mini</a> ]</p>
+    <h2>FULL-BODY</h2>
+    <p>Every expression for: $100 | Add-ons: +$25</p>
+
+    <div class="package full-package">
+        <div class="emote">
+            <p>[Included]</p>
+            <img src="Images/Commission/cyidle.gif" alt="Idle">
+            <p>Idle</p>
+        </div>
+        <div class="emote">
+            <p>[Included]</p>
+            <img src="Images/Commission/cytalk.gif" alt="Talk">
+            <p>Talk</p>
+        </div>
+        <div class="emote">
+            <p>[Add-Ons] </p>
+            <img src="Images/Commission/cyset.gif" alt="Set">
+            <p>Set</p>
+        </div>
+    </div>
+
+    <h3>Examples</h3>
+    <div class="more-emotes">
+        <div class="emote">
+            <img src="Images/Commission/patcarrin.gif" alt="Emote 1">
+            <p>Pat</p>
+        </div>
+        <div class="emote">
+            <img src="Images/Commission/cheerfulcarrin.gif" alt="Emote 1">
+            <p>Cheery</p>
+        </div>
+
+            <div class="emote">
+                <img src="Images/Commission/idanodissapear.gif" alt="Emote 1">
+                <p>Dissappear</p>
+            </div>
+            <div class="emote">
+                <img src="Images/Commission/scaredidano.gif" alt="Emote 1">
+                <p>Shiver</p>
+            </div>
+   
+    </div>
+    
+    <h2>HALF-BODY</h2>
+    <p>Every expression for: $75 | Add-ons: +$25</p>
+
+    <div class="package full-package">
+        <div class="emote">
+            <p>[Included]</p>
+            <img src="Images/Commission/ToontuberIdle.gif" alt="Idle">
+            <p>Idle</p>
+        </div>
+        <div class="emote">
+            <p>[Included]</p>
+            <img src="Images/Commission/Toontubertalk.gif" alt="Talk">
+            <p>Talk</p>
+        </div>
+        <div class="emote">
+            <p>[Add-Ons] </p>
+            <img src="Images/Commission/Toontuberset.gif" alt="Set">
+            <p>Set</p>
+        </div>
+    </div>
+    
+
+    <h3>Examples</h3>
+    <div class="more-emotes">
+        <div class="emote">
+            <img src="Images/Commission/ToontuberSuper.gif" alt="Emote 1">
+            <p>Powerup</p>
+        </div>
+        <div class="emote">
+            <img src="Images/Commission/Toontubercry.gif" alt="Emote 2">
+            <p>Cry</p>
+        </div>
+        <div class="emote">
+            <img src="Images/Commission/Toontuberheart.gif" alt="Emote 3">
+            <p>Heart</p>
+        </div>
+        <div class="emote">
+            <img src="Images/Commission/Toontuberdrink.gif" alt="Emote 4">
+            <p>Drink</p>
+        </div>
+        <div class="emote">
+            <img src="Images/Commission/Toontuberstretch.gif" alt="Emote 5">
+            <p>Stretch</p>
+        </div>
+ 
+    </div>
+
+    <h2>SIMPLE</h2>
+    <p>Every expression for: $30 | Add-ons: +$20</p>
+    
+
+    <div class="package lite-package">
+        <div class="emote">
+            <p>[Included] </p>
+            <img src="Images/Commission/KazuyaIdle.gif" alt="Idle">
+            <p>Idle</p>
+        </div>
+        <div class="emote">
+            <p>[Included] </p>
+            <img src="Images/Commission/KazuyaTalk.gif" alt="Talk">
+            <p>Talk</p>
+        </div>
+        <div class="emote">
+            <p>[Add-Ons] </p>
+            <img src="Images/Commission/KazuyaMute.gif" alt="Mute">
+            <p> Mute</p>
+        </div>
+        <div class="emote">
+            <p>[Add-Ons] </p>
+            <img src="Images/Commission/KazuyaDeafen.gif" alt="Deafen">
+            <p> Deafen</p>
+        </div>
+    </div>
+
+    <h3>Examples</h3>
+    <div class="more-examples">
+        <div class="emote">
+            <img src="Images/Commission/nubtalk.gif" alt="Example 1">
+            <p>Mob</p>
+        </div>
+        <div class="emote">
+            <img src="Images/Commission/Shikiidle.gif" alt="Example 2">
+            <p>Human</p>
+        </div>
+        <div class="emote">
+            <img src="Images/Commission/Jay talk.gif" alt="Example 3">
+            <p>Furry</p>
+        </div>
+        <div class="emote">
+            <img src="Images/Commission/Makoidle.gif" alt="Example 5">
+            <p>Anthro</p>
+        </div>
+        <div class="emote">
+            <img src="Images/Commission/newgoobertalk.gif" alt="Example 5">
+            <p>Mecha</p>
+        </div>
+        <div class="emote">
+            <img src="Images/Commission/dodoidle.gif" alt="Example 4">
+            <p>Pet</p>
+        </div>
+       
+     
+      
+    </div>
+</section>
+    
+    <hr>
 <section class="commission-prices" id="short-animation-prices">
-    <h1>COMMISSION PRICES</h1>
     <h2>SHORT ANIMATION</h2>
     <h3>[ Animation that does not exceed 4 seconds ]</h3>
 
@@ -257,166 +448,11 @@
     <a href="mailto:yapcommissions@gmail.com">yapcommissions@gmail.com</a>
 </div>
 
-<hr>
-<section class="toon" id="toontubers-prices">
-<div class="toontubers">
-    <h1>TOONTUBER AVATARS</h1>
-    <h2>WHAT'S A TOONTUBER?</h2>
-    <p>ToonTubers are cartoony avatars for streaming & content creation! </p>
-    <p>[ Compatible with <a href="https://www.youtube.com/watch?v=oICHBZaz2To" target="_blank">Toontuber Guide</a> | <a href="https://reactive.fugi.tech/" target="_blank">Discord Reactive</a> | <a href="https://olmewe.itch.io/veadotube-mini" target="_blank">Veadotube-mini</a> ]</p>
-    <h2>FULL-BODY</h2>
-    <p>Every expression for: $100 | Add-ons: +$25</p>
 
-    <div class="package full-package">
-        <div class="emote">
-            <p>[Included]</p>
-            <img src="Images/Commission/cyidle.gif" alt="Idle">
-            <p>Idle</p>
-        </div>
-        <div class="emote">
-            <p>[Included]</p>
-            <img src="Images/Commission/cytalk.gif" alt="Talk">
-            <p>Talk</p>
-        </div>
-        <div class="emote">
-            <p>[Add-Ons] </p>
-            <img src="Images/Commission/cyset.gif" alt="Set">
-            <p>Set</p>
-        </div>
-    </div>
-
-    <h3>Examples</h3>
-    <div class="more-emotes">
-        <div class="emote">
-            <img src="Images/Commission/patcarrin.gif" alt="Emote 1">
-            <p>Pat</p>
-        </div>
-        <div class="emote">
-            <img src="Images/Commission/cheerfulcarrin.gif" alt="Emote 1">
-            <p>Cheery</p>
-        </div>
-
-            <div class="emote">
-                <img src="Images/Commission/idanodissapear.gif" alt="Emote 1">
-                <p>Dissappear</p>
-            </div>
-            <div class="emote">
-                <img src="Images/Commission/scaredidano.gif" alt="Emote 1">
-                <p>Shiver</p>
-            </div>
-   
-    </div>
-    
-    <h2>HALF-BODY</h2>
-    <p>Every expression for: $75 | Add-ons: +$25</p>
-
-    <div class="package full-package">
-        <div class="emote">
-            <p>[Included]</p>
-            <img src="Images/Commission/ToontuberIdle.gif" alt="Idle">
-            <p>Idle</p>
-        </div>
-        <div class="emote">
-            <p>[Included]</p>
-            <img src="Images/Commission/Toontubertalk.gif" alt="Talk">
-            <p>Talk</p>
-        </div>
-        <div class="emote">
-            <p>[Add-Ons] </p>
-            <img src="Images/Commission/Toontuberset.gif" alt="Set">
-            <p>Set</p>
-        </div>
-    </div>
-    
-
-    <h3>Examples</h3>
-    <div class="more-emotes">
-        <div class="emote">
-            <img src="Images/Commission/ToontuberSuper.gif" alt="Emote 1">
-            <p>Powerup</p>
-        </div>
-        <div class="emote">
-            <img src="Images/Commission/Toontubercry.gif" alt="Emote 2">
-            <p>Cry</p>
-        </div>
-        <div class="emote">
-            <img src="Images/Commission/Toontuberheart.gif" alt="Emote 3">
-            <p><3</p>
-        </div>
-        <div class="emote">
-            <img src="Images/Commission/Toontuberdrink.gif" alt="Emote 4">
-            <p>Drink</p>
-        </div>
-        <div class="emote">
-            <img src="Images/Commission/Toontuberstretch.gif" alt="Emote 5">
-            <p>Stretch</p>
-        </div>
- 
-    </div>
-
-    <h2>SIMPLE</h2>
-    <p>Every expression for: $30 | Add-ons: +$20</p>
-    
-
-    <div class="package lite-package">
-        <div class="emote">
-            <p>[Included] </p>
-            <img src="Images/Commission/KazuyaIdle.gif" alt="Idle">
-            <p>Idle</p>
-        </div>
-        <div class="emote">
-            <p>[Included] </p>
-            <img src="Images/Commission/KazuyaTalk.gif" alt="Talk">
-            <p>Talk</p>
-        </div>
-        <div class="emote">
-            <p>[Add-Ons] </p>
-            <img src="Images/Commission/KazuyaMute.gif" alt="Mute">
-            <p> Mute</p>
-        </div>
-        <div class="emote">
-            <p>[Add-Ons] </p>
-            <img src="Images/Commission/KazuyaDeafen.gif" alt="Deafen">
-            <p> Deafen</p>
-        </div>
-    </div>
-
-    <h3>Examples</h3>
-    <div class="more-examples">
-        <div class="emote">
-            <img src="Images/Commission/nubtalk.gif" alt="Example 1">
-            <p>Mob</p>
-        </div>
-        <div class="emote">
-            <img src="Images/Commission/Shikiidle.gif" alt="Example 2">
-            <p>Human</p>
-        </div>
-        <div class="emote">
-            <img src="Images/Commission/Jay talk.gif" alt="Example 3">
-            <p>Furry</p>
-        </div>
-        <div class="emote">
-            <img src="Images/Commission/Makoidle.gif" alt="Example 5">
-            <p>Anthro</p>
-        </div>
-        <div class="emote">
-            <img src="Images/Commission/newgoobertalk.gif" alt="Example 5">
-            <p>Mecha</p>
-        </div>
-        <div class="emote">
-            <img src="Images/Commission/dodoidle.gif" alt="Example 4">
-            <p>Pet</p>
-        </div>
-       
-     
-      
-    </div>
--->
-    
     
 </section>
 <hr>
-<!-- Commission Prices Section 
+
 <section class="commission-prices" id="illustrations-prices">
     <h1>ILLUSTRATIONS</h1>
     <h2>FULL ILLUSTRATIONS</h2>
@@ -542,12 +578,9 @@
             <img src="Images/Commission/Mayo.png" alt="Past Commissions">
         </div>
     </div>
-
-
 </section>
--->
+
 <hr>
-<!-- Full Package 
 <section class="toon">
 <div class="toontubers" id="packages-prices">
     <h1>PACKAGES</h1>
@@ -654,32 +687,6 @@
           </div>
         </div>
       </div>
-    <h2>ADD ONS</h2>
-    <p>Features to spice up your Stream~ </p>
-
-    
-
-    <div class="package lite-package">
-        <div class="emote">
-            <p>Toontuber Integrated Throwing System </p>
-            <img src="Images/Commission/Fayrunasmack.gif" alt="TITS">
-            <p> SAMMI Code + Setup: $60</p>
-        </div>
-    
-        <div class="emote">
-            <p>Add AI to Mascot</p>
-            <img src="Images/Commission/Chatgpt.gif" alt="Channel_Mascots">
-            <p>SAMMI Code + Setup: $20</p>
-        </div>
-        <div class="emote">
-            <p>Stream Consulation</p>
-            <img src="Images/Commission/Contact.gif" alt="Contact">
-            <p> $5/hr</p>
-        </div>
-    </div>
-
-      
-    </div>
 
 </section>
 
@@ -699,7 +706,7 @@
     <a href="commission_form.html"><button class="white-button">Order Now</button></a>
 </div>
 
-  -->
+ 
     <div class="bottom-button button-container">
         <a href="portfolio.html"><button class="white-button">Back</button></a>
     </div>
