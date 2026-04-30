@@ -248,171 +248,113 @@ function updateFormVisibility() {
  });
 
 /*-------------------------------GALLERY--------------------------------*/
+const galleryCarousels = [];
 
-let autoScrollInterval;
-let activeGalleryIndex = 0;
+function makeCarousel(container) {
+    const slides = Array.from(container.querySelectorAll('.artist'));
+    const thumbContainer = container.querySelector('.thumbnails');
+    const origThumbs = thumbContainer ? Array.from(thumbContainer.querySelectorAll('.thumbnail')) : [];
+    const prevBtn = container.querySelector('.prevbtn');
+    const nextBtn = container.querySelector('.nextbtn');
+    const counter = container.querySelector('.car-counter');
+    let idx = 0, autoTimer = null, resumeTimer = null;
 
-// Initialize carousels for all galleries
-function initializeGallery(gallery) {
-    const slides = gallery.querySelectorAll(".artist");
-    const thumbnails = gallery.querySelectorAll(".thumbnail");
-    let slideIndex = 0;
-
-    function showSlide(n) {
-        slideIndex = (n + slides.length) % slides.length;
-
-        slides.forEach(slide => slide.classList.remove("active"));
-        thumbnails.forEach(thumb => thumb.classList.remove("active"));
-
-        slides[slideIndex].classList.add("active");
-        thumbnails[slideIndex].classList.add("active");
+    // Clone thumbnails for infinite scroll looping
+    if (thumbContainer && origThumbs.length > 0) {
+        origThumbs.forEach(t => thumbContainer.appendChild(t.cloneNode(true)));
     }
 
-    function prevSlide() {
-        showSlide(slideIndex - 1);
+    const thumbPx = origThumbs.length > 0 ? (origThumbs[0].offsetWidth || 80) + 8 : 88;
+
+    function updateThumbs() {
+        if (!thumbContainer) return;
+        Array.from(thumbContainer.querySelectorAll('.thumbnail'))
+            .forEach((t, i) => t.classList.toggle('active', i % origThumbs.length === idx));
+        if (origThumbs[idx]) {
+            const t = origThumbs[idx];
+            const cw = thumbContainer.clientWidth;
+            const sl = thumbContainer.scrollLeft;
+            if (t.offsetLeft < sl) thumbContainer.scrollTo({ left: t.offsetLeft - 8, behavior: 'smooth' });
+            else if (t.offsetLeft + t.offsetWidth > sl + cw) thumbContainer.scrollTo({ left: t.offsetLeft + t.offsetWidth - cw + 8, behavior: 'smooth' });
+        }
     }
 
-    function nextSlide() {
-        showSlide(slideIndex + 1);
+    function show(n) {
+        slides[idx].classList.remove('active');
+        idx = ((n % slides.length) + slides.length) % slides.length;
+        slides[idx].classList.add('active');
+        if (counter) counter.textContent = (idx + 1) + ' / ' + slides.length;
+        updateThumbs();
     }
 
-    gallery.querySelector(".prevbtn").onclick = () => {
-        prevSlide();
-        stopAutoScroll();
-    };
-    gallery.querySelector(".nextbtn").onclick = () => {
-        nextSlide();
-        stopAutoScroll();
-    };
+    function startAuto() { clearInterval(autoTimer); autoTimer = setInterval(() => show(idx + 1), 4000); }
+    function stopAuto() { clearInterval(autoTimer); autoTimer = null; clearTimeout(resumeTimer); resumeTimer = null; }
+    function pauseAuto() { clearInterval(autoTimer); autoTimer = null; clearTimeout(resumeTimer); resumeTimer = setTimeout(startAuto, 8000); }
 
-    thumbnails.forEach((thumb, i) => {
-        thumb.onclick = () => {
-            showSlide(i);
-            stopAutoScroll();
-        };
-    });
+    if (prevBtn) prevBtn.addEventListener('click', () => { show(idx - 1); pauseAuto(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { show(idx + 1); pauseAuto(); });
 
-    // Start auto-scrolling for this gallery
-    startAutoScroll(() => nextSlide());
+    // Thumbnail click — event delegation covers originals + clones
+    if (thumbContainer) {
+        thumbContainer.addEventListener('click', e => {
+            const thumb = e.target.closest('.thumbnail');
+            if (!thumb) return;
+            const i = Array.from(thumbContainer.querySelectorAll('.thumbnail')).indexOf(thumb) % origThumbs.length;
+            if (i >= 0) { show(i); pauseAuto(); }
+        });
+    }
 
-    showSlide(slideIndex);
+    // Swipe on carousel image
+    const inner = container.querySelector('.carousel-inner');
+    if (inner) {
+        let tx = 0;
+        inner.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+        inner.addEventListener('touchend', e => {
+            const d = tx - e.changedTouches[0].clientX;
+            if (Math.abs(d) > 50) { show(idx + (d > 0 ? 1 : -1)); pauseAuto(); }
+        });
+    }
+
+    // Thumbnail strip scroll, drag, infinite loop
+    if (thumbContainer) {
+        const wrapper = container.querySelector('.thumbnail-wrapper');
+        const scrollLeftBtn = container.querySelector('.thumb-scroll.left');
+        const scrollRightBtn = container.querySelector('.thumb-scroll.right');
+        const origCount = origThumbs.length;
+
+        if (scrollLeftBtn) scrollLeftBtn.addEventListener('click', () => thumbContainer.scrollBy({ left: -150, behavior: 'smooth' }));
+        if (scrollRightBtn) scrollRightBtn.addEventListener('click', () => thumbContainer.scrollBy({ left: 150, behavior: 'smooth' }));
+
+        thumbContainer.addEventListener('scroll', () => {
+            const sl = thumbContainer.scrollLeft;
+            const maxScroll = thumbContainer.scrollWidth - thumbContainer.clientWidth;
+            if (sl <= 0) thumbContainer.scrollLeft = thumbPx * origCount;
+            else if (sl >= maxScroll) thumbContainer.scrollLeft = thumbPx * origCount - (wrapper ? wrapper.offsetWidth / 2 : 150);
+        });
+
+        let isDragging = false, dragStartX, dragStartSL;
+        thumbContainer.addEventListener('mousedown', e => { isDragging = true; thumbContainer.classList.add('dragging'); dragStartX = e.pageX - thumbContainer.offsetLeft; dragStartSL = thumbContainer.scrollLeft; });
+        thumbContainer.addEventListener('mouseleave', () => { isDragging = false; thumbContainer.classList.remove('dragging'); });
+        thumbContainer.addEventListener('mouseup', () => { isDragging = false; thumbContainer.classList.remove('dragging'); });
+        thumbContainer.addEventListener('mousemove', e => { if (!isDragging) return; e.preventDefault(); thumbContainer.scrollLeft = dragStartSL - (e.pageX - thumbContainer.offsetLeft - dragStartX) * 1.5; });
+        thumbContainer.addEventListener('touchstart', e => { dragStartX = e.touches[0].pageX; dragStartSL = thumbContainer.scrollLeft; }, { passive: true });
+        thumbContainer.addEventListener('touchmove', e => { thumbContainer.scrollLeft = dragStartSL - (e.touches[0].pageX - dragStartX) * 1.2; });
+    }
+
+    show(0);
+    return { startAuto, stopAuto };
 }
 
-// Start auto-scrolling
-function startAutoScroll(callback) {
-    stopAutoScroll(); // Clear existing intervals
-    autoScrollInterval = setInterval(callback, 4000);
-}
+window.switchGallery = function(index) {
+    document.querySelectorAll('.gallery-container').forEach((g, i) => g.classList.toggle('active', i === index));
+    document.querySelectorAll('.gallery-btn').forEach((b, i) => b.classList.toggle('active', i === index));
+    galleryCarousels.forEach((c, i) => i === index ? c.startAuto() : c.stopAuto());
+};
 
-// Stop auto-scrolling
-function stopAutoScroll() {
-    clearInterval(autoScrollInterval);
-}
-
-function switchGallery(index) {
-    const galleries = document.querySelectorAll(".gallery-container");
-    const buttons = document.querySelectorAll(".gallery-btn");
-
-    // Deactivate all galleries and buttons
-    galleries.forEach(gallery => gallery.classList.remove("active"));
-    buttons.forEach(button => button.classList.remove("active"));
-
-    // Activate selected gallery and button
-    galleries[index].classList.add("active");
-    buttons[index].classList.add("active");
-
-    activeGalleryIndex = index;
-
-    // Initialize carousel for the active gallery
-    initializeGallery(galleries[index]);
-}
-
-// Initialize the first gallery
-document.addEventListener("DOMContentLoaded", () => {
-    const galleries = document.querySelectorAll(".gallery-container");
-    galleries.forEach(gallery => initializeGallery(gallery));
-    switchGallery(0); // Start with the first gallery
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.gallery-container').forEach(g => galleryCarousels.push(makeCarousel(g)));
+    switchGallery(0);
 });
-
-/*-------------------------------THUMBNAIL--------------------------------*/
-document.querySelectorAll('.thumbnail-wrapper').forEach(wrapper => {
-    const thumbnails = wrapper.querySelector('.thumbnails');
-    const scrollLeftBtn = wrapper.querySelector('.thumb-scroll.left');
-    const scrollRightBtn = wrapper.querySelector('.thumb-scroll.right');
-    const scrollAmount = 150;
-  
-    // Clone items for infinite scroll
-    const items = Array.from(thumbnails.children);
-    items.forEach(item => {
-        thumbnails.appendChild(item.cloneNode(true));
-      });
-    const thumbnailWidth = items[0].offsetWidth + 8; // 8 is gap
-    const originalCount = items.length;
-    const totalCount = thumbnails.children.length;
-  
-
-    // Scroll buttons
-    scrollLeftBtn.addEventListener('click', () => {
-      thumbnails.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    });
-  
-    scrollRightBtn.addEventListener('click', () => {
-      thumbnails.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    });
-  
-    // Infinite scroll logic
-    thumbnails.addEventListener('scroll', () => {
-      const scrollLeft = thumbnails.scrollLeft;
-      const maxScroll = thumbnails.scrollWidth - thumbnails.clientWidth;
-  
-      if (scrollLeft <= 0) {
-        thumbnails.scrollLeft = thumbnailWidth * originalCount;
-      } else if (scrollLeft >= maxScroll) {
-        thumbnails.scrollLeft = thumbnailWidth * originalCount - wrapper.offsetWidth / 2;
-      }
-    });
-  
-    // Drag functionality
-    let isDragging = false;
-    let startX, scrollLeft;
-  
-    thumbnails.addEventListener('mousedown', e => {
-      isDragging = true;
-      thumbnails.classList.add('dragging');
-      startX = e.pageX - thumbnails.offsetLeft;
-      scrollLeft = thumbnails.scrollLeft;
-    });
-  
-    thumbnails.addEventListener('mouseleave', () => {
-      isDragging = false;
-      thumbnails.classList.remove('dragging');
-    });
-  
-    thumbnails.addEventListener('mouseup', () => {
-      isDragging = false;
-      thumbnails.classList.remove('dragging');
-    });
-  
-    thumbnails.addEventListener('mousemove', e => {
-      if (!isDragging) return;
-      e.preventDefault();
-      const x = e.pageX - thumbnails.offsetLeft;
-      const walk = (x - startX) * 1.5;
-      thumbnails.scrollLeft = scrollLeft - walk;
-    });
-  
-    // Touch support
-    thumbnails.addEventListener('touchstart', e => {
-      startX = e.touches[0].pageX;
-      scrollLeft = thumbnails.scrollLeft;
-    });
-  
-    thumbnails.addEventListener('touchmove', e => {
-      const x = e.touches[0].pageX;
-      const walk = (x - startX) * 1.2;
-      thumbnails.scrollLeft = scrollLeft - walk;
-    });
-  });
 /*-------------------------------SCROLL TO TOP--------------------------------*/
 
 let mybutton = document.getElementById("myBtn");
@@ -455,21 +397,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const overlay = document.getElementById('overlay');
     const body = document.body;
     const header = document.querySelector('.header');
-    const a= document.querySelector('.prevbtn');
-    const b = document.querySelector('.nextbtn');
-    
+
     hamburger.addEventListener('click', () => {
         overlay.classList.toggle('active');
         hamburger.classList.toggle('active');
         body.classList.toggle('no-scroll');
-    
-        // Toggle visibility of prevBtn and nextBtn
-        if (a && b) {
-            a.classList.toggle('hidden');
-            b.classList.toggle('hidden');
-        }
     });
-    
+
     // Close overlay when a link is clicked
     const overlayLinks = document.querySelectorAll('.overlay-menu a');
     overlayLinks.forEach(link => {
@@ -477,27 +411,15 @@ document.addEventListener("DOMContentLoaded", () => {
             overlay.classList.remove('active');
             hamburger.classList.remove('active');
             body.classList.remove('no-scroll');
-    
-            // Ensure prevBtn and nextBtn are shown when overlay closes
-            if (a && b) {
-                a.classList.remove('hidden');
-                b.classList.remove('hidden');
-            }
         });
     });
-    
+
     // Remove overlay and hamburger active class on window resize if larger than 768px
     window.addEventListener('resize', () => {
         if (window.innerWidth > 768) {
             overlay.classList.remove('active');
             hamburger.classList.remove('active');
             body.classList.remove('no-scroll');
-    
-            // Ensure prevBtn and nextBtn are shown when window is resized
-            if (a && b) {
-                a.classList.remove('hidden');
-                b.classList.remove('hidden');
-            }
         }
     });
     

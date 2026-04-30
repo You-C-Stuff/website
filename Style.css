@@ -426,7 +426,7 @@ color: var(--color-hover);
     right: 150%;
     top: 50%;
     transform: translateY(-50%);
-    color: white;
+    color: white; 
     border-radius: 4px;
     white-space: nowrap;
     opacity: 0;
@@ -2149,8 +2149,60 @@ input, select, textarea {
   }
 
 
+.carousel {
+    position: relative;
+}
+
 .carousel-button {
-    display: none; /* Hide prev/next buttons */
+    position: absolute;
+    top: 65%;
+    transform: translateY(-50%);
+    background: rgba(99, 79, 79, 0);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: var(--color-white);
+    font-size: 1.4em;
+    padding: 10px 14px;
+    cursor: pointer;
+    z-index: 1;
+    border-radius: 6px;
+    line-height: 1;
+}
+
+.carousel-button:hover {
+    background: rgba(0, 0, 0, 0.75);
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
+.prevbtn { left: 10%; }
+.nextbtn { right: 10%; }
+
+.car-info {
+    display: flex;
+    justify-content: center;
+    padding: 6px 0 2px;
+}
+
+.car-counter {
+    color: var(--color-hover);
+    font-size: 0.85em;
+    font-family: 'Audiowide', sans-serif;
+}
+
+.gallery-switcher-wrap {
+    overflow-x: auto;
+    padding: 0 10px 8px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.gallery-switcher-wrap::-webkit-scrollbar { display: none; }
+
+.gallery-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    min-width: max-content;
+    margin: 0 auto 20px;
 }
 
 /*-------------------------------FOOTER--------------------------------*/
