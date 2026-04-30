@@ -54,9 +54,10 @@ body.mode-hallway #hallwayContainer{display:block;}
 #spriteCount strong{color:#fff;font-weight:500;}
 #costumeSelect{background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.18);border-radius:6px;color:#fff;font-size:11px;font-family:inherit;padding:3px 6px;cursor:pointer;max-width:110px;flex-shrink:0;}
 #costumeSelect option{background:#1c1c1c;}
-#settingsPanel{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:300;align-items:flex-start;justify-content:center;padding-top:92px;}
+#settingsPanel{display:none;position:fixed;inset:0;background:transparent;z-index:300;align-items:flex-start;justify-content:center;padding-top:92px;pointer-events:none;}
+#settingsOverlay{display:none;position:fixed;inset:0;z-index:299;}
 #settingsPanel.open{display:flex;}
-#settingsBox{background:#1c1c1c;border:0.5px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px;width:460px;max-height:calc(100vh - 75px);overflow-y:scroll;color:#fff;scrollbar-color:rgba(255,255,255,0.4) #1c1c1c;scrollbar-width:thin;}
+#settingsBox{pointer-events:all;background:#1c1c1c;border:0.5px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px;width:460px;max-height:calc(100vh - 75px);overflow-y:scroll;color:#fff;scrollbar-color:rgba(255,255,255,0.4) #1c1c1c;scrollbar-width:thin;}
 #settingsBox::-webkit-scrollbar{width:6px;}
 #settingsBox::-webkit-scrollbar-track{background:#1c1c1c;border-radius:3px;}
 #settingsBox::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.35);border-radius:3px;}
@@ -121,8 +122,6 @@ body.mode-hallway #hallwayContainer{display:block;}
     <div class="tbgroup">
       <button class="tbbtn" id="resetBtn">Reset</button>
       <button class="tbbtn" id="explosionBtn">Explode</button>
-      <button class="tbbtn" id="burstBtn">Burst</button>
-      <button class="tbbtn" id="vibeBtn">Vibrate</button>
       <button class="tbbtn hoop" id="hoopShotBtn">🏀 Ballin'</button>
       <button class="tbbtn" id="brTopBtn" style="border-color:rgba(220,60,60,0.5);color:rgba(220,80,80,0.9);">⚔️ Battle</button>
       <button class="tbbtn" id="warTopBtn" style="border-color:rgba(220,60,60,0.5);color:rgba(220,100,100,0.9);">🚩 War</button>
@@ -168,8 +167,8 @@ body.mode-hallway #hallwayContainer{display:block;}
     <div class="tbgroup">
       <span class="tblabel">Pets</span>
       <div class="tbslider"><span class="name">Size</span><input type="range" id="size" min="10" max="300" step="1" value="40"><span class="val" id="sv">40</span></div>
-      <button class="tbbtn" id="sizeUpBtn">Size +10</button>
-      <button class="tbbtn" id="sizeDnBtn">Size -10</button>
+      <button class="tbbtn" id="vibeBtn">Vibrate</button>
+      <button class="tbbtn" id="burstBtn">Burst</button>
       <button class="tbbtn" id="bounceBtn">Bounce</button>
     </div>
     <div class="tbsep"></div>
@@ -190,6 +189,7 @@ body.mode-hallway #hallwayContainer{display:block;}
     </div>
   </div>
 </div>
+<div id="settingsOverlay"></div>
 
 <button id="showUIBtn">Show UI</button>
 
@@ -203,7 +203,6 @@ body.mode-hallway #hallwayContainer{display:block;}
       <button class="stab" data-tab="hotkeys">Hotkeys</button>
       <button class="stab" data-tab="fights">Fights</button>
       <button class="stab" data-tab="commands">Commands</button>
-      <button class="stab" data-tab="redeems">Redeems</button>
     </div>
 
     <div class="stabpanel" id="tab-twitch">
@@ -225,13 +224,8 @@ body.mode-hallway #hallwayContainer{display:block;}
         <button id="simulateRaidBtn" style="width:100%;margin-top:6px;padding:6px;border-radius:7px;border:0.5px solid rgba(255,150,50,0.4);background:transparent;color:rgba(255,160,60,0.8);font-size:11px;cursor:pointer;font-family:inherit;">⚡ Simulate test raid</button>
       </div>
       <div class="srow">
-        <label>OAuth token <span style="font-size:10px;color:rgba(255,255,255,0.3);">(optional — enables redeems)</span></label>
-        <div style="display:flex;gap:6px;">
-          <input type="password" id="twitchOAuth" placeholder="oauth:xxxxxxxx" style="flex:1;font-family:monospace;">
-          <button id="twitchOAuthConnectBtn" style="padding:6px 10px;border-radius:7px;border:0.5px solid rgba(60,200,120,0.4);background:rgba(60,200,120,0.08);color:rgba(80,220,140,0.9);font-size:12px;cursor:pointer;font-family:inherit;white-space:nowrap;">+Auth</button>
-        </div>
-        <p style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:4px;">Get a token at <code style="background:rgba(255,255,255,0.06);padding:1px 4px;border-radius:3px;">twitchapps.com/tmi</code></p>
-        <div id="twitchPubSubStatus" style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;"></div>
+        <label>Ignore list <span style="font-size:10px;color:rgba(255,255,255,0.3);">(won't spawn, one per line)</span></label>
+        <textarea id="ignoreListInput" rows="4" placeholder="nightbot" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;color:#fff;font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;"></textarea>
       </div>
       <div class="srow">
         <label>Walk speed</label>
@@ -295,16 +289,16 @@ body.mode-hallway #hallwayContainer{display:block;}
           <input type="file" id="petFileIdle" multiple accept="image/*" style="display:none;">
         </div>
         <div class="costume-row">
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">💬 Talk (idle with speech bubble)</div>
+          <div class="costume-frames" id="petFrameTalk"></div>
+          <button class="addFrameBtn" id="addPetFrameTalkBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
+          <input type="file" id="petFileTalk" multiple accept="image/*" style="display:none;">
+        </div>
+        <div class="costume-row">
           <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">💬⬅ Talk — left</div>
           <div class="costume-frames" id="petFrameLeftTalk"></div>
           <button class="addFrameBtn" id="addPetFrameLeftTalkBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
           <input type="file" id="petFileLeftTalk" multiple accept="image/*" style="display:none;">
-        </div>
-        <div class="costume-row">
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">💬⬤ Talk — idle</div>
-          <div class="costume-frames" id="petFrameTalk"></div>
-          <button class="addFrameBtn" id="addPetFrameTalkBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
-          <input type="file" id="petFileTalk" multiple accept="image/*" style="display:none;">
         </div>
         <div class="costume-row">
           <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">💬➡ Talk — right</div>
@@ -312,7 +306,6 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button class="addFrameBtn" id="addPetFrameRightTalkBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
           <input type="file" id="petFileRightTalk" multiple accept="image/*" style="display:none;">
         </div>
-
       </div>
       <div class="srow" style="margin-top:8px;"><label>Animation fps</label><input type="number" id="viewerFpsInput" value="12" min="1" max="120"></div>
       <div class="srow"><label>Default viewer size (px)</label><input type="number" id="defaultViewerSize" value="84" min="8" max="300"></div>
@@ -489,12 +482,6 @@ body.mode-hallway #hallwayContainer{display:block;}
       <div id="viewerCmdsGrid"></div>
     </div>
 
-    <div class="stabpanel" id="tab-redeems">
-      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:8px;">Map channel point redeems to actions. Requires OAuth token in Twitch settings. Click <strong>Fetch redeems</strong> after connecting.</p>
-      <button id="fetchRedeemsBtn" style="width:100%;padding:7px;border-radius:7px;border:0.5px solid rgba(60,200,120,0.4);background:rgba(60,200,120,0.08);color:rgba(80,220,140,0.85);font-size:12px;cursor:pointer;font-family:inherit;margin-bottom:12px;">Fetch channel redeems</button>
-      <div id="redeemMappingGrid"></div>
-    </div>
-
     <button class="sclose" id="closeSettings">Done</button>
   </div>
 </div>
@@ -558,20 +545,20 @@ body.mode-hallway #hallwayContainer{display:block;}
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
     <div>
-      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">X</label>
-      <input type="number" id="blockX" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;">
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">X <span id="blockXVal" style="color:rgba(255,255,255,0.65);">0</span></label>
+      <input type="range" id="blockX" min="0" max="3840" value="0" style="width:100%;accent-color:#7F77DD;">
     </div>
     <div>
-      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">Y</label>
-      <input type="number" id="blockY" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;">
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">Y <span id="blockYVal" style="color:rgba(255,255,255,0.65);">0</span></label>
+      <input type="range" id="blockY" min="0" max="2160" value="0" style="width:100%;accent-color:#7F77DD;">
     </div>
     <div>
-      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">Width</label>
-      <input type="number" id="blockW" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;" min="10">
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">W <span id="blockWVal" style="color:rgba(255,255,255,0.65);">100</span></label>
+      <input type="range" id="blockW" min="10" max="1920" value="100" style="width:100%;accent-color:#7F77DD;">
     </div>
     <div>
-      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">Height</label>
-      <input type="number" id="blockH" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;" min="10">
+      <label style="font-size:11px;color:rgba(255,255,255,0.4);display:block;margin-bottom:3px;">H <span id="blockHVal" style="color:rgba(255,255,255,0.65);">40</span></label>
+      <input type="range" id="blockH" min="10" max="1080" value="40" style="width:100%;accent-color:#7F77DD;">
     </div>
   </div>
   <div style="font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:10px;">Changes apply live as you type</div>
@@ -603,7 +590,7 @@ let currentViewMode='fullscreen';
 const hallwayContainer=document.getElementById('hallwayContainer');
 const hallwayCanvas=document.getElementById('hallwayCanvas');
 const hallwayCtx=hallwayCanvas.getContext('2d');
-const HALLWAY_HEIGHT=140; // fits 67px walker + name tag + bubble
+const HALLWAY_HEIGHT=Math.round(window.innerHeight*0.5); // half the screen — fits 180px viewer + bubble + drag space
 
 // viewers queued for hallway entry
 let hallwayWalkers=[]; // {pet, x, targetX, speed, done}
@@ -634,11 +621,10 @@ function resize(){
   const topH=82;
   const availW=window.innerWidth;
   const availH=window.innerHeight-topH;
-  const hwH=currentViewMode==='hallway'?HALLWAY_HEIGHT:0;
+  const hwH=currentViewMode==='hallway'?Math.round(window.innerHeight*0.5):0;
 
-  // True 16:9 — fit height first so on a 1920x1080 monitor you get full 1920x1080
-  const maxH=availH-hwH;
-  let vpH=maxH, vpW=Math.round(vpH*16/9);
+  let vpW=availW, vpH=Math.round(availW*9/16);
+  if(vpH>availH-hwH){vpH=availH-hwH; vpW=Math.round(vpH*16/9);}
   if(vpW>availW){vpW=availW; vpH=Math.round(vpW*9/16);}
 
   const scale=vpW/window.innerWidth;
@@ -656,13 +642,35 @@ function resize(){
     hallwayContainer.style.left=leftX+'px';
     hallwayContainer.style.top=hwTop+'px';
     hallwayContainer.style.width=vpW+'px';
-    hallwayContainer.style.height=HALLWAY_HEIGHT+'px';
-    hallwayCanvas.width=vpW; hallwayCanvas.height=HALLWAY_HEIGHT;
+    const _hwH=Math.round(window.innerHeight*0.5);
+    hallwayContainer.style.height=_hwH+'px';
+    hallwayCanvas.width=vpW; hallwayCanvas.height=_hwH;
   } else {
     hallwayContainer.style.display='none';
   }
 }
 resize();window.addEventListener('resize',resize);
+
+// Scroll wheel on topbar sliders for precision
+document.querySelectorAll('.tbslider input[type=range]').forEach(slider=>{
+  slider.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const step=parseFloat(slider.step)||1;
+    const v=parseFloat(slider.value)+(e.deltaY<0?step:-step);
+    slider.value=Math.min(parseFloat(slider.max),Math.max(parseFloat(slider.min),v));
+    slider.dispatchEvent(new Event('input',{bubbles:true}));
+  },{passive:false});
+});
+// Scroll wheel on settings panel sliders too
+document.querySelectorAll('#settingsBox input[type=range]').forEach(slider=>{
+  slider.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const step=parseFloat(slider.step)||1;
+    const v=parseFloat(slider.value)+(e.deltaY<0?step:-step);
+    slider.value=Math.min(parseFloat(slider.max),Math.max(parseFloat(slider.min),v));
+    slider.dispatchEvent(new Event('input',{bubbles:true}));
+  },{passive:false});
+});
 // Helper: position a pet DOM element accounting for canvas offset in small/hallway modes
 function placePetEl(p){
   // canvasWrap handles all scaling/offset via CSS transform
@@ -1361,8 +1369,10 @@ let spaceDown=false,spawnInterval=null;
 document.addEventListener('keydown',e=>{
   if(['ArrowUp','ArrowDown','PageUp','PageDown'].includes(e.code)){e.preventDefault();return;}
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
+  const _hkM=[];if(e.ctrlKey)_hkM.push('Ctrl');if(e.altKey)_hkM.push('Alt');if(e.shiftKey)_hkM.push('Shift');if(e.metaKey)_hkM.push('Meta');
+  const _pressed=_hkM.length?_hkM.join('+')+'+'+e.code:e.code;
   for(const[action,key]of Object.entries(hotkeys)){
-    if(e.code!==key)continue;
+    if(_pressed!==key&&e.code!==key)continue;
     e.preventDefault();
     switch(action){
       case 'clear': document.getElementById('resetBtn').click();break;
@@ -1540,9 +1550,9 @@ document.getElementById('blockImgClearBtn').addEventListener('click',()=>{
 });
 
 
-document.getElementById('settingsBtn').addEventListener('click',()=>document.getElementById('settingsPanel').classList.add('open'));
-document.getElementById('closeSettings').addEventListener('click',()=>document.getElementById('settingsPanel').classList.remove('open'));
-document.getElementById('settingsPanel').addEventListener('click',e=>{if(e.target===document.getElementById('settingsPanel'))document.getElementById('settingsPanel').classList.remove('open');});
+document.getElementById('settingsBtn').addEventListener('click',()=>{document.getElementById('settingsPanel').classList.add('open');document.getElementById('settingsOverlay').style.display='block';});
+document.getElementById('closeSettings').addEventListener('click',()=>{document.getElementById('settingsPanel').classList.remove('open');document.getElementById('settingsOverlay').style.display='none';});
+document.getElementById('settingsOverlay').addEventListener('click',()=>{document.getElementById('settingsPanel').classList.remove('open');document.getElementById('settingsOverlay').style.display='none';});
 document.querySelectorAll('.stab').forEach(btn=>{
   btn.addEventListener('click',()=>{
     document.querySelectorAll('.stab').forEach(b=>b.classList.remove('active'));
@@ -1608,8 +1618,7 @@ function renderCostumeGrid(){
     const dirs=[
       {key:'frames',      label:'\u2b24 Forward / All'},
       {key:'framesLeft',  label:'\u2b05 Left'},
-      {key:'framesRight', label:'\u27a1 Right'},
-    ];
+      {key:'framesRight', label:'\u27a1 Right'},    ];
     dirs.forEach(({key,label})=>{
       const sec=document.createElement('div');sec.style.marginTop='8px';
       const lbl=document.createElement('div');lbl.style.cssText='font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:4px;';lbl.textContent=label;
@@ -1726,7 +1735,7 @@ function buildHotkeyTable(){
     const td2=document.createElement('td');
     const inp=document.createElement('input');inp.type='text';inp.className='hkInput';inp.readOnly=true;inp.value=codeToDisplay(hotkeys[action.id]);
     inp.addEventListener('click',()=>{document.querySelectorAll('.hkInput').forEach(i=>i.classList.remove('listening'));inp.classList.add('listening');inp.value='…';});
-    inp.addEventListener('keydown',e=>{if(!inp.classList.contains('listening'))return;e.preventDefault();e.stopPropagation();hotkeys[action.id]=e.code;inp.value=codeToDisplay(e.code);inp.classList.remove('listening');saveHotkeys();});
+    inp.addEventListener('keydown',e=>{if(!inp.classList.contains('listening'))return;e.preventDefault();e.stopPropagation();const _m=[];if(e.ctrlKey)_m.push('Ctrl');if(e.altKey)_m.push('Alt');if(e.shiftKey)_m.push('Shift');if(e.metaKey)_m.push('Meta');const _b=e.code;if(['ControlLeft','ControlRight','AltLeft','AltRight','ShiftLeft','ShiftRight','MetaLeft','MetaRight'].includes(_b))return;const _c=_m.length?_m.join('+')+'+'+_b:_b;hotkeys[action.id]=_c;inp.value=_c.replace(/Key|Digit/g,'');inp.classList.remove('listening');saveHotkeys();});
     td2.appendChild(inp);tr.appendChild(td1);tr.appendChild(td2);table.appendChild(tr);
   });
 }
@@ -1760,7 +1769,10 @@ function getPetFramesForDir(fl,mov,talking){
 } // loaded images for walking animation
 let petSize=84, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
 // pets declared early above
-const LS_PET='lpp_pet5', LS_TCHAN='lpp_tchan5';
+const LS_PET='lpp_pet5', LS_TCHAN='lpp_tchan5', LS_IGNORE='lpp_ignore5';
+let ignoreList=new Set();
+(function(){try{const r=localStorage.getItem(LS_IGNORE);if(r){ignoreList=new Set(JSON.parse(r));}}catch(e){}})();
+function saveIgnoreList(){try{localStorage.setItem(LS_IGNORE,JSON.stringify([...ignoreList]));}catch(e){}}
 
 const PET_COLORS=['#7F77DD','#1D9E75','#D85A30','#D4537E','#378ADD','#EF9F27','#E24B4A','#9FE1CB'];
 
@@ -1836,6 +1848,7 @@ class ChatPet{
     this.el.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();openPetImagePicker(this,e.clientX,e.clientY);});
   }
   say(msg,emoteTag){
+    this._inactiveFrames=0;
     if(!bubblesEnabled)return;
     if(this.bubble)this.bubble.remove();
     this.bubble=document.createElement('div');
@@ -1858,15 +1871,10 @@ class ChatPet{
     // pick directional custom image first, then directional frames, then fallback
     const isMoving=Math.abs(this.vx)>0.3;
     let customFrame=null;
-    const hasTalkImgs=this.customImgForwardTalk||this.customImgLeftTalk||this.customImgRightTalk;
-    if(this.customImgLeft||this.customImgRight||this.customImgForward||hasTalkImgs){
-      if(!isMoving){
-        customFrame=(isTalking&&this.customImgForwardTalk)||this.customImgForward||this.customImgLeft||this.customImgRight;
-      } else if(this.facingLeft){
-        customFrame=(isTalking&&this.customImgLeftTalk)||this.customImgLeft||(isTalking&&this.customImgForwardTalk)||this.customImgForward||this.customImgRight;
-      } else {
-        customFrame=(isTalking&&this.customImgRightTalk)||this.customImgRight||(isTalking&&this.customImgForwardTalk)||this.customImgForward||this.customImgLeft;
-      }
+    if(this.customImgLeft||this.customImgRight||this.customImgForward){
+      if(!isMoving) customFrame=this.customImgForward||this.customImgLeft||this.customImgRight;
+      else if(this.facingLeft) customFrame=this.customImgLeft||this.customImgForward||this.customImgRight;
+      else customFrame=this.customImgRight||this.customImgForward||this.customImgLeft;
     } else if(this.customImg){ customFrame=this.customImg; }
 
     const isTalking=!!(this.bubble&&this.bubbleTimer>0);
@@ -1910,22 +1918,10 @@ class ChatPet{
       ctx2.fillRect(cx-eGap-eW*0.5,eY,eW,eH);
       ctx2.strokeStyle='#111';ctx2.lineWidth=lw*0.55;ctx2.strokeRect(cx-eGap-eW*0.5,eY,eW,eH);
       ctx2.fillRect(cx+eGap-eW*0.5,eY,eW,eH);ctx2.strokeRect(cx+eGap-eW*0.5,eY,eW,eH);
-      // mouth: V smile when silent, filled downward triangle (open mouth) when talking
+      // smile: tiny V at 72% down head
       const smY=hy+hh*0.72;
-      const _isTalkingNow=!!(this.bubble&&this.bubbleTimer>0);
-      if(_isTalkingNow){
-        // downward triangle — wider and deeper than V smile for prominence
-        ctx2.fillStyle='#1a1a1a';
-        ctx2.beginPath();
-        ctx2.moveTo(cx-w*0.07, smY);           // top-left (wider)
-        ctx2.lineTo(cx+w*0.07, smY);           // top-right (wider)
-        ctx2.lineTo(cx, smY+h*0.045);          // bottom-centre point (deeper)
-        ctx2.closePath();
-        ctx2.fill();
-      } else {
-        ctx2.strokeStyle='#111';ctx2.lineWidth=lw*0.75;ctx2.lineJoin='round';ctx2.lineCap='round';
-        ctx2.beginPath();ctx2.moveTo(cx-w*0.038,smY);ctx2.lineTo(cx,smY+h*0.022);ctx2.lineTo(cx+w*0.038,smY);ctx2.stroke();
-      }
+      ctx2.strokeStyle='#111';ctx2.lineWidth=lw*0.75;ctx2.lineJoin='round';ctx2.lineCap='round';
+      ctx2.beginPath();ctx2.moveTo(cx-w*0.038,smY);ctx2.lineTo(cx,smY+h*0.022);ctx2.lineTo(cx+w*0.038,smY);ctx2.stroke();
     }
 
     // update DOM health bar
@@ -1995,6 +1991,12 @@ class ChatPet{
         this.vx=Math.max(-maxV,Math.min(maxV,this.vx));
         if(this.x<=0){this.x=0;this.vx=Math.abs(this.vx)||petSpeed*0.5;}
         if(this.x+this.w>=W){this.x=W-this.w;this.vx=-(Math.abs(this.vx)||petSpeed*0.5);}
+        for(const b of blocks){
+          if(this.x+this.w>b.x&&this.x<b.x+b.w&&this.y+this.h>b.y&&this.y<b.y+b.h){
+            if(this.x+this.w-b.x<b.x+b.w-this.x){this.x=b.x-this.w;this.vx=-Math.abs(this.vx||petSpeed*0.5);}
+            else{this.x=b.x+b.w;this.vx=Math.abs(this.vx||petSpeed*0.5);}
+          }
+        }
       } else if(!this.airborne && Math.abs(this.vy)<0.1 && Math.abs(g)<0.01){
         // zero gravity walk
         if(Math.random()<0.005)this.vx*=-1;
@@ -2011,6 +2013,13 @@ class ChatPet{
     if(this.bubbleTimer>0){
       this.bubbleTimer--;
       if(this.bubbleTimer<=0&&this.bubble){this.bubble.remove();this.bubble=null;this._talking=false;}
+    }
+    if(this._inactiveFrames===undefined)this._inactiveFrames=0;
+    this._inactiveFrames++;
+    if(this._inactiveFrames>108000&&!this.pinned&&!this._inHallway){
+      this.el.style.transition='opacity 2s';this.el.style.opacity='0';
+      const _u=this.username;
+      setTimeout(()=>{if(petMap[_u])delete petMap[_u];pets=pets.filter(p=>p.username!==_u);this.destroy();},2000);
     }
 
     // push from physics spires AND push spires back (Newton 3rd law)
@@ -2071,7 +2080,6 @@ function windowToCanvas(cx,cy){
 }
 
 function startGrabPet(pet,cx,cy){
-  if(pet.pinned)return; // pinned viewers can't be dragged to new position
   grabbedPet=pet;pet.grabbed=true;
   const cp=windowToCanvas(cx,cy);
   petGrabOffX=cp.x-pet.x; petGrabOffY=cp.y-pet.y;
@@ -2132,6 +2140,7 @@ const __drawOrig=draw;
 // petMap declared early above
 const _petMapAlias=petMap; // keep ref
 function getOrCreatePet(username,color){
+  if(ignoreList.has(username.toLowerCase()))return null;
   if(petMap[username])return petMap[username];
   if(Object.keys(petMap).length>=maxPets)return null;
   const pet=new ChatPet(username,color);
@@ -2150,7 +2159,7 @@ function getOrCreatePet(username,color){
     pet.el.style.position='absolute';
     pet.el.style.display='flex';
     const hwH=hallwayCanvas.height||HALLWAY_HEIGHT;
-    const HW_SIZE=42; // fixed hallway display size
+    const HW_SIZE=100; // hallway display size — becomes petSize on graduation
     pet.w=HW_SIZE;pet.h=HW_SIZE;
     pet.spriteEl.width=HW_SIZE;pet.spriteEl.height=HW_SIZE;
     pet.el.style.width=HW_SIZE+'px';
@@ -2238,34 +2247,30 @@ function saveViewerImgs(){try{localStorage.setItem(LS_VIEWER_IMGS,JSON.stringify
 // Inject picker popup HTML
 const vip=document.createElement('div');
 vip.id='petImgPicker';
-vip.style.cssText='display:none;position:fixed;z-index:400;background:#141420;border:0.5px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px;box-shadow:0 6px 28px rgba(0,0,0,0.85);min-width:200px;font-family:inherit;';
-vip.innerHTML=`<div style="margin-bottom:8px;">
-  <button id="petPinBtn" title="Pin / Unpin" style="width:100%;padding:6px;border-radius:6px;border:0.5px solid rgba(127,119,221,0.45);background:rgba(127,119,221,0.1);color:#b8b2ff;font-size:18px;cursor:pointer;font-family:inherit;line-height:1;">📌</button>
+vip.style.cssText='display:none;position:fixed;z-index:400;background:#1c1c1c;border:0.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:8px;min-width:130px;box-shadow:0 4px 20px rgba(0,0,0,0.7);';
+vip.innerHTML=`
+<div style="display:flex;gap:4px;margin-bottom:8px;">
+  <button id="petPinBtn" title="Pin/Unpin" style="flex:1;padding:6px;border-radius:6px;border:0.5px solid rgba(127,119,221,0.4);background:rgba(127,119,221,0.1);color:#b8b2ff;font-size:18px;cursor:pointer;font-family:inherit;line-height:1;">&#x1F4CC;</button>
+  <button id="petDismissBtn" title="Remove viewer" style="padding:6px 11px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.45);background:rgba(180,50,50,0.1);color:rgba(220,80,80,0.85);font-size:18px;cursor:pointer;font-family:inherit;line-height:1;">&#x2715;</button>
 </div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;">
-  <div style="display:flex;flex-direction:column;gap:3px;">
-    <span style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:2px;">⬅ Left</span>
-    <button id="petImgLeftBtn" title="Idle — left" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
-    <button id="petImgLeftTalkBtn" title="Talk — left" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">💬</button>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:3px;">
-    <span style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:2px;">⬤ Idle</span>
-    <button id="petImgFwdBtn" title="Idle — forward" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
-    <button id="petImgFwdTalkBtn" title="Talk — idle" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">💬</button>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:3px;">
-    <span style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;margin-bottom:2px;">➡ Right</span>
-    <button id="petImgRightBtn" title="Idle — right" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
-    <button id="petImgRightTalkBtn" title="Talk — right" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">💬</button>
-  </div>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;">
+  <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;padding-bottom:3px;">&#x2B05; Left</div>
+  <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;padding-bottom:3px;">&#x2B24; Idle</div>
+  <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;padding-bottom:3px;">&#x27A1; Right</div>
+  <button id="petImgLeftBtn" title="Left — idle" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
+  <button id="petImgFwdBtn" title="Idle/forward" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
+  <button id="petImgRightBtn" title="Right — idle" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
+  <button id="petImgLeftTalkBtn" title="Left — talk" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">&#x1F4AC;</button>
+  <button id="petImgFwdTalkBtn" title="Idle — talk" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">&#x1F4AC;</button>
+  <button id="petImgRightTalkBtn" title="Right — talk" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">&#x1F4AC;</button>
 </div>
-<button id="petImgClearBtn" style="width:100%;margin-top:8px;padding:5px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.35);background:transparent;color:rgba(220,80,80,0.75);font-size:10px;cursor:pointer;font-family:inherit;">🗑 Clear all</button>
+<button id="petImgClearBtn" style="width:100%;margin-top:7px;padding:5px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.35);background:transparent;color:rgba(220,80,80,0.75);font-size:10px;cursor:pointer;font-family:inherit;">&#x1F5D1; Clear all images</button>
 <input type="file" id="petImgFileInputFwd" accept="image/*" style="display:none;">
 <input type="file" id="petImgFileInputLeft" accept="image/*" style="display:none;">
 <input type="file" id="petImgFileInputRight" accept="image/*" style="display:none;">
 <input type="file" id="petImgFileInputFwdTalk" accept="image/*" style="display:none;">
 <input type="file" id="petImgFileInputLeftTalk" accept="image/*" style="display:none;">
-<input type="file" id="petImgFileInputRightTalk" accept="image/*" style="display:none;">`
+<input type="file" id="petImgFileInputRightTalk" accept="image/*" style="display:none;">`;
 document.body.appendChild(vip);
 
 let petImgTarget=null;
@@ -2278,13 +2283,12 @@ function openPetImagePicker(pet,cx,cy){
   const pinBtn=document.getElementById('petPinBtn');
   pinBtn.style.background=pet.pinned?'rgba(127,119,221,0.4)':'rgba(127,119,221,0.1)';
   pinBtn.style.borderColor=pet.pinned?'#7F77DD':'rgba(127,119,221,0.4)';
-  vip.style.display='block'; // show first to measure height
-  const _vpW=vip.offsetWidth||210, _vpH=vip.offsetHeight||160;
-  // position above the viewer, centred on their x
-  const _x=Math.max(4,Math.min(cx-_vpW/2, window.innerWidth-_vpW-4));
-  const _y=Math.max(4,cy-_vpH-8); // 8px above click point
-  vip.style.left=_x+'px';
-  vip.style.top=_y+'px';
+  vip.style.display='block';
+  const _vw=vip.offsetWidth||185,_vh=vip.offsetHeight||220;
+  // open top-right of the viewer
+  vip.style.left=Math.min(cx+4,window.innerWidth-_vw-4)+'px';
+  vip.style.top=Math.max(4,cy-_vh-4)+'px';
+  vip.style.display='block';
 }
 function closePetImagePicker(){
   if(petImgTarget){
@@ -2305,6 +2309,14 @@ document.getElementById('petPinBtn').addEventListener('click',()=>{
     petImgTarget.nameEl.textContent=petImgTarget.username;
   }
   closePetImagePicker();
+});
+document.getElementById('petDismissBtn').addEventListener('click',()=>{
+  if(!petImgTarget)return;
+  const p=petImgTarget;closePetImagePicker();
+  if(petMap[p.username])delete petMap[p.username];
+  pets=pets.filter(q=>q!==p);
+  p.el.style.transition='opacity 0.4s';p.el.style.opacity='0';
+  setTimeout(()=>p.destroy(),400);
 });
 // per-viewer directional image upload
 function loadViewerImgDir(file,target,dir){
@@ -2345,7 +2357,7 @@ document.getElementById('petImgClearBtn').addEventListener('click',()=>{
   if(!petImgTarget)return;
   petImgTarget.customImg=null;
   petImgTarget.customImgLeft=null;petImgTarget.customImgRight=null;petImgTarget.customImgForward=null;
-  petImgTarget.customImgLeftTalk=null;petImgTarget.customImgRightTalk=null;petImgTarget.customImgForwardTalk=null;
+  petImgTarget.customImgForwardTalk=null;petImgTarget.customImgLeftTalk=null;petImgTarget.customImgRightTalk=null;
   delete viewerImgMap[petImgTarget.username];
   saveViewerImgs();
   closePetImagePicker();
@@ -2360,9 +2372,6 @@ function applyViewerImgToPet(pet){
   if(data.fwd){const img=new Image();img.onload=()=>{pet.customImgForward=img;};img.src=data.fwd;}
   if(data.left){const img=new Image();img.onload=()=>{pet.customImgLeft=img;};img.src=data.left;}
   if(data.right){const img=new Image();img.onload=()=>{pet.customImgRight=img;};img.src=data.right;}
-  if(data.fwdTalk){const img=new Image();img.onload=()=>{pet.customImgForwardTalk=img;};img.src=data.fwdTalk;}
-  if(data.leftTalk){const img=new Image();img.onload=()=>{pet.customImgLeftTalk=img;};img.src=data.leftTalk;}
-  if(data.rightTalk){const img=new Image();img.onload=()=>{pet.customImgRightTalk=img;};img.src=data.rightTalk;}
 }
 
 // ── BATTLE ROYALE ─────────────────────────────────────────
@@ -2712,166 +2721,6 @@ function renderWithEmotes(text,emoteTag,fontSize){
   return result.length?result:[Object.assign(document.createElement('span'),{textContent:text})];
 }
 
-
-// ══════════════════════════════════════════════════════════
-// TWITCH PUBSUB (channel point redeems via OAuth)
-// ══════════════════════════════════════════════════════════
-const LS_OAUTH='lpp_oauth5';
-const LS_REDEEMS='lpp_redeems5';
-let pubSubWS=null, pubSubPingInterval=null;
-let oauthToken='', channelId='';
-let redeemMap={}; // redeemTitle → actionId
-let knownRedeems=[]; // [{id,title}]
-
-(function(){
-  try{oauthToken=localStorage.getItem(LS_OAUTH)||'';}catch(e){}
-  try{const r=localStorage.getItem(LS_REDEEMS);if(r)redeemMap=JSON.parse(r);}catch(e){}
-  if(oauthToken){document.getElementById('twitchOAuth').value=oauthToken;}
-})();
-
-function saveRedeemMap(){try{localStorage.setItem(LS_REDEEMS,JSON.stringify(redeemMap));}catch(e){}}
-
-async function getChannelId(channelName,token){
-  try{
-    const r=await fetch('https://api.twitch.tv/helix/users?login='+channelName,{
-      headers:{'Client-Id':'kimne78kx3ncx6brgo4mv6wki5h1ko','Authorization':'Bearer '+token.replace('oauth:','')}
-    });
-    const d=await r.json();
-    return d.data&&d.data[0]?d.data[0].id:'';
-  }catch(e){return '';}
-}
-
-async function fetchRedeems(token,chId){
-  try{
-    const r=await fetch('https://api.twitch.tv/helix/channel_points/custom_rewards?broadcaster_id='+chId,{
-      headers:{'Client-Id':'kimne78kx3ncx6brgo4mv6wki5h1ko','Authorization':'Bearer '+token.replace('oauth:','')}
-    });
-    const d=await r.json();
-    return(d.data||[]).map(x=>({id:x.id,title:x.title}));
-  }catch(e){return[];}
-}
-
-function connectPubSub(token,chId){
-  if(pubSubWS){pubSubWS.close();}
-  clearInterval(pubSubPingInterval);
-  const ws=new WebSocket('wss://pubsub-edge.twitch.tv');
-  pubSubWS=ws;
-  ws.onopen=()=>{
-    ws.send(JSON.stringify({type:'LISTEN',data:{topics:['channel-points-channel-v1.'+chId],auth_token:token.replace('oauth:','')}}));
-    pubSubPingInterval=setInterval(()=>{if(ws.readyState===1)ws.send(JSON.stringify({type:'PING'}));},240000);
-    document.getElementById('twitchPubSubStatus').textContent='\u2B24 PubSub connected';
-    document.getElementById('twitchPubSubStatus').style.color='rgba(80,220,140,0.8)';
-  };
-  ws.onmessage=e=>{
-    try{
-      const msg=JSON.parse(e.data);
-      if(msg.type==='MESSAGE'&&msg.data){
-        const inner=JSON.parse(msg.data.message);
-        if(inner.type==='reward-redeemed'){
-          const title=inner.data.redemption.reward.title;
-          const username=inner.data.redemption.user.display_name||inner.data.redemption.user.login;
-          handleRedeem(title,username);
-        }
-      }
-    }catch(ex){}
-  };
-  ws.onerror=()=>{document.getElementById('twitchPubSubStatus').textContent='PubSub error';};
-  ws.onclose=()=>{clearInterval(pubSubPingInterval);document.getElementById('twitchPubSubStatus').textContent='PubSub disconnected';};
-}
-
-function handleRedeem(title,username){
-  const actionId=redeemMap[title];
-  if(!actionId)return;
-  // dispatch to the same action system as hotkeys
-  const pet=pets.find(p=>p.username===username);
-  switch(actionId){
-    case 'bounce':if(pet){pet.vy=-(8+Math.random()*4);pet.airborne=true;}break;
-    case 'viewerBounce':pets.forEach(p=>{p.vy=-(8+Math.random()*4);p.airborne=true;});break;
-    case 'sizeUp':adjustSize(10);break;
-    case 'sizeDown':adjustSize(-10);break;
-    case 'hoop':fireHoopShot();break;
-    case 'gravFlip':document.getElementById('gravFlipBtn').click();break;
-    case 'zeroG':document.getElementById('zeroGBtn').click();break;
-    case 'explode':document.getElementById('explosionBtn').click();break;
-    case 'clear':document.getElementById('resetBtn').click();break;
-    case 'burst':document.getElementById('burstBtn').click();break;
-    case 'vibrate':document.getElementById('vibeBtn').click();break;
-    case 'freeze':document.getElementById('freezeBtn').click();break;
-    case 'viewerToggle':document.getElementById('viewerToggleBtn').click();break;
-    default:execViewerCmd(actionId,username,[]);
-  }
-}
-
-document.getElementById('twitchOAuthConnectBtn').addEventListener('click',async()=>{
-  const tok=document.getElementById('twitchOAuth').value.trim();
-  const ch=document.getElementById('twitchChannel').value.trim();
-  if(!tok||!ch){alert('Enter both channel name and OAuth token first.');return;}
-  oauthToken=tok;
-  try{localStorage.setItem(LS_OAUTH,tok);}catch(e){}
-  document.getElementById('twitchPubSubStatus').textContent='Fetching channel ID...';
-  const id=await getChannelId(ch,tok);
-  if(!id){document.getElementById('twitchPubSubStatus').textContent='Could not find channel ID. Check token/channel.';return;}
-  channelId=id;
-  connectPubSub(tok,id);
-});
-
-document.getElementById('fetchRedeemsBtn').addEventListener('click',async()=>{
-  if(!oauthToken||!channelId){
-    document.getElementById('redeemMappingGrid').innerHTML='<p style="font-size:12px;color:rgba(255,100,100,0.7);">Connect with OAuth token first.</p>';return;
-  }
-  document.getElementById('redeemMappingGrid').innerHTML='<p style="font-size:11px;color:rgba(255,255,255,0.4);">Fetching...</p>';
-  knownRedeems=await fetchRedeems(oauthToken,channelId);
-  buildRedeemMappingUI();
-});
-
-function buildRedeemMappingUI(){
-  const grid=document.getElementById('redeemMappingGrid');
-  if(!grid)return;
-  if(!knownRedeems.length){grid.innerHTML='<p style="font-size:11px;color:rgba(255,255,255,0.4);">No redeems found.</p>';return;}
-  grid.innerHTML='';
-  const actionOpts=[
-    {id:'',label:'-- No action --'},
-    {id:'bounce',label:'Bounce viewer'},
-    {id:'viewerBounce',label:'Bounce all viewers'},
-    {id:'sizeUp',label:'Size +10'},
-    {id:'sizeDown',label:'Size -10'},
-    {id:'hoop',label:'Ballin\u2019'},
-    {id:'gravFlip',label:'Reverse gravity'},
-    {id:'zeroG',label:'Zero gravity'},
-    {id:'explode',label:'Explode everything'},
-    {id:'clear',label:'Reset'},
-    {id:'burst',label:'Burst spawn'},
-    {id:'vibrate',label:'Toggle vibrate'},
-    {id:'freeze',label:'Toggle freeze'},
-    {id:'viewerToggle',label:'Toggle viewers'},
-    {id:'jump',label:'Viewer jump'},
-    {id:'float',label:'Float (zero G)'},
-    {id:'spawn',label:'Spawn ball'},
-    {id:'ballin',label:'Viewer Ballin\u2019'},
-    {id:'grow',label:'Grow ball'},
-    {id:'shrink',label:'Shrink ball'},
-  ];
-  knownRedeems.forEach(redeem=>{
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px;';
-    const lbl=document.createElement('span');
-    lbl.style.cssText='flex:1;font-size:12px;color:rgba(255,255,255,0.7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
-    lbl.textContent=redeem.title;lbl.title=redeem.title;
-    const sel=document.createElement('select');
-    sel.style.cssText='background:#1a1a2e;border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:4px 6px;color:#fff;font-size:11px;font-family:inherit;cursor:pointer;';
-    actionOpts.forEach(opt=>{
-      const o=document.createElement('option');o.value=opt.id;o.textContent=opt.label;
-      if(redeemMap[redeem.title]===opt.id)o.selected=true;
-      sel.appendChild(o);
-    });
-    sel.addEventListener('change',function(){
-      if(this.value)redeemMap[redeem.title]=this.value;else delete redeemMap[redeem.title];
-      saveRedeemMap();
-    });
-    row.appendChild(lbl);row.appendChild(sel);grid.appendChild(row);
-  });
-}
-
 let tmiClient=null, twitchWS=null, twitchChannel='', twitchConnected=false;
 let _twitchReconnectTimer=null;
 
@@ -2954,6 +2803,9 @@ function _doConnect(){
         if(cmdTrigger===cmd('shrink'))execViewerCmd('shrink',username,cmdArgs);
         if(cmdTrigger===cmd('grow'))execViewerCmd('grow',username,cmdArgs);
         if(cmdTrigger===cmd('despawn'))execViewerCmd('despawn',username,cmdArgs);
+        if(cmdTrigger===cmd('lurk'))execViewerCmd('lurk',username,cmdArgs);
+        if(cmdTrigger===cmd('hug'))execViewerCmd('hug',username,cmdArgs);
+        if(cmdTrigger===cmd('eat'))execViewerCmd('eat',username,cmdArgs);
       }
     }
   };
@@ -2977,6 +2829,8 @@ function setTwitchStatus(msg,color){
 }
 
 // ── Twitch settings wiring ────────────────────────────────
+document.getElementById('ignoreListInput').addEventListener('input',function(){ignoreList=new Set(this.value.split('\n').map(s=>s.trim().toLowerCase()).filter(Boolean));saveIgnoreList();});
+(function(){try{const r=localStorage.getItem(LS_IGNORE);if(r)document.getElementById('ignoreListInput').value=JSON.parse(r).join('\n');}catch(e){}})();
 document.getElementById('twitchConnectBtn').addEventListener('click',()=>{
   const ch=document.getElementById('twitchChannel').value.trim();
   if(ch){localStorage.setItem(LS_TCHAN,ch);connectTwitch(ch);}
@@ -3056,8 +2910,7 @@ document.getElementById('freezeBtn').addEventListener('click',()=>{
   document.getElementById('freezeBtn').textContent=frozen?'Unfreeze':'Freeze';
   if(frozen){spires.forEach(s=>{s.vx=0;s.vy=0;});pets.forEach(p=>{p.vx=0;p.vy=0;p.airborne=false;});}
 });
-document.getElementById('sizeUpBtn').addEventListener('click',()=>{ensureAudio();adjustSize(10);});
-document.getElementById('sizeDnBtn').addEventListener('click',()=>{ensureAudio();adjustSize(-10);});
+// size+10/-10 buttons removed from UI
 document.getElementById('explosionBtn').addEventListener('click',()=>{
   const cx=canvas.width/2,cy=canvas.height/2;
   spires.forEach(s=>{const dx=s.x-cx,dy=s.y-cy,d=Math.sqrt(dx*dx+dy*dy)||1,f=20+Math.random()*15;s.vx+=dx/d*f;s.vy+=dy/d*f;});
@@ -3325,10 +3178,10 @@ function closeBlockMenu(){document.getElementById('blockMenu').style.display='no
 function openBlockMenu(idx,clientX,clientY){
   blockMenuTarget=idx;
   const b=blocks[idx];
-  document.getElementById('blockX').value=Math.round(b.x);
-  document.getElementById('blockY').value=Math.round(b.y);
-  document.getElementById('blockW').value=Math.round(b.w);
-  document.getElementById('blockH').value=Math.round(b.h);
+  document.getElementById('blockX').value=Math.round(b.x);(document.getElementById('blockXVal')||{}).textContent=Math.round(b.x);
+  document.getElementById('blockY').value=Math.round(b.y);(document.getElementById('blockYVal')||{}).textContent=Math.round(b.y);
+  document.getElementById('blockW').value=Math.round(b.w);(document.getElementById('blockWVal')||{}).textContent=Math.round(b.w);
+  document.getElementById('blockH').value=Math.round(b.h);(document.getElementById('blockHVal')||{}).textContent=Math.round(b.h);
   const menu=document.getElementById('blockMenu');
   menu.style.left=Math.min(clientX,window.innerWidth-240)+'px';
   menu.style.top=Math.min(clientY,window.innerHeight-260)+'px';
@@ -3343,9 +3196,10 @@ function applyBlockFromInputs(){
   const ny=parseInt(document.getElementById('blockY').value);
   const nw=Math.max(10,parseInt(document.getElementById('blockW').value)||b.w);
   const nh=Math.max(10,parseInt(document.getElementById('blockH').value)||b.h);
-  if(!isNaN(nx))b.x=nx;
-  if(!isNaN(ny))b.y=ny;
-  b.w=nw;b.h=nh;
+  if(!isNaN(nx)){b.x=nx;(document.getElementById('blockXVal')||{}).textContent=nx;}
+  if(!isNaN(ny)){b.y=ny;(document.getElementById('blockYVal')||{}).textContent=ny;}
+  b.w=nw;(document.getElementById('blockWVal')||{}).textContent=nw;
+  b.h=nh;(document.getElementById('blockHVal')||{}).textContent=nh;
   saveBlocks();
 }
 ['blockX','blockY','blockW','blockH'].forEach(id=>{
@@ -3403,8 +3257,8 @@ canvas.addEventListener('mousemove',e=>{
   b.y=Math.round(p.y-blockMoveDrag.offY);
   const menu=document.getElementById('blockMenu');
   if(menu.style.display!=='none'&&blockMenuTarget===blockMoveDrag.idx){
-    document.getElementById('blockX').value=b.x;
-    document.getElementById('blockY').value=b.y;
+    document.getElementById('blockX').value=b.x;(document.getElementById('blockXVal')||{}).textContent=Math.round(b.x);
+    document.getElementById('blockY').value=b.y;(document.getElementById('blockYVal')||{}).textContent=Math.round(b.y);
   }
 },{capture:true});
 
@@ -3721,6 +3575,9 @@ const CMD_DEFS=[
   {id:'shrink',       label:'Shrink pet ball',  def:'!shrink',       owner:false},
   {id:'grow',         label:'Grow pet ball',    def:'!grow',         owner:false},
   {id:'despawn',      label:'Despawn a pet ball',def:'!despawn',     owner:false},
+  {id:'lurk',         label:'Viewer lurks',       def:'!lurk',         owner:false},
+  {id:'hug',          label:'Hug a viewer',       def:'!hug',          owner:false},
+  {id:'eat',          label:'Eat a viewer',        def:'!eat',          owner:false},
 ];
 
 // Live command map: id → current trigger string (lowercase, with !)
@@ -3936,11 +3793,57 @@ function execViewerCmd(cmdId,username,args){
       break;
     }
     case 'despawn':{
-      // remove the most recently spawned ball
-      if(spires.length>0){
-        spires.pop();
-        if(pet)pet.say('Poof!');
+      if(spires.length>0){spires.pop();if(pet)pet.say('Poof!');}
+      break;
+    }
+    case 'lurk':{
+      if(pet){
+        pet.say('Going lurk...');
+        const _lu=pet.username;
+        setTimeout(()=>{
+          const lp=petMap[_lu];if(!lp)return;
+          lp.el.style.transition='opacity 2s';lp.el.style.opacity='0';
+          setTimeout(()=>{if(petMap[_lu])delete petMap[_lu];pets=pets.filter(p=>p.username!==_lu);lp.destroy();},2000);
+        },1500);
       }
+      break;
+    }
+    case 'hug':{
+      const hugTgt=args&&args[0]
+        ?pets.find(p=>p.username.toLowerCase()===(args[0]||'').toLowerCase()&&p!==pet)
+        :pets.find(p=>p!==pet);
+      if(pet&&hugTgt){
+        const hugIv=setInterval(()=>{
+          if(!pets.includes(pet)||!pets.includes(hugTgt)){clearInterval(hugIv);return;}
+          const dx=(hugTgt.x+hugTgt.w/2)-(pet.x+pet.w/2);
+          if(Math.abs(dx)<pet.w*1.2){
+            clearInterval(hugIv);pet.vx=0;
+            pet.say('❤');hugTgt.say('❤');
+            hugTgt.vx=(Math.random()<0.5?-1:1)*3;hugTgt.vy=-4;hugTgt.airborne=true;
+          }else{pet.vx=Math.sign(dx)*petSpeed*1.5;}
+        },100);
+      }
+      break;
+    }
+    case 'eat':{
+      const eatTgt=args&&args[0]
+        ?pets.find(p=>p.username.toLowerCase()===(args[0]||'').toLowerCase()&&p!==pet)
+        :null;
+      if(pet&&eatTgt){
+        const eatIv=setInterval(()=>{
+          if(!pets.includes(pet)||!pets.includes(eatTgt)){clearInterval(eatIv);return;}
+          const dx=(eatTgt.x+eatTgt.w/2)-(pet.x+pet.w/2);
+          if(Math.abs(dx)<pet.w*0.8){
+            clearInterval(eatIv);
+            pet.say('Yum!');
+            const ns=Math.min(400,pet.w+Math.round(eatTgt.w*0.4));
+            pet.w=ns;pet.h=ns;pet.spriteEl.width=ns;pet.spriteEl.height=ns;pet.el.style.width=ns+'px';
+            const eu=eatTgt.username;
+            eatTgt.el.style.transition='opacity 0.5s';eatTgt.el.style.opacity='0';
+            setTimeout(()=>{if(petMap[eu])delete petMap[eu];pets=pets.filter(p=>p.username!==eu);eatTgt.destroy();},500);
+          }else{pet.vx=Math.sign(dx)*petSpeed*2;}
+        },80);
+      }else if(pet){pet.say('Who?');}
       break;
     }
     case 'pledge':{
@@ -4050,8 +3953,8 @@ function wireViewerFrameBtn(btnId,fileId,arr){
 wireViewerFrameBtn('addPetFrameLeftBtn','petFileLeft',petFramesLeft);
 wireViewerFrameBtn('addPetFrameRightBtn','petFileRight',petFramesRight);
 wireViewerFrameBtn('addPetFrameIdleBtn','petFileIdle',petFramesIdle);
-wireViewerFrameBtn('addPetFrameLeftTalkBtn','petFileLeftTalk',petFramesLeftTalk);
 wireViewerFrameBtn('addPetFrameTalkBtn','petFileTalk',petFramesTalk);
+wireViewerFrameBtn('addPetFrameLeftTalkBtn','petFileLeftTalk',petFramesLeftTalk);
 wireViewerFrameBtn('addPetFrameRightTalkBtn','petFileRightTalk',petFramesRightTalk);
 // load saved directional frames
 (function(){
