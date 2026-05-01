@@ -259,8 +259,11 @@ function makeCarousel(container) {
     const counter = container.querySelector('.car-counter');
     let idx = 0, autoTimer = null, resumeTimer = null;
 
-    // Clone thumbnails for infinite scroll looping
-    if (thumbContainer && origThumbs.length > 0) {
+    // Only clone for infinite loop when there are enough thumbnails to warrant it
+    const shouldLoop = origThumbs.length >= 8;
+    const thumbWrapper = container.querySelector('.thumbnail-wrapper');
+    if (!shouldLoop && thumbWrapper) thumbWrapper.classList.add('no-loop');
+    if (thumbContainer && origThumbs.length > 0 && shouldLoop) {
         origThumbs.forEach(t => thumbContainer.appendChild(t.cloneNode(true)));
     }
 
@@ -325,12 +328,14 @@ function makeCarousel(container) {
         if (scrollLeftBtn) scrollLeftBtn.addEventListener('click', () => thumbContainer.scrollBy({ left: -150, behavior: 'smooth' }));
         if (scrollRightBtn) scrollRightBtn.addEventListener('click', () => thumbContainer.scrollBy({ left: 150, behavior: 'smooth' }));
 
-        thumbContainer.addEventListener('scroll', () => {
-            const sl = thumbContainer.scrollLeft;
-            const maxScroll = thumbContainer.scrollWidth - thumbContainer.clientWidth;
-            if (sl <= 0) thumbContainer.scrollLeft = thumbPx * origCount;
-            else if (sl >= maxScroll) thumbContainer.scrollLeft = thumbPx * origCount - (wrapper ? wrapper.offsetWidth / 2 : 150);
-        });
+        if (shouldLoop) {
+            thumbContainer.addEventListener('scroll', () => {
+                const sl = thumbContainer.scrollLeft;
+                const maxScroll = thumbContainer.scrollWidth - thumbContainer.clientWidth;
+                if (sl <= 0) thumbContainer.scrollLeft = thumbPx * origCount;
+                else if (sl >= maxScroll) thumbContainer.scrollLeft = thumbPx * origCount - (wrapper ? wrapper.offsetWidth / 2 : 150);
+            });
+        }
 
         let isDragging = false, dragStartX, dragStartSL;
         thumbContainer.addEventListener('mousedown', e => { isDragging = true; thumbContainer.classList.add('dragging'); dragStartX = e.pageX - thumbContainer.offsetLeft; dragStartSL = thumbContainer.scrollLeft; });

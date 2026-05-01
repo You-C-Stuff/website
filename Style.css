@@ -2188,6 +2188,17 @@ input, select, textarea {
     font-family: 'Audiowide', sans-serif;
 }
 
+.thumbnail-wrapper.no-loop .thumbnails {
+    justify-content: center;
+    overflow-x: hidden;
+    mask-image: none;
+    -webkit-mask-image: none;
+}
+
+.thumbnail-wrapper.no-loop .thumb-scroll {
+    display: none;
+}
+
 .gallery-switcher-wrap {
     overflow-x: auto;
     padding: 0 10px 8px;
@@ -2447,9 +2458,29 @@ input, select, textarea {
     
 
     .artist img {
-        height: 250px; /* Allow image height to adjust based on content */
+        height: 250px;
     }
 
+    .artist-info {
+        font-size: 2em;
+    }
+
+    .wall-body {
+        padding: 8px;
+    }
+
+    .thumbnail-wrapper {
+        width: 100%;
+    }
+
+    .carousel-button {
+        font-size: 1.2em;
+        padding: 10px 12px;
+    }
+
+    .gallery-switcher-wrap {
+        padding: 0 4px 8px;
+    }
 
     #caption {
         top:50px;
@@ -2746,18 +2777,59 @@ input, select, textarea {
 
       .gallery-btn {
         font-size: 14px;
-      
+        padding: 8px 14px;
+        min-height: 44px;
     }
-    
+
+    .artist-info {
+        font-size: 1.5em;
+    }
+
+    .artist img {
+        height: 200px;
+    }
+
+    .carousel-button {
+        font-size: 1em;
+        padding: 8px 10px;
+    }
+
+    .thumbnail {
+        width: 68px;
+        height: 68px;
+    }
+
   }
 
     @media (max-width: 422px) {
-   .image-container img {
-    max-width: 155%;
-    height: auto;
-    border-radius: 8px;
+    .image-container img {
+        max-width: 155%;
+        height: auto;
+        border-radius: 8px;
+    }
 
-}
-    
+    .artist img {
+        height: 160px;
+    }
+
+    .artist-info {
+        font-size: 1.2em;
+    }
+
+    .gallery-btn {
+        font-size: 12px;
+        padding: 8px 10px;
+    }
+
+    .carousel-button {
+        font-size: 0.9em;
+        padding: 6px 8px;
+    }
+
+    .thumbnail {
+        width: 56px;
+        height: 56px;
+    }
+
   }
 
