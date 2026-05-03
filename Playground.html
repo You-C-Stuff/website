@@ -491,7 +491,7 @@ body.mode-hallway #hallwayContainer{display:block;}
         <select id="numWarTeams" style="background:#1a1a2e;border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:4px 8px;color:#fff;font-size:12px;font-family:inherit;">
           <option value="2">2</option>
           <option value="3">3</option>
-          <option value="4">4</option>
+          <option value="4" selected>4</option>
         </select>
       </div>
       <div id="teamConfigGrid"></div>
@@ -533,6 +533,7 @@ body.mode-hallway #hallwayContainer{display:block;}
 .chat-pet-el{
   position:absolute;bottom:0;pointer-events:none;z-index:15;
   display:flex;flex-direction:column;align-items:center;
+  overflow:visible;
 }
 .chat-pet-sprite{image-rendering:pixelated;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));}
 .chat-pet-name{
@@ -543,12 +544,14 @@ body.mode-hallway #hallwayContainer{display:block;}
 }
 .speech-bubble{
   position:absolute;bottom:100%;
+  width:max-content;max-width:min(250px,20vw);
+  white-space:normal;word-break:break-word;
   background:#1a1a2e;
   border:2px solid #fff;
   border-radius:0;
   padding:4px 7px;
   font-size:11px;font-family:'Courier New',monospace;font-weight:700;
-  color:#fff;white-space:nowrap;max-width:600px;overflow:visible;
+  color:#fff;overflow:hidden;
   image-rendering:pixelated;
   box-shadow:3px 3px 0 #000,inset -1px -1px 0 rgba(255,255,255,0.15);
   pointer-events:none;
@@ -900,9 +903,12 @@ const ACTIONS=[
   {id:'burst',        label:'Burst spawn',         default:''},
   {id:'vibrate',      label:'Toggle vibrate',      default:''},
   {id:'freeze',       label:'Toggle freeze',       default:''},
+  {id:'smallScreen',  label:'Small screen mode',   default:''},
+  {id:'hallwayMode',  label:'Hallway mode',         default:''},
+  {id:'fullscreen',   label:'Fullscreen mode',      default:''},
 ];
 let hotkeys={};
-ACTIONS.forEach(a=>hotkeys[a.id]=a.default);
+ACTIONS.forEach(a=>hotkeys[a.id]=a.default?[a.default]:[]);
 
 const LS_C='lpp_c5',LS_A='lpp_a5',LS_H='lpp_h5',LS_HK='lpp_hk5',LS_PREFS='lpp_prefs5';
 const LS_SND='lpp_snd5',LS_VSND='lpp_vsnd5',LS_RSND='lpp_rsnd5';
@@ -968,7 +974,7 @@ function loadAll(){
     const raw=localStorage.getItem(LS_HK);
     if(raw){
       const saved=JSON.parse(raw);
-      ACTIONS.forEach(a=>{if(saved[a.id])hotkeys[a.id]=saved[a.id];});
+      ACTIONS.forEach(a=>{if(saved[a.id]!==undefined){hotkeys[a.id]=Array.isArray(saved[a.id])?saved[a.id]:(saved[a.id]?[saved[a.id]]:[]);}});
     }
   }catch(e){}
   // load prefs
@@ -1426,8 +1432,9 @@ document.addEventListener('keydown',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
   const _hkM=[];if(e.ctrlKey)_hkM.push('Ctrl');if(e.altKey)_hkM.push('Alt');if(e.shiftKey)_hkM.push('Shift');if(e.metaKey)_hkM.push('Meta');
   const _pressed=_hkM.length?_hkM.join('+')+'+'+e.code:e.code;
-  for(const[action,key]of Object.entries(hotkeys)){
-    if(_pressed!==key&&e.code!==key)continue;
+  for(const[action,keys]of Object.entries(hotkeys)){
+    const _keyArr=Array.isArray(keys)?keys:(keys?[keys]:[]);
+    if(!_keyArr.some(k=>k===_pressed||k===e.code))continue;
     e.preventDefault();
     switch(action){
       case 'clear': document.getElementById('resetBtn').click();break;
@@ -1443,7 +1450,9 @@ document.addEventListener('keydown',e=>{
       case 'explode': document.getElementById('explosionBtn').click();break;
       case 'viewerToggle': document.getElementById('viewerToggleBtn').click();break;
       case 'viewerBounce': document.getElementById('petScatterBtn').click();break;
-      case 'freeze': document.getElementById('freezeBtn').click();break;
+      case 'smallScreen': applyViewMode('small');break;
+      case 'hallwayMode': applyViewMode('hallway');break;
+      case 'fullscreen': applyViewMode('fullscreen');break;
     }
   }
 });
@@ -1796,17 +1805,59 @@ document.getElementById('soundThresh').addEventListener('input',function(){sound
 document.addEventListener('pointerdown',()=>ensureAudio());
 
 function codeToDisplay(code){if(code==='Space')return'Space';if(code==='Equal')return'=';if(code==='Minus')return'-';return code.replace(/^Key/,'').replace(/^Digit/,'').replace(/^Arrow/,'');}
+function renderHotkeyRow(action,tr){
+  tr.innerHTML='';
+  const td1=document.createElement('td');td1.textContent=action.label;tr.appendChild(td1);
+  const td2=document.createElement('td');
+  const keys=Array.isArray(hotkeys[action.id])?hotkeys[action.id]:(hotkeys[action.id]?[hotkeys[action.id]]:[]);
+  const wrap=document.createElement('div');
+  wrap.style.cssText='display:flex;flex-wrap:wrap;gap:4px;align-items:center;';
+
+  keys.forEach((k,i)=>{
+    const chip=document.createElement('div');
+    chip.style.cssText='display:flex;align-items:center;gap:2px;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.2);border-radius:5px;padding:2px 6px;font-size:11px;color:#fff;font-family:inherit;';
+    const lbl=document.createElement('span');lbl.textContent=k.replace(/Key|Digit/g,'');
+    const x=document.createElement('span');x.textContent='×';
+    x.style.cssText='cursor:pointer;color:rgba(220,80,80,0.8);margin-left:3px;font-weight:bold;line-height:1;';
+    x.addEventListener('click',()=>{
+      const arr=Array.isArray(hotkeys[action.id])?hotkeys[action.id]:[];
+      arr.splice(i,1);hotkeys[action.id]=arr;saveHotkeys();renderHotkeyRow(action,tr);
+    });
+    chip.appendChild(lbl);chip.appendChild(x);wrap.appendChild(chip);
+  });
+
+  const addBtn=document.createElement('button');
+  addBtn.textContent='+';
+  addBtn.title='Add binding (then press any key)';
+  addBtn.style.cssText='background:rgba(127,119,221,0.15);border:0.5px solid rgba(127,119,221,0.4);border-radius:5px;color:#b8b2ff;font-size:13px;padding:1px 8px;cursor:pointer;font-family:inherit;';
+  addBtn.addEventListener('click',()=>{
+    addBtn.textContent='…';addBtn.style.color='rgba(255,200,80,0.9)';
+    const capture=e=>{
+      e.preventDefault();e.stopPropagation();
+      const _m=[];if(e.ctrlKey)_m.push('Ctrl');if(e.altKey)_m.push('Alt');if(e.shiftKey)_m.push('Shift');if(e.metaKey)_m.push('Meta');
+      const _b=e.code;
+      if(['ControlLeft','ControlRight','AltLeft','AltRight','ShiftLeft','ShiftRight','MetaLeft','MetaRight'].includes(_b))return;
+      if(_b==='Escape'){document.removeEventListener('keydown',capture,true);renderHotkeyRow(action,tr);return;}
+      const _c=_m.length?_m.join('+')+'+'+_b:_b;
+      if(!Array.isArray(hotkeys[action.id]))hotkeys[action.id]=[];
+      if(!hotkeys[action.id].includes(_c))hotkeys[action.id].push(_c);
+      saveHotkeys();
+      document.removeEventListener('keydown',capture,true);
+      renderHotkeyRow(action,tr);
+    };
+    document.addEventListener('keydown',capture,true);
+  });
+  wrap.appendChild(addBtn);
+  td2.appendChild(wrap);tr.appendChild(td2);
+}
+
 function buildHotkeyTable(){
   const table=document.getElementById('hotkeyList');
   while(table.rows.length>1)table.deleteRow(1);
   ACTIONS.forEach(action=>{
     const tr=document.createElement('tr');
-    const td1=document.createElement('td');td1.textContent=action.label;
-    const td2=document.createElement('td');
-    const inp=document.createElement('input');inp.type='text';inp.className='hkInput';inp.readOnly=true;inp.value=codeToDisplay(hotkeys[action.id]);
-    inp.addEventListener('click',()=>{document.querySelectorAll('.hkInput').forEach(i=>i.classList.remove('listening'));inp.classList.add('listening');inp.value='…';});
-    inp.addEventListener('keydown',e=>{if(!inp.classList.contains('listening'))return;e.preventDefault();e.stopPropagation();const _m=[];if(e.ctrlKey)_m.push('Ctrl');if(e.altKey)_m.push('Alt');if(e.shiftKey)_m.push('Shift');if(e.metaKey)_m.push('Meta');const _b=e.code;if(['ControlLeft','ControlRight','AltLeft','AltRight','ShiftLeft','ShiftRight','MetaLeft','MetaRight'].includes(_b))return;const _c=_m.length?_m.join('+')+'+'+_b:_b;hotkeys[action.id]=_c;inp.value=_c.replace(/Key|Digit/g,'');inp.classList.remove('listening');saveHotkeys();});
-    td2.appendChild(inp);tr.appendChild(td1);tr.appendChild(td2);table.appendChild(tr);
+    renderHotkeyRow(action,tr);
+    table.appendChild(tr);
   });
 }
 buildHotkeyTable();
@@ -1839,7 +1890,10 @@ function getPetFramesForDir(fl,mov,talking){
 } // loaded images for walking animation
 let petSize=84, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
 // pets declared early above
-const LS_PET='lpp_pet5', LS_TCHAN='lpp_tchan5', LS_IGNORE='lpp_ignore5';
+const LS_PET='lpp_pet5', LS_TCHAN='lpp_tchan5', LS_IGNORE='lpp_ignore5', LS_PLEDGES='lpp_pledges5';
+let pledgeStore={}; // username.toLowerCase() → teamId
+(function(){try{const r=localStorage.getItem(LS_PLEDGES);if(r)pledgeStore=JSON.parse(r);}catch(e){}})();
+function savePledges(){try{localStorage.setItem(LS_PLEDGES,JSON.stringify(pledgeStore));}catch(e){}}
 let ignoreList=new Set();
 (function(){try{const r=localStorage.getItem(LS_IGNORE);if(r){ignoreList=new Set(JSON.parse(r));}}catch(e){}})();
 function saveIgnoreList(){try{localStorage.setItem(LS_IGNORE,JSON.stringify([...ignoreList]));}catch(e){}}
@@ -1941,10 +1995,20 @@ class ChatPet{
     // pick directional custom image first, then directional frames, then fallback
     const isMoving=Math.abs(this.vx)>0.3;
     let customFrame=null;
-    if(this.customImgLeft||this.customImgRight||this.customImgForward){
-      if(!isMoving) customFrame=this.customImgForward||this.customImgLeft||this.customImgRight;
-      else if(this.facingLeft) customFrame=this.customImgLeft||this.customImgForward||this.customImgRight;
-      else customFrame=this.customImgRight||this.customImgForward||this.customImgLeft;
+    if(this.customImgLeft||this.customImgRight||this.customImgForward||
+       this.customImgForwardTalk||this.customImgLeftTalk||this.customImgRightTalk){
+      const talking=!!(this.bubble&&this.bubbleTimer>0);
+      if(!isMoving){
+        customFrame=(talking&&this.customImgForwardTalk)||this.customImgForward||
+                    (talking&&(this.customImgLeftTalk||this.customImgRightTalk))||
+                    this.customImgLeft||this.customImgRight;
+      } else if(this.facingLeft){
+        customFrame=(talking&&this.customImgLeftTalk)||this.customImgLeft||
+                    (talking&&this.customImgForwardTalk)||this.customImgForward||this.customImgRight;
+      } else {
+        customFrame=(talking&&this.customImgRightTalk)||this.customImgRight||
+                    (talking&&this.customImgForwardTalk)||this.customImgForward||this.customImgLeft;
+      }
     } else if(this.customImg){ customFrame=this.customImg; }
 
     const isTalking=!!(this.bubble&&this.bubbleTimer>0);
@@ -1962,7 +2026,15 @@ class ChatPet{
       // only auto-flip when using shared single set, not directional sets or custom images
       const usingCustomDir=this.customImgLeft||this.customImgRight||this.customImgForward;
       if(!hasDir&&!usingCustomDir&&!this.customImg&&this.facingLeft){ctx2.translate(this.w,0);ctx2.scale(-1,1);}
-      ctx2.drawImage(img,0,0,this.w,this.h);
+      // draw at full height, maintain aspect ratio, centre horizontally
+      if(img.naturalWidth&&img.naturalHeight){
+        const scale=this.h/img.naturalHeight;
+        const dw=img.naturalWidth*scale;
+        const dx=(this.w-dw)/2;
+        ctx2.drawImage(img,dx,0,dw,this.h);
+      } else {
+        ctx2.drawImage(img,0,0,this.w,this.h);
+      }
       ctx2.restore();
     } else {
       // ── fallback character (reference: tall narrow rect head, small rect eyes/mouth, narrow trapezoid body)
@@ -1995,7 +2067,7 @@ class ChatPet{
     }
 
     // update DOM health bar
-    if((battleRoyaleActive||warActive||kaijuActive||this._inDuel)&&this.alive){
+    if((battleRoyaleActive||warActive||(kaijuActive&&!this._isRaidBoss)||this._inDuel)&&this.alive){
       this.healthBarWrap.style.display='block';
       const ratio=Math.max(0,this.hp/this.maxHp);
       this.healthBarFill.style.width=(ratio*100)+'%';
@@ -2032,7 +2104,7 @@ class ChatPet{
         if(this.y>=screenFloor){
           this.y=screenFloor;
           const imp=Math.abs(this.vy);
-          if(imp>2){this.vy=-imp*0.35;this.vx*=0.75;if(Math.abs(this.vy)<0.8){this.vy=0;onSurface=true;}}
+          if(imp>2){this.vy=-imp*0.35;if(Math.abs(this.vy)<0.8){this.vy=0;onSurface=true;}}
           else{this.vy=0;onSurface=true;}
         }
         if(this.y<0){this.y=0;this.vy=Math.abs(this.vy)*0.4;}
@@ -2052,21 +2124,49 @@ class ChatPet{
       if(this.x+this.w>W){this.x=W-this.w;this.vx=-Math.abs(this.vx)*0.6;}
 
       if(onSurface){
-        // walking state
+        // walking state — ensure viewer is always moving
         this.airborne=false;
         if(Math.abs(this.vx)<0.3)this.vx=(Math.random()<0.5?-1:1)*(0.4+Math.random()*petSpeed);
-        // random direction change
-        if(Math.random()<0.005)this.vx*=-1;
+        // gradually restore walking speed if too slow (e.g. after landing on a block)
+        const targetSpeed=(this.vx>=0?1:-1)*Math.max(0.5,Math.abs(this.vx)||petSpeed*0.6);
+        if(Math.abs(this.vx)<petSpeed*0.4)this.vx+=(targetSpeed-this.vx)*0.15;
+        // random direction change — skip during block bounce cooldown
+        if(Math.random()<0.005&&!this._blockBounce)this.vx*=-1;
         const maxV=petSpeed*1.8;
         this.vx=Math.max(-maxV,Math.min(maxV,this.vx));
         if(this.x<=0){this.x=0;this.vx=Math.abs(this.vx)||petSpeed*0.5;}
         if(this.x+this.w>=W){this.x=W-this.w;this.vx=-(Math.abs(this.vx)||petSpeed*0.5);}
         for(const b of blocks){
-          if(this.x+this.w>b.x&&this.x<b.x+b.w&&this.y+this.h>b.y&&this.y<b.y+b.h){
-            if(this.x+this.w-b.x<b.x+b.w-this.x){this.x=b.x-this.w;this.vx=-Math.abs(this.vx||petSpeed*0.5);}
-            else{this.x=b.x+b.w;this.vx=Math.abs(this.vx||petSpeed*0.5);}
+          const margin=this.w*0.00005; // small buffer — close to visual edge
+          const bx=b.x-margin, bx2=b.x+b.w+margin;
+          const overlapY=this.y+this.h>b.y+2&&this.y<b.y+b.h-2;
+          if(overlapY){
+            // approaching from left — turn around at margin
+            if(this.vx>0&&this.x+this.w>bx&&this.x+this.w<b.x+b.w*0.5){
+              this.x=bx-this.w;
+              this.vx=-Math.abs(this.vx||petSpeed*0.8);
+              this._blockBounce=30;
+            }
+            // approaching from right — turn around at margin
+            else if(this.vx<0&&this.x<bx2&&this.x>b.x+b.w*0.5){
+              this.x=bx2;
+              this.vx=Math.abs(this.vx||petSpeed*0.8);
+              this._blockBounce=30;
+            }
+            // already inside block — push out immediately
+            else if(this.x+this.w>b.x&&this.x<b.x+b.w){
+              if(this.x+this.w-b.x<b.x+b.w-this.x){
+                this.x=b.x-this.w-1;
+                this.vx=-Math.abs(this.vx||petSpeed*0.8);
+              } else {
+                this.x=b.x+b.w+1;
+                this.vx=Math.abs(this.vx||petSpeed*0.8);
+              }
+              this._blockBounce=30;
+            }
           }
         }
+        if(this._blockBounce>0)this._blockBounce--;
       } else if(!this.airborne && Math.abs(this.vy)<0.1 && Math.abs(g)<0.01){
         // zero gravity walk
         if(Math.random()<0.005)this.vx*=-1;
@@ -2218,6 +2318,16 @@ function getOrCreatePet(username,color){
   pets.push(pet);
   applyViewerImgToPet(pet);
   if(!viewersVisible){pet.el.style.display='none';pet._hidden=true;}
+  // restore saved pledge allegiance
+  const savedTeamId=pledgeStore[username.toLowerCase()];
+  if(savedTeamId){
+    const savedTeam=warTeams.find(t=>t.id===savedTeamId);
+    if(savedTeam){
+      pet._pledgedTeam=savedTeam.id;
+      pet.nameEl.textContent=(pet.pinned?'\uD83D\uDCCC ':'')+savedTeam.emoji+' '+pet.username;
+      pet.nameEl.style.color=savedTeam.color;
+    }
+  }
   // hallway mode: queue viewer to walk through before entering main canvas
   if(currentViewMode==='hallway'&&!pet._hallwayDone){
     pet._hallwayDone=true;
@@ -2559,13 +2669,13 @@ function endBattleRoyale(){
 // ── FIGHT SETTINGS ────────────────────────────────────────
 // ── Multi-team war ─────────────────────────────────────────
 const WAR_DEFAULTS=[
-  {id:'A', name:'Red',    emoji:'⚔️',  cry:'For glory!',    color:'#5588ff'},
-  {id:'B', name:'Blue',   emoji:'🛡️', cry:'Hold the line!', color:'#ff5555'},
-  {id:'C', name:'Gold',   emoji:'💥',  cry:'Charge!',        color:'#ffaa22'},
-  {id:'D', name:'Purple', emoji:'🔥',  cry:'Burn it all!',   color:'#aa44ff'},
+  {id:'A', name:'Cy',     emoji:'🎮', cry:'Game on!',        color:'#5588ff'},
+  {id:'B', name:'Carrin', emoji:'👻', cry:'Boo!',            color:'#aa44ff'},
+  {id:'C', name:'Idano',  emoji:'📦', cry:'Open the box!',   color:'#ffaa22'},
+  {id:'D', name:'Hornius',emoji:'🐉', cry:'Unleash the dragon!', color:'#ff5555'},
 ];
-let warTeams=WAR_DEFAULTS.slice(0,2).map(t=>Object.assign({},t));
-let numWarTeamsCount=2;
+let warTeams=WAR_DEFAULTS.slice(0,4).map(t=>Object.assign({},t));
+let numWarTeamsCount=4;
 
 function getWarSpawnX(tIdx,n,petW){
   if(n<=1)return window.innerWidth/2-petW/2;
@@ -2864,6 +2974,7 @@ function _doConnect(){
         if(cmdTrigger===cmd('attack'))execViewerCmd('attack',username,cmdArgs);
         if(cmdTrigger===cmd('jump'))execViewerCmd('jump',username,cmdArgs);
         if(cmdTrigger===cmd('duel'))execViewerCmd('duel',username,cmdArgs);
+        if(cmdTrigger===cmd('fight'))execViewerCmd('duel',username,cmdArgs);
         if(cmdTrigger===cmd('punch'))execViewerCmd('punch',username,cmdArgs);
         if(cmdTrigger===cmd('pledge'))execViewerCmd('pledge',username,cmdArgs);
         if(cmdTrigger===cmd('spawn'))execViewerCmd('spawn',username,cmdArgs);
@@ -2874,6 +2985,8 @@ function _doConnect(){
         if(cmdTrigger===cmd('grow'))execViewerCmd('grow',username,cmdArgs);
         if(cmdTrigger===cmd('despawn'))execViewerCmd('despawn',username,cmdArgs);
         if(cmdTrigger===cmd('lurk'))execViewerCmd('lurk',username,cmdArgs);
+        if(cmdTrigger===cmd('vanish'))execViewerCmd('lurk',username,cmdArgs);
+        if(cmdTrigger===cmd('v'))execViewerCmd('lurk',username,cmdArgs);
         if(cmdTrigger===cmd('hug'))execViewerCmd('hug',username,cmdArgs);
         if(cmdTrigger===cmd('eat'))execViewerCmd('eat',username,cmdArgs);
       }
@@ -3607,8 +3720,15 @@ function startRaidKaiju(raiderName, raidViewers){
   raidStomp();
   kaijuStompTimer=setInterval(raidStomp,kaijuStompInterval);
 
-  // no HP bar for raid — viewers just spam !attack
-  if(kaijuBarEl){kaijuBarEl.remove();kaijuBarEl=null;}
+  // HP bar — red theme for raid
+  if(kaijuBarEl)kaijuBarEl.remove();
+  kaijuBarEl=document.createElement('div');
+  kaijuBarEl.style.cssText='position:fixed;top:88px;left:50%;transform:translateX(-50%);width:500px;z-index:50;pointer-events:none;text-align:center;';
+  kaijuBarEl.innerHTML=
+    '<div style="font-size:13px;font-weight:700;color:#ff5050;letter-spacing:0.1em;margin-bottom:6px;font-family:\'Courier New\',monospace;">RAID BOSS: '+raiderName.toUpperCase()+' ('+raidViewers+' viewers)</div>'+
+    '<div style="height:26px;background:rgba(0,0,0,0.65);border-radius:4px;overflow:hidden;border:1px solid rgba(255,80,80,0.55);"><div id="kaijuBarFill" style="height:100%;width:100%;background:linear-gradient(90deg,#ff5050,#cc2020);border-radius:4px;transition:width 0.2s;"></div></div>'+
+    '<div style="font-size:11px;color:#000;font-weight:800;margin-top:7px;font-family:\'Courier New\',monospace;">type !attack in chat to defeat the raid boss</div>';
+  document.body.appendChild(kaijuBarEl);
 
   // centre splash
   const splash=document.createElement('div');
@@ -3636,6 +3756,7 @@ const CMD_DEFS=[
   {id:'attack',       label:'Attack Kaiju',     def:'!attack',       owner:false},
   {id:'jump',         label:'Jump',             def:'!jump',         owner:false},
   {id:'duel',         label:'Duel someone',     def:'!duel',         owner:false},
+  {id:'fight',        label:'Fight (alias duel)', def:'!fight',       owner:false},
   {id:'punch',        label:'Punch someone',    def:'!punch',        owner:false},
   {id:'pledge',       label:'Pledge allegiance',def:'!pledge',       owner:false},
   {id:'spawn',        label:'Spawn a pet ball', def:'!spawn',        owner:false},
@@ -3646,6 +3767,8 @@ const CMD_DEFS=[
   {id:'grow',         label:'Grow pet ball',    def:'!grow',         owner:false},
   {id:'despawn',      label:'Despawn a pet ball',def:'!despawn',     owner:false},
   {id:'lurk',         label:'Viewer lurks',       def:'!lurk',         owner:false},
+  {id:'vanish',       label:'Vanish (alias lurk)', def:'!vanish',      owner:false},
+  {id:'v',            label:'!v (alias lurk)',      def:'!v',           owner:false},
   {id:'hug',          label:'Hug a viewer',       def:'!hug',          owner:false},
   {id:'eat',          label:'Eat a viewer',        def:'!eat',          owner:false},
 ];
@@ -3697,6 +3820,30 @@ document.querySelectorAll('.stab[data-tab="commands"]').forEach(btn=>{
 // ── New viewer command implementations ────────────────────
 // active duels: map of pet username → {target, hp, maxHp, oppHp, oppMaxHp, interval}
 const activeDuels=new Map();
+// Queue for duel / punch / hug when one is already in progress for a participant
+const interactionQueue=[];
+let interactionBusy=false;
+
+function processInteractionQueue(){
+  if(interactionBusy||interactionQueue.length===0)return;
+  const next=interactionQueue.shift();
+  // validate pets still exist
+  if(!pets.includes(next.pet)||!pets.includes(next.target)){processInteractionQueue();return;}
+  interactionBusy=true;
+  next.fn(next.pet,next.target,()=>{interactionBusy=false;processInteractionQueue();});
+}
+
+function queueInteraction(pet,target,fn){
+  // if either participant is currently busy, queue it
+  if(interactionBusy||activeDuels.has(pet.username)||activeDuels.has(target.username)||
+     pet._inPunch||target._inPunch||pet._inHug||target._inHug){
+    interactionQueue.push({pet,target,fn});
+    if(pet)pet.say('Queued!');
+  } else {
+    interactionBusy=true;
+    fn(pet,target,()=>{interactionBusy=false;processInteractionQueue();});
+  }
+}
 
 function startDuel(pet,target){
   if(!pet||!target)return;
@@ -3769,39 +3916,44 @@ function startDuel(pet,target){
 // active punches: username → timeout
 const activePunches=new Map();
 
-function startPunch(pet,target){
+function startPunch(pet,target,done){
   if(!pet||!target)return;
-  // walk toward target first
+  pet._inPunch=true;target._inPunch=true;
   pet.say('\uD83D\uDCA5');
   const walkInterval=setInterval(()=>{
-    if(!pets.includes(pet)||!pets.includes(target)){clearInterval(walkInterval);return;}
+    if(!pets.includes(pet)||!pets.includes(target)){
+      clearInterval(walkInterval);pet._inPunch=false;target._inPunch=false;
+      if(done)done();return;
+    }
     const dx=(target.x+target.w/2)-(pet.x+pet.w/2);
     const dist=Math.abs(dx);
     if(dist>pet.w*1.2){
-      // keep walking
       pet.vx=Math.sign(dx)*petSpeed*2;
     } else {
-      // landed next to target — punch!
       clearInterval(walkInterval);
       pet.vx=0;
       const nx=Math.sign(dx)||1;
       target.vx=nx*14;target.vy=-7;target.airborne=true;
       target.say('OW!');
       ensureAudio();playEventSound(hitBuffer,'hit');
-      // stumble back slightly
       pet.vx=-nx*3;pet.vy=-2;pet.airborne=true;
+      pet._inPunch=false;target._inPunch=false;
+      setTimeout(()=>{if(done)done();},500);
     }
   },50);
   activePunches.set(pet.username,walkInterval);
 }
 
 function execViewerCmd(cmdId,username,args){
+  // strip @ prefix from target usernames
+  if(args&&args[0]&&args[0].startsWith('@'))args[0]=args[0].slice(1);
   const pet=pets.find(p=>p.username===username);
   switch(cmdId){
     case 'jump':
       if(pet){pet.vy=-(8+Math.random()*4);pet.airborne=true;}
       break;
     case 'attack':
+      if(pet&&pet.alive===false)break; // dead viewers can't attack
       kaijuTakeDamage(10,username);
       break;
     case 'duel':{
@@ -3809,7 +3961,10 @@ function execViewerCmd(cmdId,username,args){
       const target=targetName
         ?pets.find(p=>p.username.toLowerCase()===targetName.toLowerCase()&&p!==pet)
         :pets.find(p=>p!==pet&&!activeDuels.has(p.username));
-      if(pet&&target)startDuel(pet,target);
+      if(pet&&target)queueInteraction(pet,target,(p,t,done)=>{startDuel(p,t);
+        // mark done when duel ends (watch activeDuels)
+        const watcher=setInterval(()=>{if(!activeDuels.has(p.username)){clearInterval(watcher);done();}},500);
+      });
       else if(pet)pet.say('Who should I duel?');
       break;
     }
@@ -3848,7 +4003,7 @@ function execViewerCmd(cmdId,username,args){
         // push all viewers and balls off the ground
         pets.forEach(p=>{if(!p.pinned){p.vy=-(4+Math.random()*4);p.airborne=true;}});
         spires.forEach(s=>{s.vy=-(4+Math.random()*4);});
-        if(pet)pet.say('Zero G!');
+        if(pet)pet.say('I believe I can fly!');
       }
       break;
     }
@@ -3883,15 +4038,20 @@ function execViewerCmd(cmdId,username,args){
         ?pets.find(p=>p.username.toLowerCase()===(args[0]||'').toLowerCase()&&p!==pet)
         :pets.find(p=>p!==pet);
       if(pet&&hugTgt){
-        const hugIv=setInterval(()=>{
-          if(!pets.includes(pet)||!pets.includes(hugTgt)){clearInterval(hugIv);return;}
-          const dx=(hugTgt.x+hugTgt.w/2)-(pet.x+pet.w/2);
-          if(Math.abs(dx)<pet.w*1.2){
-            clearInterval(hugIv);pet.vx=0;
-            pet.say('❤');hugTgt.say('❤');
-            hugTgt.vx=(Math.random()<0.5?-1:1)*3;hugTgt.vy=-4;hugTgt.airborne=true;
-          }else{pet.vx=Math.sign(dx)*petSpeed*1.5;}
-        },100);
+        queueInteraction(pet,hugTgt,(p,t,done)=>{
+          p._inHug=true;t._inHug=true;
+          const hugIv=setInterval(()=>{
+            if(!pets.includes(p)||!pets.includes(t)){clearInterval(hugIv);p._inHug=false;t._inHug=false;done();return;}
+            const dx=(t.x+t.w/2)-(p.x+p.w/2);
+            if(Math.abs(dx)<p.w*1.2){
+              clearInterval(hugIv);p.vx=0;
+              p.say('\u2764');t.say('\u2764');
+              t.vx=(Math.random()<0.5?-1:1)*3;t.vy=-4;t.airborne=true;
+              p._inHug=false;t._inHug=false;
+              setTimeout(done,500);
+            }else{p.vx=Math.sign(dx)*petSpeed*1.5;}
+          },100);
+        });
       }
       break;
     }
@@ -3923,6 +4083,8 @@ function execViewerCmd(cmdId,username,args){
       if(!matchTeam){if(pet)pet.say('Teams: '+warTeams.map(t=>t.name).join(', '));break;}
       if(pet){
         pet._pledgedTeam=matchTeam.id;
+        pledgeStore[username.toLowerCase()]=matchTeam.id;
+        savePledges();
         const pinPrefix=pet.pinned?'\uD83D\uDCCC ':'';
         pet.nameEl.textContent=pinPrefix+matchTeam.emoji+' '+pet.username;
         pet.nameEl.style.color=matchTeam.color;
@@ -3935,7 +4097,7 @@ function execViewerCmd(cmdId,username,args){
       const target2=targetName2
         ?pets.find(p=>p.username.toLowerCase()===targetName2.toLowerCase()&&p!==pet)
         :pets.find(p=>p!==pet);
-      if(pet&&target2)startPunch(pet,target2);
+      if(pet&&target2)queueInteraction(pet,target2,(p,t,done)=>{startPunch(p,t,done);});
       break;
     }
   }
