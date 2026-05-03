@@ -36,9 +36,9 @@ function updateFormVisibility() {
     var animationIllustrationFields = document.getElementById("animationIllustrationFields");
     var toontuberFields = document.getElementById("toontuberFields");
     var toontuberAddOns = document.getElementById("toontuberAddOns");
-    var commonFields = document.getElementById("referenceLink");
     var additionalCharactersField = document.getElementById("additionalCharactersField");
     var packageplanfields = document.getElementById("packageplanfields");
+    var packagetypefields = document.getElementById("packagetypefields");
     var designTypeFields = document.getElementById("Designtype");
     var addOns = document.getElementById("addOns");
     var emoteFields = document.getElementById("emoteFields");
@@ -50,13 +50,11 @@ function updateFormVisibility() {
     var uncommon1 = document.getElementById("uncommon1");
     var rare = document.getElementById("rare");
     var rare1 = document.getElementById("rare1");
-    var packageAddOns = document.getElementById("packageAddOns");
 
     // Hide all sections initially
     animationIllustrationFields.classList.add("hidden");
     toontuberFields.classList.add("hidden");
     toontuberAddOns.classList.add("hidden");
-    commonFields.classList.add("hidden");
     additionalCharactersField.classList.add("hidden");
     packageplanfields.classList.add("hidden");
     packagetypefields.classList.add("hidden");
@@ -67,7 +65,7 @@ function updateFormVisibility() {
     // Show relevant fields based on the selected commission type
     if (commissionType === "Animated Assets") {
         animationIllustrationFields.classList.remove("hidden");
-        commonFields.classList.remove("hidden");
+
         common.classList.add("hidden");
         common1.classList.add("hidden");
         common2.classList.add("hidden");
@@ -76,18 +74,15 @@ function updateFormVisibility() {
         uncommon1.classList.remove("hidden");
         rare1.classList.add("hidden");
         rare.classList.add("hidden");
-        packageAddOns.classList.add("hidden");
-
 
         // Manage visibility based on level of detail
         if (levelOfDetail === "Emote" ) {
             emoteFields.classList.remove("hidden");
         }
-  
 
     } else if (commissionType === "Graphic Assets") {
         animationIllustrationFields.classList.remove("hidden");
-        commonFields.classList.remove("hidden");
+
         common.classList.add("hidden");
         common1.classList.add("hidden");
         common2.classList.add("hidden");
@@ -96,26 +91,23 @@ function updateFormVisibility() {
         uncommon1.classList.remove("hidden");
         rare1.classList.remove("hidden");
         rare.classList.remove("hidden");
-        packageAddOns.classList.add("hidden");
 
         // Manage visibility based on level of detail
         if (levelOfDetail === "Emote" ) {
             emoteFields.classList.remove("hidden");
         }
-        
+
     } else if (commissionType === "Toontuber") {
         toontuberFields.classList.remove("hidden");
         toontuberAddOns.classList.remove("hidden");
-        commonFields.classList.remove("hidden");
         packageplanfields.classList.remove("hidden");
-        packageAddOns.classList.add("hidden");
 
     } else if (commissionType === "Character Design") {
         designTypeFields.classList.remove("hidden");
-        commonFields.classList.remove("hidden");
+
     } else if (commissionType === "Animation" || commissionType === "Illustration") {
         animationIllustrationFields.classList.remove("hidden");
-        commonFields.classList.remove("hidden");
+
         addOns.classList.remove("hidden");
         common.classList.remove("hidden");
         common1.classList.remove("hidden");
@@ -125,13 +117,9 @@ function updateFormVisibility() {
         uncommon1.classList.add("hidden");
         rare1.classList.add("hidden");
         rare.classList.add("hidden");
-        packageAddOns.classList.add("hidden");
-
 
     } else if (commissionType === "Package") {
-        document.getElementById("packagetypefields").classList.remove("hidden");
-        packageAddOns.classList.remove("hidden"); 
-        commonFields.classList.remove("hidden"); // optional if you want reference link to show
+        packagetypefields.classList.remove("hidden");
     }
 
     // Add event listener for the additional characters checkbox
