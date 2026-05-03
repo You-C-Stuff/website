@@ -1995,20 +1995,9 @@ class ChatPet{
     // pick directional custom image first, then directional frames, then fallback
     const isMoving=Math.abs(this.vx)>0.3;
     let customFrame=null;
-    if(this.customImgLeft||this.customImgRight||this.customImgForward||
-       this.customImgForwardTalk||this.customImgLeftTalk||this.customImgRightTalk){
+    if(this.customImgRight||this.customImgRightTalk){
       const talking=!!(this.bubble&&this.bubbleTimer>0);
-      if(!isMoving){
-        customFrame=(talking&&this.customImgForwardTalk)||this.customImgForward||
-                    (talking&&(this.customImgLeftTalk||this.customImgRightTalk))||
-                    this.customImgLeft||this.customImgRight;
-      } else if(this.facingLeft){
-        customFrame=(talking&&this.customImgLeftTalk)||this.customImgLeft||
-                    (talking&&this.customImgForwardTalk)||this.customImgForward||this.customImgRight;
-      } else {
-        customFrame=(talking&&this.customImgRightTalk)||this.customImgRight||
-                    (talking&&this.customImgForwardTalk)||this.customImgForward||this.customImgLeft;
-      }
+      customFrame=(talking&&this.customImgRightTalk)||this.customImgRight;
     } else if(this.customImg){ customFrame=this.customImg; }
 
     const isTalking=!!(this.bubble&&this.bubbleTimer>0);
@@ -2023,9 +2012,9 @@ class ChatPet{
       if(this._talkStatePrev!==this._talking){this.frame=0;this._talkStatePrev=this._talking;}
       const img=frames[this.frame%frames.length];
       ctx2.save();
-      // only auto-flip when using shared single set, not directional sets or custom images
-      const usingCustomDir=this.customImgLeft||this.customImgRight||this.customImgForward;
-      if(!hasDir&&!usingCustomDir&&!this.customImg&&this.facingLeft){ctx2.translate(this.w,0);ctx2.scale(-1,1);}
+      // flip when facing left — always mirror (custom images are right-facing only)
+      const usingCustom=this.customImgRight||this.customImgRightTalk||this.customImg;
+      if(this.facingLeft&&(usingCustom||(!hasDir))){ctx2.translate(this.w,0);ctx2.scale(-1,1);}
       // draw at full height, maintain aspect ratio, centre horizontally
       if(img.naturalWidth&&img.naturalHeight){
         const scale=this.h/img.naturalHeight;
@@ -2433,24 +2422,20 @@ vip.innerHTML=`
   <button id="petPinBtn" title="Pin/Unpin" style="flex:1;padding:6px;border-radius:6px;border:0.5px solid rgba(127,119,221,0.4);background:rgba(127,119,221,0.1);color:#b8b2ff;font-size:18px;cursor:pointer;font-family:inherit;line-height:1;">&#x1F4CC;</button>
   <button id="petDismissBtn" title="Remove viewer" style="padding:6px 11px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.45);background:rgba(180,50,50,0.1);color:rgba(220,80,80,0.85);font-size:18px;cursor:pointer;font-family:inherit;line-height:1;">&#x2715;</button>
 </div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;">
-  <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;padding-bottom:3px;">&#x2B05; Left</div>
-  <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;padding-bottom:3px;">&#x2B24; Idle</div>
-  <div style="font-size:9px;color:rgba(255,255,255,0.35);text-align:center;padding-bottom:3px;">&#x27A1; Right</div>
-  <button id="petImgLeftBtn" title="Left — idle" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
-  <button id="petImgFwdBtn" title="Idle/forward" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
-  <button id="petImgRightBtn" title="Right — idle" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:10px;cursor:pointer;font-family:inherit;">Idle</button>
-  <button id="petImgLeftTalkBtn" title="Left — talk" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">&#x1F4AC;</button>
-  <button id="petImgFwdTalkBtn" title="Idle — talk" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">&#x1F4AC;</button>
-  <button id="petImgRightTalkBtn" title="Right — talk" style="padding:5px 0;border-radius:5px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:10px;cursor:pointer;font-family:inherit;">&#x1F4AC;</button>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:7px;">
+  <div style="text-align:center;">
+    <div style="font-size:9px;color:rgba(255,255,255,0.35);margin-bottom:4px;">&#x27A1; Idle</div>
+    <button id="petImgRightBtn" style="width:100%;padding:7px 0;border-radius:6px;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.65);font-size:11px;cursor:pointer;font-family:inherit;">Upload</button>
+  </div>
+  <div style="text-align:center;">
+    <div style="font-size:9px;color:rgba(255,200,80,0.7);margin-bottom:4px;">&#x27A1; Talk</div>
+    <button id="petImgRightTalkBtn" style="width:100%;padding:7px 0;border-radius:6px;border:0.5px solid rgba(255,200,80,0.3);background:rgba(255,200,80,0.06);color:rgba(255,200,80,0.85);font-size:11px;cursor:pointer;font-family:inherit;">Upload</button>
+  </div>
 </div>
-<button id="petImgClearBtn" style="width:100%;margin-top:7px;padding:5px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.35);background:transparent;color:rgba(220,80,80,0.75);font-size:10px;cursor:pointer;font-family:inherit;">&#x1F5D1; Clear all images</button>
-<input type="file" id="petImgFileInputFwd" accept="image/*" style="display:none;">
-<input type="file" id="petImgFileInputLeft" accept="image/*" style="display:none;">
+<div style="font-size:9px;color:rgba(255,255,255,0.25);margin-bottom:7px;text-align:center;">Left is auto-flipped</div>
+<button id="petImgClearBtn" style="width:100%;padding:5px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.35);background:transparent;color:rgba(220,80,80,0.75);font-size:10px;cursor:pointer;font-family:inherit;">&#x1F5D1; Clear images</button>
 <input type="file" id="petImgFileInputRight" accept="image/*" style="display:none;">
-<input type="file" id="petImgFileInputFwdTalk" accept="image/*" style="display:none;">
-<input type="file" id="petImgFileInputLeftTalk" accept="image/*" style="display:none;">
-<input type="file" id="petImgFileInputRightTalk" accept="image/*" style="display:none;">`;
+<input type="file" id="petImgFileInputRightTalk" accept="image/*" style="display:none;">`
 document.body.appendChild(vip);
 
 let petImgTarget=null;
@@ -2527,17 +2512,12 @@ function wireVipInput(btnId,fileId,dir){
     closePetImagePicker();this.value='';
   });
 }
-wireVipInput('petImgFwdBtn','petImgFileInputFwd','fwd');
-wireVipInput('petImgLeftBtn','petImgFileInputLeft','left');
 wireVipInput('petImgRightBtn','petImgFileInputRight','right');
-wireVipInput('petImgFwdTalkBtn','petImgFileInputFwdTalk','fwdTalk');
-wireVipInput('petImgLeftTalkBtn','petImgFileInputLeftTalk','leftTalk');
 wireVipInput('petImgRightTalkBtn','petImgFileInputRightTalk','rightTalk');
 document.getElementById('petImgClearBtn').addEventListener('click',()=>{
   if(!petImgTarget)return;
   petImgTarget.customImg=null;
-  petImgTarget.customImgLeft=null;petImgTarget.customImgRight=null;petImgTarget.customImgForward=null;
-  petImgTarget.customImgForwardTalk=null;petImgTarget.customImgLeftTalk=null;petImgTarget.customImgRightTalk=null;
+  petImgTarget.customImgRight=null;petImgTarget.customImgRightTalk=null;
   delete viewerImgMap[petImgTarget.username];
   saveViewerImgs();
   closePetImagePicker();
