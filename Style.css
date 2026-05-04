@@ -1544,6 +1544,17 @@ transition: transform 0.3s ease;
     margin: 10px 0 0;
 }
 
+.toontubers a.client-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.toontubers a.client-link:hover {
+    color: var(--color-accent);
+    text-decoration: underline;
+}
+
 
 .package-display {
     display: flex;
@@ -2944,6 +2955,10 @@ input, select, textarea {
         width: 80vw;
     }
 
+    .past-commissions-container img {
+        width: 100%;
+    }
+
     /* Footer */
     .footer-email a {
         font-size: 20px;
@@ -3087,7 +3102,16 @@ input, select, textarea {
 
     .tier-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+        text-align: center;
+    }
+
+    .tier-header h3 {
+        text-align: center;
+    }
+
+    .tier-price-group {
+        justify-content: center;
     }
 
     .tier-header h2 {
@@ -3106,7 +3130,8 @@ input, select, textarea {
 
     .pkg-header {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
+        text-align: center;
     }
 
     .thumbnails {
