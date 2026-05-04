@@ -42,6 +42,7 @@ function updateFormVisibility() {
     var designTypeFields = document.getElementById("Designtype");
     var addOns = document.getElementById("addOns");
     var emoteFields = document.getElementById("emoteFields");
+    var referenceSection = document.getElementById("referenceSection");
     var common = document.getElementById("common");
     var common1 = document.getElementById("common1");
     var common2 = document.getElementById("common2");
@@ -50,6 +51,24 @@ function updateFormVisibility() {
     var uncommon1 = document.getElementById("uncommon1");
     var rare = document.getElementById("rare");
     var rare1 = document.getElementById("rare1");
+
+    // Clear all service highlights
+    document.querySelectorAll(".svc-item").forEach(function(el) {
+        el.classList.remove("svc-active");
+    });
+
+    // Highlight the matching service
+    var svcMap = {
+        "Animation":        "svc-animation",
+        "Illustration":     "svc-illustration",
+        "Toontuber":        "svc-toontuber",
+        "Character Design": "svc-conceptdesign",
+        "Animated Assets":  "svc-animatedassets",
+        "Graphic Assets":   "svc-graphicassets"
+    };
+    if (svcMap[commissionType]) {
+        document.getElementById(svcMap[commissionType]).classList.add("svc-active");
+    }
 
     // Hide all sections initially
     animationIllustrationFields.classList.add("hidden");
@@ -61,6 +80,7 @@ function updateFormVisibility() {
     designTypeFields.classList.add("hidden");
     addOns.classList.add("hidden");
     emoteFields.classList.add("hidden");
+    referenceSection.classList.add("hidden");
 
     // Show relevant fields based on the selected commission type
     if (commissionType === "Animated Assets") {
@@ -122,6 +142,11 @@ function updateFormVisibility() {
         packagetypefields.classList.remove("hidden");
     }
 
+    // Show reference/details section for any valid selection
+    if (commissionType !== "") {
+        referenceSection.classList.remove("hidden");
+    }
+
     // Add event listener for the additional characters checkbox
     var additionalCharactersCheckbox = document.querySelector('input[name="entry.80710002"][value="Additional Characters"]');
     if (additionalCharactersCheckbox) {
@@ -160,8 +185,8 @@ function updateFormVisibility() {
             $('#Designtype').addClass('hidden');
             $('#emoteFields').addClass('hidden');
             $('#AddOns').addClass('hidden');
-          
-            
+            $('#referenceSection').addClass('hidden');
+            $('.svc-item').removeClass('svc-active');
 
             // Display success message for 5 seconds
             $('.success-message').show();
@@ -185,6 +210,8 @@ function updateFormVisibility() {
             $('#Designtype').addClass('hidden');
             $('#emoteFields').addClass('hidden');
             $('#AddOns').addClass('hidden');
+            $('#referenceSection').addClass('hidden');
+            $('.svc-item').removeClass('svc-active');
 
             // Display success message for 5 seconds
             $('.success-message').show();

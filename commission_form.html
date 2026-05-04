@@ -93,21 +93,21 @@
                         <div class="tier-card">
                             <p class="tier-section-label">SERVICES</p>
                             <div class="tier-grid">
-                                <div class="svc-item">
+                                <div class="svc-item" id="svc-toontuber">
                                     <p class="svc-name">TOONTUBER</p>
                                     <img src="Images/Commission/toontuberhearttalk.gif" alt="Toontuber Avatar">
                                     <div class="tier-price-group under-img">
                                         <div class="tier-price-badge">$30 – $100</div>
                                     </div>
                                 </div>
-                                <div class="svc-item">
+                                <div class="svc-item" id="svc-animation">
                                     <p class="svc-name">ANIMATION</p>
                                     <img src="Images/Commission/AnimationFull.gif" alt="Animation">
                                     <div class="tier-price-group under-img">
                                         <div class="tier-price-badge">$50 – $200</div>
                                     </div>
                                 </div>
-                                <div class="svc-item">
+                                <div class="svc-item" id="svc-illustration">
                                     <p class="svc-name">ILLUSTRATIONS</p>
                                     <img src="Images/Commission/Double.png" alt="Illustrations">
                                     <div class="tier-price-group under-img">
@@ -116,23 +116,23 @@
                                 </div>
                             </div>
 
-           
+
                             <div class="tier-grid">
-                                <div class="svc-item">
+                                <div class="svc-item" id="svc-conceptdesign">
                                     <p class="svc-name">CONCEPT DESIGN</p>
                                     <img src="Images/Commission/Yap_Ref.png" alt="Concept Design">
                                     <div class="tier-price-group under-img">
                                         <div class="tier-price-badge">$60 – $80</div>
                                     </div>
                                 </div>
-                                <div class="svc-item">
+                                <div class="svc-item" id="svc-animatedassets">
                                     <p class="svc-name">ANIMATED ASSETS</p>
                                     <img src="Images/Commission/CarrinMoney.gif" alt="Animated Assets">
                                     <div class="tier-price-group under-img">
                                         <div class="tier-price-badge">$30</div>
                                     </div>
                                 </div>
-                                <div class="svc-item">
+                                <div class="svc-item" id="svc-graphicassets">
                                     <p class="svc-name">GRAPHIC ASSETS</p>
                                     <img src="Images/Commission/Profile & Banner.png" alt="Graphic Assets">
                                     <div class="tier-price-group under-img">
@@ -168,9 +168,9 @@
                         <label for="commissionType">Commission Type*</label>
                         <select id="commissionType" name="entry.1880220156" onchange="updateFormVisibility()">
                             <option value="">Select</option>
+                            <option value="Toontuber">Toontuber</option>
                             <option value="Animation">Animation</option>
                             <option value="Illustration">Illustration</option>
-                            <option value="Toontuber">Toontuber</option>
                             <option value="Character Design">Concept Design</option>
                             <option value="Animated Assets">Animated Assets</option>
                             <option value="Graphic Assets">Graphic Assets</option>
@@ -248,7 +248,7 @@
                             <label>Add Ons</label>
                             <label><input type="checkbox" id="ToonaddOnsSet" name="entry.1015173148" value="Set"> "Set" Animation</label>
                             <label><input type="checkbox" id="ToonaddOnsMuteDeafen" name="entry.1015173148" value="Mute/Deafen"> Mute/Deafen</label>
-                           
+                        </div>
                     </div>
                     <div id="toontuberFields" class="hidden">
                         <div class="form-grp">
@@ -278,7 +278,7 @@
 
                     
 
-                    <div id="referenceSection">
+                    <div id="referenceSection" class="hidden">
                         <div class="form-grp">
                             <label for="referenceLink">Link to Reference</label>
                             <input type="url" id="referenceLink" name="entry.459108534">
