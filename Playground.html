@@ -288,24 +288,6 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button class="addFrameBtn" id="addPetFrameIdleBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
           <input type="file" id="petFileIdle" multiple accept="image/*" style="display:none;">
         </div>
-        <div class="costume-row">
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">💬 Talk (idle with speech bubble)</div>
-          <div class="costume-frames" id="petFrameTalk"></div>
-          <button class="addFrameBtn" id="addPetFrameTalkBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
-          <input type="file" id="petFileTalk" multiple accept="image/*" style="display:none;">
-        </div>
-        <div class="costume-row">
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">💬⬅ Talk — left</div>
-          <div class="costume-frames" id="petFrameLeftTalk"></div>
-          <button class="addFrameBtn" id="addPetFrameLeftTalkBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
-          <input type="file" id="petFileLeftTalk" multiple accept="image/*" style="display:none;">
-        </div>
-        <div class="costume-row">
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">💬➡ Talk — right</div>
-          <div class="costume-frames" id="petFrameRightTalk"></div>
-          <button class="addFrameBtn" id="addPetFrameRightTalkBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
-          <input type="file" id="petFileRightTalk" multiple accept="image/*" style="display:none;">
-        </div>
       </div>
       <div class="srow" style="margin-top:8px;"><label>Animation fps</label><input type="number" id="viewerFpsInput" value="12" min="1" max="120"></div>
       <div class="srow"><label>Default viewer size (px)</label><input type="number" id="defaultViewerSize" value="84" min="8" max="300"></div>
@@ -1614,7 +1596,7 @@ document.getElementById('blockImgClearBtn').addEventListener('click',()=>{
 });
 
 
-document.getElementById('settingsBtn').addEventListener('click',()=>{document.getElementById('settingsPanel').classList.add('open');document.getElementById('settingsOverlay').style.display='block';});
+document.getElementById('settingsBtn').addEventListener('click',()=>{document.getElementById('settingsPanel').classList.add('open');document.getElementById('settingsOverlay').style.display='block';renderAllPetFrameDirs();});
 document.getElementById('closeSettings').addEventListener('click',()=>{document.getElementById('settingsPanel').classList.remove('open');document.getElementById('settingsOverlay').style.display='none';});
 document.getElementById('settingsOverlay').addEventListener('click',()=>{document.getElementById('settingsPanel').classList.remove('open');document.getElementById('settingsOverlay').style.display='none';});
 document.querySelectorAll('.stab').forEach(btn=>{
@@ -2532,6 +2514,7 @@ function applyViewerImgToPet(pet){
   if(data.fwd){const img=new Image();img.onload=()=>{pet.customImgForward=img;};img.src=data.fwd;}
   if(data.left){const img=new Image();img.onload=()=>{pet.customImgLeft=img;};img.src=data.left;}
   if(data.right){const img=new Image();img.onload=()=>{pet.customImgRight=img;};img.src=data.right;}
+  if(data.rightTalk){const img=new Image();img.onload=()=>{pet.customImgRightTalk=img;};img.src=data.rightTalk;}
 }
 
 // ── BATTLE ROYALE ─────────────────────────────────────────
@@ -4139,9 +4122,9 @@ document.getElementById('bubbleFontSize').addEventListener('input',function(){bu
 // directional viewer frame wiring
 const LS_PFL='lpp_pfl5',LS_PFR='lpp_pfr5',LS_PFI='lpp_pfi5';
 function savePetFramesDir(){
-  try{localStorage.setItem(LS_PFL,JSON.stringify(petFramesLeft.map(i=>i.src)));}catch(e){}
-  try{localStorage.setItem(LS_PFR,JSON.stringify(petFramesRight.map(i=>i.src)));}catch(e){}
-  try{localStorage.setItem(LS_PFI,JSON.stringify(petFramesIdle.map(i=>i.src)));}catch(e){}
+  try{localStorage.setItem(LS_PFL,JSON.stringify(petFramesLeft.map(i=>i._dataUrl||i.src)));}catch(e){}
+  try{localStorage.setItem(LS_PFR,JSON.stringify(petFramesRight.map(i=>i._dataUrl||i.src)));}catch(e){}
+  try{localStorage.setItem(LS_PFI,JSON.stringify(petFramesIdle.map(i=>i._dataUrl||i.src)));}catch(e){}
 }
 function renderPetFrameDir(arr,listId){
   const list=document.getElementById(listId);if(!list)return;list.innerHTML='';
@@ -4164,7 +4147,7 @@ function wireViewerFrameBtn(btnId,fileId,arr){
     Array.from(this.files).forEach(file=>{
       if(!file.type.startsWith('image/'))return;
       const reader=new FileReader();
-      reader.onload=ev=>{const img=new Image();img.onload=()=>{arr.push(img);savePetFramesDir();renderAllPetFrameDirs();};img.src=ev.target.result;};
+      reader.onload=ev=>{const img=new Image();img._dataUrl=ev.target.result;img.onload=()=>{arr.push(img);savePetFramesDir();renderAllPetFrameDirs();};img.src=ev.target.result;};
       reader.readAsDataURL(file);
     });this.value='';
   });
@@ -4172,13 +4155,10 @@ function wireViewerFrameBtn(btnId,fileId,arr){
 wireViewerFrameBtn('addPetFrameLeftBtn','petFileLeft',petFramesLeft);
 wireViewerFrameBtn('addPetFrameRightBtn','petFileRight',petFramesRight);
 wireViewerFrameBtn('addPetFrameIdleBtn','petFileIdle',petFramesIdle);
-wireViewerFrameBtn('addPetFrameTalkBtn','petFileTalk',petFramesTalk);
-wireViewerFrameBtn('addPetFrameLeftTalkBtn','petFileLeftTalk',petFramesLeftTalk);
-wireViewerFrameBtn('addPetFrameRightTalkBtn','petFileRightTalk',petFramesRightTalk);
 // load saved directional frames
 (function(){
   [[LS_PFL,petFramesLeft],[LS_PFR,petFramesRight],[LS_PFI,petFramesIdle]].forEach(([key,arr])=>{
-    try{const r=localStorage.getItem(key);if(r)JSON.parse(r).forEach(src=>{const img=new Image();img.onload=()=>{arr.push(img);renderAllPetFrameDirs();};img.src=src;});}catch(e){}
+    try{const r=localStorage.getItem(key);if(r)JSON.parse(r).forEach(src=>{const img=new Image();img._dataUrl=src;img.onload=()=>{arr.push(img);renderAllPetFrameDirs();};img.src=src;});}catch(e){}
   });
 })();
 const LS_PET_FRAMES='lpp_petf5';
