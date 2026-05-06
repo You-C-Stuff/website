@@ -2399,11 +2399,16 @@ input, select, textarea {
 
 
 
-.top-content h2,.bottom-gallery .gallery-header h2 {
+.top-content h2,.bottom-gallery .gallery-header h2{
     color: var(--color-text);
     font-weight: normal;
     font-size: 1.5em;
     margin-bottom: 30px;
+}
+.top-content h2 a{
+    color: var(--color-text);
+    font-weight: normal;
+    font-size: 1em;
 }
 
 .centered-content .iframe-container {

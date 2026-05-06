@@ -268,25 +268,13 @@ body.mode-hallway #hallwayContainer{display:block;}
 
       <!-- ── Viewer Costume ── -->
       <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Viewer Costume</div>
-      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">Upload directional frames. Forward is used as fallback if Left/Right not set.</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px;">Upload walking-right frames. Walking left is automatically flipped.</p>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <div class="costume-row">
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">⬅ Walking left</div>
-          <div class="costume-frames" id="petFrameLeft"></div>
-          <button class="addFrameBtn" id="addPetFrameLeftBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
-          <input type="file" id="petFileLeft" multiple accept="image/*" style="display:none;">
-        </div>
-        <div class="costume-row">
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">➡ Walking right</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">➡ Walking right (used for both directions)</div>
           <div class="costume-frames" id="petFrameRight"></div>
           <button class="addFrameBtn" id="addPetFrameRightBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
           <input type="file" id="petFileRight" multiple accept="image/*" style="display:none;">
-        </div>
-        <div class="costume-row">
-          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:6px;">⬤ Idle / forward</div>
-          <div class="costume-frames" id="petFrameIdle"></div>
-          <button class="addFrameBtn" id="addPetFrameIdleBtn" style="margin-top:4px;width:40px;height:40px;">+</button>
-          <input type="file" id="petFileIdle" multiple accept="image/*" style="display:none;">
         </div>
       </div>
       <div class="srow" style="margin-top:8px;"><label>Animation fps</label><input type="number" id="viewerFpsInput" value="12" min="1" max="120"></div>
@@ -461,6 +449,13 @@ body.mode-hallway #hallwayContainer{display:block;}
     </div>
     <div class="stabpanel" id="tab-hotkeys">
       <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Click a field then press any key to rebind.</p>
+      <div class="srow" style="margin-bottom:14px;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.7);">
+          <input type="checkbox" id="keepFocusToggle" style="accent-color:#7F77DD;">
+          Keep focus for hotkeys (recommended for OBS / overlay use)
+        </label>
+        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;padding-left:20px;">When enabled, the page automatically recaptures keyboard focus so hotkeys work outside the browser.</div>
+      </div>
       <table id="hotkeyList"><tr><th>Action</th><th>Key</th></tr></table>
     </div>
 
@@ -896,6 +891,21 @@ const LS_C='lpp_c5',LS_A='lpp_a5',LS_H='lpp_h5',LS_HK='lpp_hk5',LS_PREFS='lpp_pr
 const LS_SND='lpp_snd5',LS_VSND='lpp_vsnd5',LS_RSND='lpp_rsnd5';
 const LS_BSND='lpp_bsnd5',LS_HSND='lpp_hsnd5',LS_KOSND='lpp_kosnd5',LS_WINSND='lpp_winsnd5',LS_STOMPSND='lpp_stompsnd5',LS_DVDSND='lpp_dvdsnd5';
 
+// ── IndexedDB image store (replaces localStorage for large image blobs) ──
+let _idb=null;
+function _openIDB(){
+  if(_idb)return Promise.resolve(_idb);
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open('lpp_imgs',1);
+    req.onupgradeneeded=e=>e.target.result.createObjectStore('imgs');
+    req.onsuccess=e=>{_idb=e.target.result;res(_idb);};
+    req.onerror=rej;
+  });
+}
+function idbSet(key,val){return _openIDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('imgs','readwrite');tx.objectStore('imgs').put(val,key);tx.oncomplete=res;tx.onerror=rej;}));}
+function idbGet(key){return _openIDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('imgs','readonly');const r=tx.objectStore('imgs').get(key);r.onsuccess=()=>res(r.result);r.onerror=rej;}));}
+// ── End IndexedDB ──
+
 // Volume uses a square curve: slider value s ∈ [0,1] → actual vol = s² * 0.04
 // So actual vol 0.02 → s = sqrt(0.02/0.04) = sqrt(0.5) ≈ 0.707 (midpoint of slider)
 function sliderToVol(s){ return s*s*0.04; }
@@ -904,8 +914,11 @@ function volToSlider(v){ return Math.sqrt(Math.max(0,v)/0.04); }
 function saveHotkeys(){
   try{localStorage.setItem(LS_HK,JSON.stringify(hotkeys));}catch(e){}
 }
+let keepFocusForHotkeys=false;
+window.addEventListener('blur',()=>{if(keepFocusForHotkeys)setTimeout(()=>window.focus(),80);});
+
 function savePrefs(){
-  try{localStorage.setItem(LS_PREFS,JSON.stringify({bgColor,fps,hoopHeightPct,soundVol,soundThresh}));}catch(e){}
+  try{localStorage.setItem(LS_PREFS,JSON.stringify({bgColor,fps,hoopHeightPct,soundVol,soundThresh,keepFocusForHotkeys}));}catch(e){}
 }
 function saveAudioBuffer(key,buf){
   if(!buf){localStorage.removeItem(key);return;}
@@ -969,6 +982,7 @@ function loadAll(){
       if(p.hoopHeightPct!=null){hoopHeightPct=p.hoopHeightPct;document.getElementById('hoopHeightSlider').value=hoopHeightPct;document.getElementById('hoopHeightVal').textContent=hoopHeightPct+'%';}
       if(p.soundVol!=null){soundVol=p.soundVol;document.getElementById('soundVol').value=volToSlider(soundVol);}
       if(p.soundThresh!=null){soundThresh=p.soundThresh;document.getElementById('soundThresh').value=soundThresh;}
+      if(p.keepFocusForHotkeys!=null){keepFocusForHotkeys=p.keepFocusForHotkeys;document.getElementById('keepFocusToggle').checked=keepFocusForHotkeys;}
     }
   }catch(e){}
   try{
@@ -1607,6 +1621,7 @@ document.querySelectorAll('.stab').forEach(btn=>{
   });
 });
 document.getElementById('bgColor').addEventListener('input',function(){bgColor=this.value;savePrefs();});
+document.getElementById('keepFocusToggle').addEventListener('change',function(){keepFocusForHotkeys=this.checked;savePrefs();});
 document.getElementById('fps').addEventListener('input',function(){fps=Math.max(1,parseInt(this.value)||12);frameTime=1000/fps;savePrefs();});
 document.getElementById('viewerFpsInput').addEventListener('input',function(){viewerFps=Math.max(1,parseInt(this.value)||12);viewerFrameTime=1000/viewerFps;});
 document.getElementById('defaultPetSize').addEventListener('input',function(){
@@ -1859,14 +1874,6 @@ let petFramesLeft=[],petFramesRight=[],petFramesIdle=[];
 let petFramesTalk=[];
 let petFramesLeftTalk=[], petFramesRightTalk=[];
 function getPetFramesForDir(fl,mov,talking){
-  if(!mov){
-    if(talking&&petFramesTalk.length)return petFramesTalk;
-    if(petFramesIdle.length)return petFramesIdle;if(petFrames.length)return petFrames;return[];
-  }
-  if(fl){
-    if(talking&&petFramesLeftTalk.length)return petFramesLeftTalk;
-    if(petFramesLeft.length)return petFramesLeft;if(petFrames.length)return petFrames;return[];
-  }
   if(talking&&petFramesRightTalk.length)return petFramesRightTalk;
   if(petFramesRight.length)return petFramesRight;if(petFrames.length)return petFrames;return[];
 } // loaded images for walking animation
@@ -1994,9 +2001,8 @@ class ChatPet{
       if(this._talkStatePrev!==this._talking){this.frame=0;this._talkStatePrev=this._talking;}
       const img=frames[this.frame%frames.length];
       ctx2.save();
-      // flip when facing left — always mirror (custom images are right-facing only)
-      const usingCustom=this.customImgRight||this.customImgRightTalk||this.customImg;
-      if(this.facingLeft&&(usingCustom||(!hasDir))){ctx2.translate(this.w,0);ctx2.scale(-1,1);}
+      // flip when facing left — all viewer costume frames are right-facing
+      if(this.facingLeft){ctx2.translate(this.w,0);ctx2.scale(-1,1);}
       // draw at full height, maintain aspect ratio, centre horizontally
       if(img.naturalWidth&&img.naturalHeight){
         const scale=this.h/img.naturalHeight;
@@ -2392,8 +2398,15 @@ let bubbleFontSize=11;
 // ── per-viewer image picker ────────────────────────────────
 const LS_VIEWER_IMGS='lpp_vi5';
 let viewerImgMap={}; // username → data URL
-(function(){try{const r=localStorage.getItem(LS_VIEWER_IMGS);if(r)viewerImgMap=JSON.parse(r);}catch(e){}})();
-function saveViewerImgs(){try{localStorage.setItem(LS_VIEWER_IMGS,JSON.stringify(viewerImgMap));}catch(e){console.warn('viewer img storage full');}}
+(function(){
+  idbGet(LS_VIEWER_IMGS).then(r=>{
+    if(!r)return;
+    try{viewerImgMap=JSON.parse(r);}catch(e){return;}
+    // retroactively apply to any pets already on screen
+    pets.forEach(p=>{if(p.username)applyViewerImgToPet(p);});
+  }).catch(()=>{});
+})();
+function saveViewerImgs(){idbSet(LS_VIEWER_IMGS,JSON.stringify(viewerImgMap)).catch(()=>{});}
 
 // Inject picker popup HTML
 const vip=document.createElement('div');
@@ -4122,9 +4135,7 @@ document.getElementById('bubbleFontSize').addEventListener('input',function(){bu
 // directional viewer frame wiring
 const LS_PFL='lpp_pfl5',LS_PFR='lpp_pfr5',LS_PFI='lpp_pfi5';
 function savePetFramesDir(){
-  try{localStorage.setItem(LS_PFL,JSON.stringify(petFramesLeft.map(i=>i._dataUrl||i.src)));}catch(e){}
-  try{localStorage.setItem(LS_PFR,JSON.stringify(petFramesRight.map(i=>i._dataUrl||i.src)));}catch(e){}
-  try{localStorage.setItem(LS_PFI,JSON.stringify(petFramesIdle.map(i=>i._dataUrl||i.src)));}catch(e){}
+  idbSet(LS_PFR,JSON.stringify(petFramesRight.map(i=>i._dataUrl||i.src))).catch(()=>{});
 }
 function renderPetFrameDir(arr,listId){
   const list=document.getElementById(listId);if(!list)return;list.innerHTML='';
@@ -4137,9 +4148,7 @@ function renderPetFrameDir(arr,listId){
   });
 }
 function renderAllPetFrameDirs(){
-  renderPetFrameDir(petFramesLeft,'petFrameLeft');
   renderPetFrameDir(petFramesRight,'petFrameRight');
-  renderPetFrameDir(petFramesIdle,'petFrameIdle');
 }
 function wireViewerFrameBtn(btnId,fileId,arr){
   document.getElementById(btnId).addEventListener('click',()=>document.getElementById(fileId).click());
@@ -4152,14 +4161,10 @@ function wireViewerFrameBtn(btnId,fileId,arr){
     });this.value='';
   });
 }
-wireViewerFrameBtn('addPetFrameLeftBtn','petFileLeft',petFramesLeft);
 wireViewerFrameBtn('addPetFrameRightBtn','petFileRight',petFramesRight);
-wireViewerFrameBtn('addPetFrameIdleBtn','petFileIdle',petFramesIdle);
 // load saved directional frames
 (function(){
-  [[LS_PFL,petFramesLeft],[LS_PFR,petFramesRight],[LS_PFI,petFramesIdle]].forEach(([key,arr])=>{
-    try{const r=localStorage.getItem(key);if(r)JSON.parse(r).forEach(src=>{const img=new Image();img._dataUrl=src;img.onload=()=>{arr.push(img);renderAllPetFrameDirs();};img.src=src;});}catch(e){}
-  });
+  idbGet(LS_PFR).then(r=>{if(!r)return;try{JSON.parse(r).forEach(src=>{const img=new Image();img._dataUrl=src;img.onload=()=>{petFramesRight.push(img);renderAllPetFrameDirs();};img.src=src;});}catch(e){}}).catch(()=>{});
 })();
 const LS_PET_FRAMES='lpp_petf5';
 function savePetFrames(){
