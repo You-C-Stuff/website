@@ -77,72 +77,78 @@
         <div class="form-content">
             <h1>COMMISSION FORM</h1>
             <h3>You can send a commission request by filling out this form. Upon receiving the email, I will reach out to you in 1-2 business days.</h3>
-            <h3>Alternatively, you can commission me through  via <a href="https://discord.gg/vaeY5Np3yb" target="_blank"> Yapcreations</a> or on <a href="https://vgen.co/yapcreations" target="_blank"> Vgen</a>.</h3>
-   <!--  <h4>or you can also commission me on:</h4>
-                 <div class="buttons">
-                    <div class="bottom-button-comms button-container">
-                        <a href="https://vgen.co/yapcreations">  <button class="white-button">Vgen</button></a>
-                    </div>
-                    <div class="bottom-button-comms button-container">
-                        <a href="https://ko-fi.com/yapcreations">  <button class="white-button">Kofi</button></a>
-                    </div>
-                    </div>-->
+            <h3>Alternatively, you can commission me through Discord via <a href="https://discord.gg/vaeY5Np3yb" target="_blank"> Yapcreations</a> or on <a href="https://vgen.co/yapcreations" target="_blank"> Vgen</a>.</h3>
+  
             <div class="content-wrapper">
                     <div class="pricing-box">
                         <div class="tier-card">
-                            <p class="tier-section-label">SERVICES</p>
-                            <div class="tier-grid">
-                                <div class="svc-item" id="svc-toontuber">
-                                    <p class="svc-name">TOONTUBER</p>
-                                    <img src="Images/Commission/toontuberhearttalk.gif" alt="Toontuber Avatar">
-                                    <div class="tier-price-group under-img">
-                                        <div class="tier-price-badge">$30 – $100+</div>
+                            <p class="tier-section-label" id="serviceHeader">CHOOSE A SERVICE</p>
+                            <button type="button" id="serviceBackBtn" class="hidden white-button" onclick="resetServiceSelection()">&#8592; Back</button>
+
+                            <!-- Grid view (default) -->
+                            <div id="svcGrid">
+                                <div class="tier-grid">
+                                    <div class="svc-item" id="svc-toontuber" onclick="selectService('svc-toontuber','Toontuber')">
+                                        <p class="svc-name">TOONTUBER</p>
+                                        <img src="Images/Commission/toontuberhearttalk.gif" alt="Toontuber Avatar">
+                                        <div class="tier-price-group under-img">
+                                            <div class="tier-price-badge">$30 – $100+</div>
+                                        </div>
+                                    </div>
+                                    <div class="svc-item" id="svc-animation" onclick="selectService('svc-animation','Animation')">
+                                        <p class="svc-name">ANIMATION</p>
+                                        <img src="Images/Commission/AnimationFull.gif" alt="Animation">
+                                        <div class="tier-price-group under-img">
+                                            <div class="tier-price-badge">$60 – $200+</div>
+                                        </div>
+                                    </div>
+                                    <div class="svc-item" id="svc-illustration" onclick="selectService('svc-illustration','Illustration')">
+                                        <p class="svc-name">ILLUSTRATIONS</p>
+                                        <img src="Images/Commission/Double.png" alt="Illustrations">
+                                        <div class="tier-price-group under-img">
+                                            <div class="tier-price-badge">$20 – $80+</div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="svc-item" id="svc-animation">
-                                    <p class="svc-name">ANIMATION</p>
-                                    <img src="Images/Commission/AnimationFull.gif" alt="Animation">
-                                    <div class="tier-price-group under-img">
-                                        <div class="tier-price-badge">$60 – $200+</div>
+                                <div class="tier-grid">
+                                      <div class="svc-item" id="svc-animatedassets" onclick="selectService('svc-animatedassets','Animated Assets')">
+                                        <p class="svc-name">ANIMATED ASSETS</p>
+                                        <img src="Images/Commission/CarrinMoney.gif" alt="Animated Assets">
+                                        <div class="tier-price-group under-img">
+                                            <div class="tier-price-badge">$30+</div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="svc-item" id="svc-illustration">
-                                    <p class="svc-name">ILLUSTRATIONS</p>
-                                    <img src="Images/Commission/Double.png" alt="Illustrations">
-                                    <div class="tier-price-group under-img">
-                                        <div class="tier-price-badge">$20 – $80+</div>
+                                 <div class="svc-item" id="svc-graphicassets" onclick="selectService('svc-graphicassets','Graphic Assets')">
+                                        <p class="svc-name">GRAPHIC ASSETS</p>
+                                        <img src="Images/Commission/Profile & Banner.png" alt="Graphic Assets">
+                                        <div class="tier-price-group under-img">
+                                            <div class="tier-price-badge">$20+</div>
+                                        </div>
+                                    </div>
+                                  
+                                    
+                                       <div class="svc-item" id="svc-package" onclick="selectService('svc-package','Package')">
+                                        <p class="svc-name">PACKAGE</p>
+                                        <img src="Images/Commission/Fulldeal.png" alt="Package">
+                                        <div class="tier-price-group under-img">
+                                            <div class="tier-price-badge">$350+</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-
-                            <div class="tier-grid">
-                                <div class="svc-item" id="svc-conceptdesign">
-                                    <p class="svc-name">CONCEPT DESIGN</p>
-                                    <img src="Images/Commission/Yap_Ref.png" alt="Concept Design">
-                                    <div class="tier-price-group under-img">
-                                        <div class="tier-price-badge">$60+</div>
-                                    </div>
-                                </div>
-                                <div class="svc-item" id="svc-animatedassets">
-                                    <p class="svc-name">ANIMATED ASSETS</p>
-                                    <img src="Images/Commission/CarrinMoney.gif" alt="Animated Assets">
-                                    <div class="tier-price-group under-img">
-                                        <div class="tier-price-badge">$30+</div>
-                                    </div>
-                                </div>
-                                <div class="svc-item" id="svc-graphicassets">
-                                    <p class="svc-name">GRAPHIC ASSETS</p>
-                                    <img src="Images/Commission/Profile & Banner.png" alt="Graphic Assets">
-                                    <div class="tier-price-group under-img">
-                                        <div class="tier-price-badge">$20+</div>
-                                    </div>
+                            <!-- Single-service view (shown after clicking a card) -->
+                            <div id="svcSelected" class="hidden">
+                                <div id="svcSelectedCard"></div>
+                                <div class="price-estimate">
+                                    <p class="price-display">Estimated: <span id="priceValue">—</span></p>
+                                    <p class="price-note">* Note that this is an estimate. Final price may vary.</p>
                                 </div>
                             </div>
                         </div>
 
                     </div>
-            <div class="form-box">
+            <div class="form-box" id="formBox">
                 <form action="https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse" method="POST" id="form" onsubmit="return postToGoogleform();" >
                     <div class="form-grp form-row">
                         <div>
@@ -161,16 +167,16 @@
                     <div class="form-grp">
                         <label>Type of Use*</label>
                         <label><input type="radio" id="typeofUse-personal" name="entry.2121224666" value="Personal" required> Personal </label>
-                        <label><input type="radio" id="typeofUse-commercial" name="entry.2121224666" value="Commercial"> Commercial [+100% price] </label>
+                        <label><input type="radio" id="typeofUse-monetised" name="entry.2121224666" value="Monetised"> Monetised </label>
+                        <label><input type="radio" id="typeofUse-commercial" name="entry.2121224666" value="Commercial"> Commercial </label>
                     </div>
                     <div class="form-grp">
                         <label for="commissionType">Commission Type*</label>
-                        <select id="commissionType" name="entry.1880220156" onchange="updateFormVisibility()">
+                        <select id="commissionType" name="entry.1880220156" onchange="syncServiceFromDropdown()">
                             <option value="">Select</option>
                             <option value="Toontuber">Toontuber</option>
                             <option value="Animation">Animation</option>
                             <option value="Illustration">Illustration</option>
-                            <option value="Character Design">Concept Design</option>
                             <option value="Animated Assets">Animated Assets</option>
                             <option value="Graphic Assets">Graphic Assets</option>
                             <option value="Package">Package</option>
@@ -181,15 +187,6 @@
                             <label for="levelOfDetail">Type*</label>
                             <select id="levelOfDetail" name="entry.92868536" onchange="updateFormVisibility()">
                                 <option value="">Select</option>
-                                <option value="Sketch" id="common">Sketch</option>
-                                <option value="Flat Colours"  id="common1">Flat Colours</option>
-                            
-                                <option value="Shaded"  id="common2">Shaded</option>
-                                <option value="Chibi"  id="common3">Chibi</option>
-                                <option value="Emote"  id="uncommon">Emote</option>
-                                <option value="Profile Pic / Banner"  id="uncommon1">Profile Pic / Banner</option>
-                                <option value="Banner"  id="rare">Banner</option>
-                                <option value="Stream Overlay"  id="rare1">Stream Assets</option>
                             </select>
                         </div>
                         <div id="addOns" class="form-grp hidden">
@@ -219,16 +216,7 @@
                             </select>
                         </div>
                     </div>
-                    <div id="Designtype" class="hidden">
-                        <div class="form-grp">
-                            <label for="DesignPlan">Type*</label>
-                            <select id="Design" name="entry.770066938">
-                                <option value="">Select</option>
-                                <option value="Reference Sheet">Character Design</option>
-                                <option value="Turnaround">Reference Sheet</option>
-                            </select>
-                        </div>
-                    </div>
+              
 
                     <div id="packagetypefields" class="hidden">
                         <div class="form-grp">
@@ -287,7 +275,7 @@
                             <textarea id="additionalDetails" name="entry.1248305771" rows="4"></textarea>
                         </div>
                     </div>
-                    <div class="form-grp submit-button">
+                    <div class="form-grp submit-button hidden" id="submitSection">
                         <button type="submit">Submit</button>
                     </div>
                     <div class="success-message">Commission request sent!</div>

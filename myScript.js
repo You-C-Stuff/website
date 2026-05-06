@@ -4,6 +4,169 @@ document.addEventListener('contextmenu', function (e) {
 });
 /*-------------------------------END IMAGE PROTECTION--------------------------------*/
 
+/*-------------------------------COMMISSION PRICE CONFIG--------------------------------*/
+// Edit these values to change pricing. Keys MUST match the dropdown option values exactly.
+const COMMISSION_PRICES = {
+    Toontuber: {
+        types:  { 'Simple': 30, 'Half Body': 80, 'Full Body': 100 },
+        addOns: { 'Set': 20, 'Mute/Deafen': 20 },
+    },
+    Animation: {
+        types:  { 'Sketch': 60, 'Flat Colours': 100, 'Shaded': 200 },
+        addOns: { 'Background': 20 },
+        // Additional Characters: multiplier applied to base type price (1.0 = +100%)
+        additionalChars: { '1': 1.0, '2': 2.0, '3': 3.0, '4 or more': 4.0 },
+    },
+    Illustration: {
+        types:  { 'Sketch': 20, 'Flat Colours': 40, 'Shaded': 80 },
+        addOns: { 'Background': 20 },
+        // Additional Characters: multiplier applied to base type price (0.8 = +80%)
+        additionalChars: { '1': 0.8, '2': 1.6, '3': 2.4, '4 or more': 3.2 },
+    },
+    'Character Design': {
+        types:  { 'Reference Sheet': 60, 'Turnaround': 80 },
+    },
+    'Animated Assets': {
+        types:  { 'Profile Pic': 30, 'Stream Assets': 20 },
+        // Emote bundle pricing — edit these values for each quantity
+        emotes: { '1': 30, '2': 60, '3': 90, '4 or more': 100 },
+    },
+    'Graphic Assets': {
+        types:  { 'Character Design': 60, 'Reference Sheet': 80, 'Profile Pic': 20, 'Banner': 30, 'Stream Assets': 20 },
+        // Emote bundle pricing — edit these values for each quantity
+        emotes: { '1': 20, '2': 40, '3': 60, '4 or more': 70 },
+    },
+    Package: {
+        types:  { 'Minimum': 350, 'Lite': 500, 'Pro': 1000, 'Full': 2000 },
+    },
+};
+/*-------------------------------END COMMISSION PRICE CONFIG--------------------------------*/
+
+/*-------------------------------COMMISSION FORM LOGIC--------------------------------*/
+var SVC_MAP = {
+    'Toontuber':       'svc-toontuber',
+    'Animation':       'svc-animation',
+    'Illustration':    'svc-illustration',
+    'Animated Assets': 'svc-animatedassets',
+    'Graphic Assets':  'svc-graphicassets',
+    'Package':         'svc-package'
+};
+
+function syncServiceFromDropdown() {
+    var commissionType = document.getElementById('commissionType').value;
+    var svcId = SVC_MAP[commissionType];
+
+    if (svcId) {
+        var card = document.getElementById(svcId);
+        var clone = card.cloneNode(true);
+        clone.removeAttribute('onclick');
+        clone.classList.add('svc-active');
+
+        var container = document.getElementById('svcSelectedCard');
+        container.innerHTML = '';
+        container.appendChild(clone);
+
+        document.getElementById('svcGrid').classList.add('hidden');
+        document.getElementById('svcSelected').classList.remove('hidden');
+        document.getElementById('serviceHeader').classList.add('hidden');
+        document.getElementById('serviceBackBtn').classList.remove('hidden');
+    } else {
+        document.getElementById('svcGrid').classList.remove('hidden');
+        document.getElementById('svcSelected').classList.add('hidden');
+        document.getElementById('serviceHeader').classList.remove('hidden');
+        document.getElementById('serviceBackBtn').classList.add('hidden');
+        document.getElementById('priceValue').textContent = '—';
+    }
+
+    updateFormVisibility();
+}
+
+function selectService(svcId, commissionValue) {
+    document.getElementById('commissionType').value = commissionValue;
+    syncServiceFromDropdown();
+}
+
+function resetServiceSelection() {
+    document.getElementById('commissionType').value = '';
+    syncServiceFromDropdown();
+}
+
+function updatePriceEstimate() {
+    var priceEl = document.getElementById('priceValue');
+    if (!priceEl) return;
+
+    var commissionType = document.getElementById('commissionType').value;
+    if (!commissionType) { priceEl.textContent = '—'; return; }
+
+    var config = COMMISSION_PRICES[commissionType];
+    if (!config || !config.types) { priceEl.textContent = '—'; return; }
+
+    var typeEl;
+    if (commissionType === 'Toontuber') typeEl = document.getElementById('Type');
+    else if (commissionType === 'Package') typeEl = document.getElementById('packageType');
+    else typeEl = document.getElementById('levelOfDetail');
+
+    var typeVal = typeEl ? typeEl.value : '';
+    if (!typeVal) { priceEl.textContent = '—'; return; }
+
+    var basePrice, total, isPlusPrice = false;
+
+    // Emote bundle pricing (overrides types lookup when emotes config exists)
+    if (typeVal === 'Emote' && config.emotes) {
+        var emoteEl = document.getElementById('Emotes');
+        var emoteQty = emoteEl ? emoteEl.value : '';
+        if (!emoteQty || config.emotes[emoteQty] === undefined) { priceEl.textContent = '—'; return; }
+        basePrice = config.emotes[emoteQty];
+        if (emoteQty === '4 or more') isPlusPrice = true;
+    } else {
+        if (config.types[typeVal] === undefined) { priceEl.textContent = '—'; return; }
+        basePrice = config.types[typeVal];
+    }
+    total = basePrice;
+
+    // Add-ons
+    if (config.addOns) {
+        var addOnName = commissionType === 'Toontuber' ? 'entry.1015173148' : 'entry.80710002';
+        var incomplete = false;
+        document.querySelectorAll('input[name="' + addOnName + '"]:checked').forEach(function(cb) {
+            if (cb.value === 'Additional Characters') {
+                var qtyEl = document.getElementById('additionalCharacters');
+                var qty = qtyEl ? qtyEl.value : '';
+                if (!qty) { incomplete = true; return; }
+                if (config.additionalChars && config.additionalChars[qty] !== undefined) {
+                    total += basePrice * config.additionalChars[qty];
+                    if (qty === '4 or more') isPlusPrice = true;
+                }
+            } else {
+                total += config.addOns[cb.value] || 0;
+            }
+        });
+        if (incomplete) { priceEl.textContent = '—'; return; }
+    }
+
+    // Type of use multiplier
+    var typeOfUse = document.querySelector('input[name="entry.2121224666"]:checked');
+    if (typeOfUse) {
+        if (typeOfUse.value === 'Commercial') total *= 2;
+        else if (typeOfUse.value === 'Monetised') total *= 1.3;
+    }
+
+    priceEl.textContent = '$' + total + (isPlusPrice ? '+' : '');
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    var form = document.getElementById('form');
+    if (form) form.addEventListener('change', updatePriceEstimate);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.id === 'addOnsAdditionalCharacters') {
+            var field = document.getElementById('additionalCharactersField');
+            if (field) field.classList.toggle('hidden', !e.target.checked);
+        }
+    });
+});
+/*-------------------------------END COMMISSION FORM LOGIC--------------------------------*/
+
 /*-------------------------------FORM--------------------------------*/
 
 function postToGoogle() {
@@ -35,198 +198,96 @@ function postToGoogle() {
     return false; // Ensure that the form submission is prevented
 }
 
-function updateFormVisibility() {
-    var commissionType = document.getElementById("commissionType").value;
-    var levelOfDetail = document.getElementById("levelOfDetail").value;
-    var animationIllustrationFields = document.getElementById("animationIllustrationFields");
-    var toontuberFields = document.getElementById("toontuberFields");
-    var toontuberAddOns = document.getElementById("toontuberAddOns");
-    var additionalCharactersField = document.getElementById("additionalCharactersField");
-    var packageplanfields = document.getElementById("packageplanfields");
-    var packagetypefields = document.getElementById("packagetypefields");
-    var designTypeFields = document.getElementById("Designtype");
-    var addOns = document.getElementById("addOns");
-    var emoteFields = document.getElementById("emoteFields");
-    var referenceSection = document.getElementById("referenceSection");
-    var common = document.getElementById("common");
-    var common1 = document.getElementById("common1");
-    var common2 = document.getElementById("common2");
-    var common3 = document.getElementById("common3");
-    var uncommon = document.getElementById("uncommon");
-    var uncommon1 = document.getElementById("uncommon1");
-    var rare = document.getElementById("rare");
-    var rare1 = document.getElementById("rare1");
+var LEVEL_OPTIONS = {
+    'Animation':       ['Sketch', 'Flat Colours', 'Shaded'],
+    'Illustration':    ['Sketch', 'Flat Colours', 'Shaded'],
+    'Graphic Assets':  ['Character Design', 'Reference Sheet', 'Profile Pic', 'Banner', 'Emote', 'Stream Assets'],
+    'Animated Assets': ['Profile Pic', 'Emote', 'Stream Assets']
+};
 
-    // Clear all service highlights
-    document.querySelectorAll(".svc-item").forEach(function(el) {
-        el.classList.remove("svc-active");
+function setLevelOfDetailOptions(commissionType) {
+    var select = document.getElementById('levelOfDetail');
+    var prevVal = select.value;
+    var opts = LEVEL_OPTIONS[commissionType] || [];
+    select.innerHTML = '<option value="">Select</option>';
+    opts.forEach(function(val) {
+        var opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = val;
+        select.appendChild(opt);
+    });
+    if (opts.indexOf(prevVal) !== -1) select.value = prevVal;
+}
+
+function updateFormVisibility() {
+    var commissionType = document.getElementById('commissionType').value;
+
+    ['animationIllustrationFields', 'toontuberFields', 'toontuberAddOns',
+     'additionalCharactersField', 'packageplanfields', 'packagetypefields',
+     'addOns', 'emoteFields', 'referenceSection', 'submitSection'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
     });
 
-    // Highlight the matching service
-    var svcMap = {
-        "Animation":        "svc-animation",
-        "Illustration":     "svc-illustration",
-        "Toontuber":        "svc-toontuber",
-        "Character Design": "svc-conceptdesign",
-        "Animated Assets":  "svc-animatedassets",
-        "Graphic Assets":   "svc-graphicassets"
-    };
-    if (svcMap[commissionType]) {
-        document.getElementById(svcMap[commissionType]).classList.add("svc-active");
-    }
+    if (commissionType === 'Toontuber') {
+        document.getElementById('packageplanfields').classList.remove('hidden');
+        document.getElementById('toontuberAddOns').classList.remove('hidden');
 
-    // Hide all sections initially
-    animationIllustrationFields.classList.add("hidden");
-    toontuberFields.classList.add("hidden");
-    toontuberAddOns.classList.add("hidden");
-    additionalCharactersField.classList.add("hidden");
-    packageplanfields.classList.add("hidden");
-    packagetypefields.classList.add("hidden");
-    designTypeFields.classList.add("hidden");
-    addOns.classList.add("hidden");
-    emoteFields.classList.add("hidden");
-    referenceSection.classList.add("hidden");
-
-    // Show relevant fields based on the selected commission type
-    if (commissionType === "Animated Assets") {
-        animationIllustrationFields.classList.remove("hidden");
-
-        common.classList.add("hidden");
-        common1.classList.add("hidden");
-        common2.classList.add("hidden");
-        common3.classList.add("hidden");
-        uncommon.classList.remove("hidden");
-        uncommon1.classList.remove("hidden");
-        rare1.classList.add("hidden");
-        rare.classList.add("hidden");
-
-        // Manage visibility based on level of detail
-        if (levelOfDetail === "Emote" ) {
-            emoteFields.classList.remove("hidden");
+    } else if (commissionType === 'Animation' || commissionType === 'Illustration') {
+        setLevelOfDetailOptions(commissionType);
+        document.getElementById('animationIllustrationFields').classList.remove('hidden');
+        document.getElementById('addOns').classList.remove('hidden');
+        var addCharsBox = document.getElementById('addOnsAdditionalCharacters');
+        if (addCharsBox && addCharsBox.checked) {
+            document.getElementById('additionalCharactersField').classList.remove('hidden');
         }
 
-    } else if (commissionType === "Graphic Assets") {
-        animationIllustrationFields.classList.remove("hidden");
-
-        common.classList.add("hidden");
-        common1.classList.add("hidden");
-        common2.classList.add("hidden");
-        common3.classList.add("hidden");
-        uncommon.classList.remove("hidden");
-        uncommon1.classList.remove("hidden");
-        rare1.classList.remove("hidden");
-        rare.classList.remove("hidden");
-
-        // Manage visibility based on level of detail
-        if (levelOfDetail === "Emote" ) {
-            emoteFields.classList.remove("hidden");
+    } else if (commissionType === 'Graphic Assets') {
+        setLevelOfDetailOptions(commissionType);
+        document.getElementById('animationIllustrationFields').classList.remove('hidden');
+        if (document.getElementById('levelOfDetail').value === 'Emote') {
+            document.getElementById('emoteFields').classList.remove('hidden');
         }
 
-    } else if (commissionType === "Toontuber") {
-        toontuberFields.classList.remove("hidden");
-        toontuberAddOns.classList.remove("hidden");
-        packageplanfields.classList.remove("hidden");
+    } else if (commissionType === 'Animated Assets') {
+        setLevelOfDetailOptions(commissionType);
+        document.getElementById('animationIllustrationFields').classList.remove('hidden');
+        if (document.getElementById('levelOfDetail').value === 'Emote') {
+            document.getElementById('emoteFields').classList.remove('hidden');
+        }
 
-    } else if (commissionType === "Character Design") {
-        designTypeFields.classList.remove("hidden");
-
-    } else if (commissionType === "Animation" || commissionType === "Illustration") {
-        animationIllustrationFields.classList.remove("hidden");
-
-        addOns.classList.remove("hidden");
-        common.classList.remove("hidden");
-        common1.classList.remove("hidden");
-        common2.classList.remove("hidden");
-        common3.classList.remove("hidden");
-        uncommon.classList.add("hidden");
-        uncommon1.classList.add("hidden");
-        rare1.classList.add("hidden");
-        rare.classList.add("hidden");
-
-    } else if (commissionType === "Package") {
-        packagetypefields.classList.remove("hidden");
+    } else if (commissionType === 'Package') {
+        document.getElementById('packagetypefields').classList.remove('hidden');
     }
 
-    // Show reference/details section for any valid selection
-    if (commissionType !== "") {
-        referenceSection.classList.remove("hidden");
+    if (commissionType !== '') {
+        document.getElementById('referenceSection').classList.remove('hidden');
+        document.getElementById('submitSection').classList.remove('hidden');
     }
 
-    // Add event listener for the additional characters checkbox
-    var additionalCharactersCheckbox = document.querySelector('input[name="entry.80710002"][value="Additional Characters"]');
-    if (additionalCharactersCheckbox) {
-        additionalCharactersCheckbox.addEventListener('change', function() {
-            if (this.checked) {
-                additionalCharactersField.classList.remove("hidden");
-            } else {
-                additionalCharactersField.classList.add("hidden");
-            }
-        });
-    }
+    updatePriceEstimate();
 }
 
     function postToGoogleform() {
-        // Collect form data
-        var formData = new FormData(document.getElementById("form"));
+        var formData = new FormData(document.getElementById('form'));
 
-        // Asynchronous request to submit form data
-        fetch("https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse", {
-            method: "POST",
+        function resetAll() {
+            $('#form')[0].reset();
+            resetServiceSelection();
+            $('.success-message').show();
+            setTimeout(function() { $('.success-message').hide(); }, 5000);
+        }
+
+        fetch('https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse', {
+            method: 'POST',
             body: formData
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Network response was not ok.");
-            }
-            
-            // Reset form elements except for specific fields
-            $('#commissionType').val(''); // Reset commission type to default
-            $('#animationIllustrationFields').addClass('hidden');
-            $('#toontuberFields').addClass('hidden');
-            $('#referenceLink').addClass('hidden');
-            $('#additionalCharactersField').addClass('hidden');
-            $('#packageplanfields').addClass('hidden');
-            $('#toontuberAddOns').addClass('hidden');
-            $('#Designtype').addClass('hidden');
-            $('#emoteFields').addClass('hidden');
-            $('#AddOns').addClass('hidden');
-            $('#referenceSection').addClass('hidden');
-            $('.svc-item').removeClass('svc-active');
-
-            // Display success message for 5 seconds
-            $('.success-message').show();
-            $('#form')[0].reset(); // Reset form using plain JavaScript for non-input elements
-            setTimeout(function () {
-                $('.success-message').hide();
-            }, 5000); // Hide after 5 seconds
-        })
-        .catch(error => {
-            console.error("Error submitting the form:", error);
-            // Handle error if needed
-
-            // Reset form elements except for specific fields on error as well
-            $('#commissionType').val(''); // Reset commission type to default
-            $('#animationIllustrationFields').addClass('hidden');
-            $('#toontuberFields').addClass('hidden');
-            $('#referenceLink').addClass('hidden');
-            $('#additionalCharactersField').addClass('hidden');
-            $('#packageplanfields').addClass('hidden');
-            $('#toontuberAddOns').addClass('hidden');
-            $('#Designtype').addClass('hidden');
-            $('#emoteFields').addClass('hidden');
-            $('#AddOns').addClass('hidden');
-            $('#referenceSection').addClass('hidden');
-            $('.svc-item').removeClass('svc-active');
-
-            // Display success message for 5 seconds
-            $('.success-message').show();
-            $('#form')[0].reset(); // Reset form using plain JavaScript for non-input elements
-            setTimeout(function () {
-                $('.success-message').hide();
-            }, 5000); // Hide after 5 seconds
+        .then(function() { resetAll(); })
+        .catch(function(error) {
+            console.error('Error submitting the form:', error);
+            resetAll();
         });
 
-        // Prevent the default form submission
         return false;
     }
 
