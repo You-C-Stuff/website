@@ -152,7 +152,7 @@ function updatePriceEstimate() {
     }
 
     // Discount code
-    var discountInput = document.getElementById('Discount');
+    var discountInput = document.getElementById('discount');
     if (discountInput && discountInput.value.trim().toUpperCase() === 'YAPPY20') {
         total *= 0.8;
     }
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    var discountInput = document.getElementById('Discount');
+    var discountInput = document.getElementById('discount');
     if (discountInput) discountInput.addEventListener('input', updatePriceEstimate);
 });
 /*-------------------------------END COMMISSION FORM LOGIC--------------------------------*/
