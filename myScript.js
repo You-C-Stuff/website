@@ -151,7 +151,13 @@ function updatePriceEstimate() {
         else if (typeOfUse.value === 'Monetised') total *= 1.3;
     }
 
-    priceEl.textContent = '$' + total + (isPlusPrice ? '+' : '');
+    // Discount code
+    var discountInput = document.getElementById('Discount');
+    if (discountInput && discountInput.value.trim().toUpperCase() === 'YAPPY20') {
+        total *= 0.8;
+    }
+
+    priceEl.textContent = '$' + Math.round(total) + (isPlusPrice ? '+' : '');
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -164,6 +170,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (field) field.classList.toggle('hidden', !e.target.checked);
         }
     });
+
+    var discountInput = document.getElementById('Discount');
+    if (discountInput) discountInput.addEventListener('input', updatePriceEstimate);
 });
 /*-------------------------------END COMMISSION FORM LOGIC--------------------------------*/
 
