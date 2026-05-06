@@ -1846,6 +1846,10 @@ transition: transform 0.3s ease;
 
 .form-content h3 a{
     color: var(--color-text);
+    transition: color 0.3s ease;
+}
+.form-content h3 a:hover{
+    color: var(--color-hover);
 }
 
 .content-wrapper {
@@ -2409,6 +2413,10 @@ input, select, textarea {
     color: var(--color-text);
     font-weight: normal;
     font-size: 1em;
+    transition: color 0.3s ease;
+}
+.top-content h2 a:hover{
+    color: var(--color-hover);
 }
 
 .centered-content .iframe-container {
