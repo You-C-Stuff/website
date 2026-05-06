@@ -33,6 +33,12 @@ body, html {
     background-color: var(--color-bg); /* Set background color */
 }
 
+img {
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
 h1 {
     font-size: 5rem;
 }
@@ -709,6 +715,80 @@ color: var(--color-hover);
     width: 100%;
     height: 100%;
 }
+
+/* ===== ILLUSTRATION COVERFLOW CAROUSEL ===== */
+.illus-carousel {
+    position: absolute;
+    inset: 0;
+    background-color: var(--color-bg);
+    overflow: hidden;
+    z-index: 0; /* creates stacking context — keeps item z-indexes self-contained */
+}
+
+.illus-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* Default: staged off-screen right, waiting to enter */
+.illus-item {
+    position: absolute;
+    top: 50%;
+    left: 80%;
+    height: 82%;
+    width: auto;
+    max-width: 35%;
+    object-fit: contain;
+    transform: translateX(calc(-50% + 100vw)) translateY(-50%) scale(0.68);
+    opacity: 0;
+    transition: transform 0.65s ease, opacity 0.65s ease;
+    pointer-events: none;
+    user-select: none;
+    z-index: 1;
+}
+
+.illus-item.illus-prev {
+    transform: translateX(calc(-50% - 16vw)) translateY(-50%) scale(0.68);
+    opacity: 1;
+}
+
+.illus-item.illus-active {
+    transform: translateX(-50%) translateY(-50%) scale(1);
+    opacity: 1;
+    z-index: 2;
+}
+
+.illus-item.illus-next {
+    transform: translateX(calc(-50% + 16vw)) translateY(-50%) scale(0.68);
+    opacity: 1;
+}
+
+/* Exit: animate off-screen left */
+.illus-item.illus-gone {
+    transform: translateX(calc(-50% - 100vw)) translateY(-50%) scale(0.68);
+    opacity: 0;
+}
+
+.illus-fade {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 25%;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.illus-fade-left {
+    left: 50%;
+    background: linear-gradient(to right, var(--color-bg), transparent);
+}
+
+.illus-fade-right {
+    right: 0;
+    background: linear-gradient(to left, var(--color-bg), transparent);
+}
+/* ===== END ILLUSTRATION COVERFLOW CAROUSEL ===== */
 
 /*-----------------------------END INDEX-----------------------------*/
 
@@ -2591,6 +2671,14 @@ input, select, textarea {
         font-size: 2em;
     }
 
+    .illus-item {
+        left: 90%;
+    }
+
+    .illus-fade-left {
+        width: 60%;
+    }
+
 }
 
 @media (max-width: 920px) and (min-width: 750px) {
@@ -2651,6 +2739,20 @@ input, select, textarea {
     #row2, #row3, #row4, #row5 {
         height: 20vh; /* Example height for other rows */
         min-height: 200px;
+    }
+
+    .illus-item {
+        height: 70%;
+        left: 75%;
+    }
+    .illus-item.illus-prev {
+        transform: translateX(calc(-50% - 10vw)) translateY(-50%) scale(0.68);
+    }
+    .illus-item.illus-next {
+        transform: translateX(calc(-50% + 10vw)) translateY(-50%) scale(0.68);
+    }
+    .illus-item.illus-gone {
+        transform: translateX(calc(-50% - 100vw)) translateY(-50%) scale(0.68);
     }
 
     #row6 {
@@ -3019,6 +3121,10 @@ input, select, textarea {
     #row3,#row5 {
         height: 45vh; /* Example height for row 3 */
         min-height: 240px;
+    }
+
+    .illus-item {
+        height: 78%;
     }
     
     #row4 {

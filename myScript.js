@@ -1,4 +1,9 @@
-  
+/*-------------------------------IMAGE PROTECTION--------------------------------*/
+document.addEventListener('contextmenu', function (e) {
+    if (e.target.tagName === 'IMG') e.preventDefault();
+});
+/*-------------------------------END IMAGE PROTECTION--------------------------------*/
+
 /*-------------------------------FORM--------------------------------*/
 
 function postToGoogle() {
@@ -375,6 +380,112 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.gallery-container').forEach(g => galleryCarousels.push(makeCarousel(g)));
     switchGallery(0);
 });
+/*-------------------------------ILLUSTRATION CAROUSEL--------------------------------*/
+/* =====================================================================
+   ADD YOUR ILLUSTRATION IMAGES HERE.
+   Each entry: { src: 'path/to/image.jpg', alt: 'description' }
+   Add or remove lines freely — the carousel adjusts automatically.
+   ===================================================================== */
+const illustrationImages = [
+    { src: 'Images/Portfolio/Ruka.png',        alt: 'Ruka Sarashina' },
+    { src: 'Images/Portfolio/Pumpkin.png',     alt: 'Pumpkin Pie Cookie' },
+    { src: 'Images/Portfolio/Yap.png',         alt: 'Yap' },
+];
+
+(function () {
+    const TRANSITION_MS = 650;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const track = document.getElementById('illustrationTrack');
+        if (!track || illustrationImages.length === 0) return;
+
+        const total = illustrationImages.length;
+
+        illustrationImages.forEach(function (data) {
+            const img = document.createElement('img');
+            img.src = data.src;
+            img.alt = data.alt;
+            img.className = 'illus-item';
+            track.appendChild(img);
+        });
+
+        const items = Array.from(track.querySelectorAll('.illus-item'));
+        let current = 0;
+
+        /* Assign prev/active/next — never removes illus-gone (its timeout does that).
+           skipIndex: optional item index that should NOT receive illus-next yet
+           (used when that element is still mid-exit and will slide in later). */
+        function setClasses(skipIndex) {
+            const prev = (current - 1 + total) % total;
+            const next = (current + 1) % total;
+            items.forEach(function (el, i) {
+                el.classList.remove('illus-prev', 'illus-active', 'illus-next');
+                if (i === current)                        el.classList.add('illus-active');
+                else if (i === prev)                      el.classList.add('illus-prev');
+                else if (i === next && i !== skipIndex)   el.classList.add('illus-next');
+            });
+        }
+
+        /* Initial paint: snap into position without animating from off-screen */
+        items.forEach(function (el) { el.style.transition = 'none'; });
+        setClasses();
+        requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+                items.forEach(function (el) { el.style.transition = ''; });
+            });
+        });
+
+        function advance() {
+            if (total < 2) return;
+
+            const oldPrev = (current - 1 + total) % total;
+            current = (current + 1) % total;
+            const newNext = (current + 1) % total;
+
+            if (oldPrev === newNext) {
+                /* Teleport case (e.g. exactly 3 images): the same element must
+                   both exit left AND enter right simultaneously.
+                   Solution: a short-lived clone handles the left-exit animation
+                   while the original instantly resets and slides in from the right. */
+                const el = items[oldPrev];
+
+                /* Clone takes over the left-exit animation */
+                const clone = el.cloneNode(false);
+                el.parentNode.appendChild(clone);
+                clone.offsetHeight;              /* force reflow so transition fires from illus-prev position */
+                clone.classList.add('illus-gone');
+
+                /* Original resets to off-screen right, then slides in as illus-next */
+                el.style.transition = 'none';
+                el.classList.remove('illus-prev', 'illus-active', 'illus-next', 'illus-gone');
+                el.offsetHeight;
+                el.style.transition = '';
+                setClasses();                    /* assigns illus-next → slides in from off-screen right */
+
+                /* Remove clone once exit animation is done */
+                setTimeout(function () {
+                    if (clone.parentNode) clone.parentNode.removeChild(clone);
+                }, TRANSITION_MS + 100);
+            } else {
+                /* Normal case: old prev slides out to the left (illus-gone),
+                   new next slides in from the right (default staging position). */
+                const exitEl = items[oldPrev];
+                exitEl.classList.add('illus-gone'); /* triggers transition to off-screen left */
+                setClasses();   /* new next gets illus-next → slides in from off-screen right */
+
+                /* After the exit animation completes, reset to off-screen right */
+                setTimeout(function () {
+                    exitEl.style.transition = 'none';
+                    exitEl.classList.remove('illus-gone');
+                    exitEl.offsetHeight;
+                    exitEl.style.transition = '';
+                }, TRANSITION_MS + 100);
+            }
+        }
+
+        if (total > 1) setInterval(advance, 3500);
+    });
+})();
 /*-------------------------------SCROLL TO TOP--------------------------------*/
 
 let mybutton = document.getElementById("myBtn");
