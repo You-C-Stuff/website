@@ -740,4 +740,104 @@ document.querySelectorAll('.overlay-toggle').forEach(btn => {
         btn.setAttribute('aria-expanded', parent.classList.contains('open'));
     });
 });
- 
+
+/*-------------------------------COMIC CAROUSEL--------------------------------*/
+(function () {
+    if (!document.getElementById('comicImg')) return;
+
+    // Add comics as: { title: "Chapter 1", src: "Images/Comics/s1/ch1.png" }
+    // Last entry in each array = latest comic, shown by default
+    var COMIC_SERIES = [
+        { name: "Don't Open Me", comics: [
+            //{ title: 'Page 1', src: 'Images/Portfolio/Ruka.png' },
+        ]},
+        { name: 'Personal', comics: [
+            //{ title: 'Page 1', src: 'Images/Portfolio/Chibi.png' },
+        ]}
+    ];
+
+    var activeSeries = 0, activeComic = 0;
+
+    function getComics() { return COMIC_SERIES[activeSeries].comics; }
+
+    function updateComic() {
+        var comics = getComics();
+        var img = document.getElementById('comicImg');
+        var empty = document.getElementById('comicEmpty');
+        var dropdown = document.getElementById('comicDropdown');
+        if (!comics.length) {
+            img.classList.add('hidden');
+            empty.style.display = 'block';
+            dropdown.disabled = true;
+            return;
+        }
+        img.classList.remove('hidden');
+        empty.style.display = 'none';
+        dropdown.disabled = false;
+        img.src = comics[activeComic].src;
+        img.alt = comics[activeComic].title;
+        dropdown.value = String(activeComic);
+    }
+
+    function buildDropdown() {
+        var comics = getComics();
+        var dropdown = document.getElementById('comicDropdown');
+        dropdown.innerHTML = '';
+        if (!comics.length) {
+            var opt = document.createElement('option');
+            opt.textContent = 'No comics yet';
+            dropdown.appendChild(opt);
+            return;
+        }
+        comics.forEach(function (c, i) {
+            var opt = document.createElement('option');
+            opt.value = String(i);
+            opt.textContent = c.title;
+            dropdown.appendChild(opt);
+        });
+    }
+
+    function switchSeries(idx) {
+        activeSeries = idx;
+        var comics = getComics();
+        activeComic = comics.length ? comics.length - 1 : 0;
+        document.querySelectorAll('.comic-tab').forEach(function (t, i) {
+            t.classList.toggle('active', i === idx);
+        });
+        buildDropdown();
+        updateComic();
+    }
+
+    document.querySelectorAll('.comic-tab').forEach(function (tab, i) {
+        tab.addEventListener('click', function () { switchSeries(i); });
+    });
+
+    document.getElementById('comicPrev').addEventListener('click', function () {
+        var comics = getComics();
+        if (!comics.length) return;
+        activeComic = (activeComic - 1 + comics.length) % comics.length;
+        updateComic();
+    });
+
+    document.getElementById('comicNext').addEventListener('click', function () {
+        var comics = getComics();
+        if (!comics.length) return;
+        activeComic = (activeComic + 1) % comics.length;
+        updateComic();
+    });
+
+    document.getElementById('comicDropdown').addEventListener('change', function () {
+        activeComic = parseInt(this.value);
+        updateComic();
+    });
+
+    document.getElementById('comicRandom').addEventListener('click', function () {
+        var comics = getComics();
+        if (!comics.length) return;
+        activeComic = Math.floor(Math.random() * comics.length);
+        updateComic();
+    });
+
+    switchSeries(0);
+})();
+

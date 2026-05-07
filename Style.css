@@ -612,7 +612,7 @@ color: var(--color-hover);
 .buttons button, .button-container button {
     margin: 0 10px;
     padding: 10px 20px;
-    font-size: 2em;
+    font-size: 1.5em;
     border: 3px solid;
     cursor: pointer;
 }
@@ -1078,10 +1078,10 @@ color: var(--color-hover);
     text-align: center;
 }
 .ill-heading h1{
-    margin-top: 10%;
+    margin-top: 8%;
 }
 .ill-heading h2 {
-    margin:7% 0% 2% 0%;
+    margin:5% 0% 2% 0%;
 }
 
 .ill-page {
@@ -1466,12 +1466,12 @@ td {
     margin:3%;
 }
 
-.toontubers a,.tos-content a{
+.toontubers a:not(.view-more-link),.tos-content a{
     text-decoration: underline;
     color: var(--color-text);
 }
 
-.toontubers a:hover, .tos-content a:hover{
+.toontubers a:not(.view-more-link):hover, .tos-content a:hover{
     text-decoration: underline;
     color: var(--color-hover);
 }
@@ -1520,6 +1520,20 @@ td {
 
 .tier-card:hover {
     border-color: rgba(217, 217, 217, 0.35);
+}
+
+.view-more-link {
+    color: var(--color-text);
+    text-decoration: none;
+    font-family: "audiowide", sans-serif;
+    font-size: 1.2em;
+    letter-spacing: 0.12em;
+    transition: text-decoration var(--transition);
+
+}
+
+.view-more-link:hover {
+    text-decoration: underline;
 }
 
 .tier-header {
@@ -2352,11 +2366,11 @@ input, select, textarea {
 
 .gallery-btn {
     font-family: "audiowide", sans-serif;
-    padding: 10px 20px;
+    padding: clamp(6px, 0.7vw, 10px) clamp(10px, 1.4vw, 20px);
     border: 2px solid white;
     background-color: transparent;
     color: white;
-    font-size: 16px;
+    font-size: clamp(12px, 1.2vw, 16px);
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -2699,9 +2713,9 @@ input, select, textarea {
 
 .gallery-switcher {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 10px;
-    min-width: max-content;
     margin: 0 auto 20px;
 }
 
@@ -2848,7 +2862,7 @@ input, select, textarea {
 
     .illus-item {
         height: 70%;
-        left: 75%;
+        left: 80%;
     }
     .illus-item.illus-prev {
         transform: translateX(calc(-50% - 10vw)) translateY(-50%) scale(0.68);
@@ -2992,6 +3006,13 @@ input, select, textarea {
 
     .gallery-switcher-wrap {
         padding: 0 4px 8px;
+        overflow-x: unset;
+    }
+
+    .gallery-switcher {
+        flex-wrap: wrap;
+        min-width: unset;
+        justify-content: center;
     }
 
     #caption {
@@ -3289,9 +3310,94 @@ input, select, textarea {
         max-width:30vw;
         height: 210px;
     }
-    
+
 
 }
+
+/* ── Comic Carousel ─────────────────────────────────────── */
+.comic-section {
+    width: 100%;
+    max-width: 1400px;
+    margin: 2rem auto 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.comic-viewer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.comic-display {
+    flex: 1;
+    max-width: 1400px;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-dark-alt);
+    border: 1px solid rgba(217,217,217,0.15);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color var(--transition);
+}
+
+.comic-display:hover { border-color: rgba(217,217,217,0.35); }
+
+.comic-display img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.comic-display img.hidden { display: none; }
+
+.comic-empty {
+    color: rgba(255,255,255,0.35);
+    font-size: 0.85em;
+    text-align: center;
+    padding: 2.5rem 1rem;
+    margin: 0;
+}
+
+/* Reuse .carousel-button — override absolute positioning for inline layout */
+.comic-nav-btn, .comic-random-btn {
+    position: static;
+    transform: none;
+    flex-shrink: 0;
+}
+
+.comic-random-btn {
+    font-family: "audiowide", sans-serif;
+    font-size: 0.75em;
+    padding: 0.5em 0.8rem;
+}
+
+.comic-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.comic-controls select {
+    background: var(--color-dark-alt);
+    color: var(--color-text);
+    border: 1px solid rgba(217,217,217,0.25);
+    padding: 0.5em 0.8rem;
+    font-family: "audiowide", sans-serif;
+    font-size: 0.75em;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 200px;
+    transition: border-color var(--transition);
+}
+
+.comic-controls select:hover { border-color: rgba(217,217,217,0.5); }
 
   @media (max-width: 1024px) {
     .package-card {

@@ -37,8 +37,8 @@
     <nav class="nav">
         <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
-        <li><a class="forced-active" href="portfolio.html">Portfolio</a></li>
         <li><a href="commissions.html">Commissions</a></li>
+        <li><a class="forced-active" href="portfolio.html">Portfolio</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="community.html" >Community</a></li>
         <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
@@ -54,8 +54,8 @@
 <div class="overlay" id="overlay">
     <ul class="overlay-menu">
         <li><a href="index.html">Home</a></li>
-        <li><a class="forced-active" href="portfolio.html">Portfolio</a></li>
         <li><a href="commissions.html">Commissions</a></li>
+        <li><a class="forced-active" href="portfolio.html">Portfolio</a></li>
         <li><a href="about.html">About</a></li>
         <li><a href="community.html" >Community</a></li>
         <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
@@ -73,12 +73,38 @@
 <main>
     <i onclick="topFunction()" id="myBtn" title="Go to top" class="fa-solid fa-angle-up"></i>
     <div class="ill-page">
+       
         <div class="ill-container">
             <!-- Centered heading -->
             <div class="ill-heading">
                 <h1>ILLUSTRATIONS</h1>
-                <h2>RENDERED</h2>
+                <h2>COMICS</h2>
             </div>
+
+             <div class="comic-section">
+            <div class="gallery-switcher-wrap">
+                <div class="gallery-switcher">
+                    <button class="gallery-btn comic-tab active" data-series="0">Don't Open Me</button>
+                    <!--<button class="gallery-btn comic-tab" data-series="1">Personal</button>-->
+                </div>
+            </div>
+            <div class="comic-viewer">
+                <button class="carousel-button comic-nav-btn" id="comicPrev">&#10094;</button>
+                <div class="comic-display">
+                    <img id="comicImg" src="" alt="Comic Page">
+                    <p class="comic-empty" id="comicEmpty">No comics in this series yet.</p>
+                </div>
+                <button class="carousel-button comic-nav-btn" id="comicNext">&#10095;</button>
+            </div>
+            <div class="comic-controls">
+                <select id="comicDropdown"></select>
+                <button class="carousel-button comic-random-btn" id="comicRandom" title="Random comic">Randomise</button>
+            </div>
+        </div>
+            <div class="ill-heading">
+                <h2>GALLERY</h2>
+            </div>
+        
             <!-- Row of images -->
             <div class="image-grid">
                 <!-- Images for the row -->
@@ -121,66 +147,7 @@
             </div>
         </div>
 
-        <div class="ill-container">
-            <!-- Centered heading -->
-            <div class="ill-heading">
-                <h2>BACKGROUND</h2>
-            </div>
-            <!-- Row of images -->
-            <div class="image-grid">
-                <div class="image-wrapper">
-                    <img src="Images/Commission/BG.png" data-full="Images/Commission/BG.png" alt="GIF 1">
-                    <div class="title">Soul Knight Background</div>
-                </div>
-                <div class="image-wrapper">
-                    <img src="Images/Portfolio/BG1.png" data-full="Images/Portfolio/BG1.png" alt="GIF 2">
-                    <div class="title">Background</div>
-                </div>
-                <div class="image-wrapper">
-                    <img src="Images/Portfolio/BG2.png" data-full="Images/Portfolio/BG2.png" alt="GIF 3">
-                    <div class="title">Minecraft</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="ill-container">
-            <!-- Centered heading -->
-            <div class="ill-heading">
-                <h2>SKETCHES</h2>
-            </div>
-            <!-- Row of images -->
-            <div class="image-grid">
-                <!-- Images for the row -->
-                <div class="image-wrapper">
-                    <img src="Images/Portfolio/Sketch1.png" data-full="Images/Portfolio/Sketch1.png" alt="GIF 2">
-                    <div class="title">Assassin</div>
-                </div>
-                <div class="image-wrapper">
-                    <img src="Images/Portfolio/Sketch2.png" data-full="Images/Portfolio/Sketch2.png" alt="GIF 2">
-                    <div class="title">Braeburn</div>
-                </div>
-                <div class="image-wrapper">
-                    <img src="Images/Portfolio/Sketch7.png" data-full="Images/Portfolio/Sketch7.png" alt="GIF 2">
-                    <div class="title">Soul Knight</div>
-                </div>
-                <div class="image-wrapper">
-                    <img src="Images/Portfolio/Doodle2.png" data-full="Images/Portfolio/Doodle2.png" alt="GIF 2">
-                    <div class="title">Carron Concept</div>
-                </div>
-                <div class="image-wrapper">
-                    <img src="Images/Portfolio/Sketch4.png" data-full="Images/Portfolio/Sketch4.png" alt="GIF 2">
-                    <div class="title">Friends</div>
-                </div>
-                <div class="image-wrapper">
-                    <img src="Images/Portfolio/Sketch5.png" data-full="Images/Portfolio/Sketch5.png" alt="GIF 2">
-                    <div class="title">Ghost Concept</div>
-                </div>
-                <div class="image-wrapper">
-                    <img src="Images/Portfolio/Sketch6.png" data-full="Images/Portfolio/Sketch6.png" alt="GIF 2">
-                    <div class="title">Scott Pilgrim VS the World</div>
-                </div>
-            </div>
-        </div>
+     
 
        <!-- Modal -->
        <div id="modal" class="modal">
@@ -217,6 +184,7 @@
         </div>
     </div>
 </footer>
+
 
 </body>
 
