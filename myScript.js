@@ -349,15 +349,34 @@ function makeCarousel(container) {
     const counter = container.querySelector('.car-counter');
     let idx = 0, autoTimer = null, resumeTimer = null;
 
-    // Only clone for infinite loop when there are enough thumbnails to warrant it
-    const shouldLoop = origThumbs.length >= 8;
+    // Clone only when thumbnails actually overflow — checked dynamically on resize
     const thumbWrapper = container.querySelector('.thumbnail-wrapper');
-    if (!shouldLoop && thumbWrapper) thumbWrapper.classList.add('no-loop');
-    if (thumbContainer && origThumbs.length > 0 && shouldLoop) {
-        origThumbs.forEach(t => thumbContainer.appendChild(t.cloneNode(true)));
-    }
-
+    const canLoop = origThumbs.length >= 8;
+    let clonesAdded = false;
     const thumbPx = origThumbs.length > 0 ? (origThumbs[0].offsetWidth || 80) + 8 : 88;
+
+    function syncLoopState() {
+        if (!thumbContainer) return;
+        const naturalWidth = origThumbs.length * thumbPx;
+        const overflows = naturalWidth > thumbContainer.clientWidth + 1;
+        if (overflows && canLoop) {
+            if (!clonesAdded) {
+                origThumbs.forEach(t => thumbContainer.appendChild(t.cloneNode(true)));
+                clonesAdded = true;
+            }
+            if (thumbWrapper) thumbWrapper.classList.remove('no-loop');
+        } else {
+            if (clonesAdded) {
+                Array.from(thumbContainer.querySelectorAll('.thumbnail'))
+                    .slice(origThumbs.length).forEach(c => c.remove());
+                clonesAdded = false;
+            }
+            if (thumbWrapper) thumbWrapper.classList.add('no-loop');
+        }
+    }
+    syncLoopState();
+    new ResizeObserver(syncLoopState).observe(container);
+    window.addEventListener('load', syncLoopState);
 
     function updateThumbs() {
         if (!thumbContainer) return;
@@ -418,8 +437,9 @@ function makeCarousel(container) {
         if (scrollLeftBtn) scrollLeftBtn.addEventListener('click', () => thumbContainer.scrollBy({ left: -150, behavior: 'smooth' }));
         if (scrollRightBtn) scrollRightBtn.addEventListener('click', () => thumbContainer.scrollBy({ left: 150, behavior: 'smooth' }));
 
-        if (shouldLoop) {
+        if (canLoop) {
             thumbContainer.addEventListener('scroll', () => {
+                if (!clonesAdded) return;
                 const sl = thumbContainer.scrollLeft;
                 const maxScroll = thumbContainer.scrollWidth - thumbContainer.clientWidth;
                 if (sl <= 0) thumbContainer.scrollLeft = thumbPx * origCount;

@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="Keywords" content="2D Animator,YapCreations,Toontuber,Community">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta property="og:title" content="The Yappers">
+    <meta property="og:site_name" content="YapCreations">
+    <meta property="og:url" content="https://yapcreations.com">
+    <meta property="og:description" content="The Yappers — YapCreations community members">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://yapcreations.com/Images/Meta.png">
+    <!--Website Tab-->
+    <title>The Yappers</title>
+    <link rel="icon" type="image/jpg" href="Images/favicon.png">
+    <!--Style Reference-->
+    <link rel="stylesheet" href="Style.css">
+    <!--Icon Reference-->
+    <script src="https://kit.fontawesome.com/2ced1b2fda.js" crossorigin="anonymous"></script>
+    <!--JavaScript-->
+    <script src="myScript.js" defer></script>
+    <!--JQuery-->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+<!--Top Header-->
+<header class="header">
+    <div class="logo-text">
+        <a href="index.html">
+            <img src="Images/Icon.png" alt="YapCreations" class="logo">
+            <span class="company-name">YAPCREATIONS</span>
+        </a>
+    </div>
+    <nav class="nav">
+        <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="commissions.html">Commissions</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a class="forced-active" href="community.html">Community</a></li>
+        <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+</header>
+
+<div class="overlay" id="overlay">
+    <ul class="overlay-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="commissions.html">Commissions</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a class="forced-active" href="community.html">Community</a></li>
+        <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
+    </ul>
+    <div class="overlay-social">
+        <a href="https://x.com/YapCreations" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+        <a href="https://www.instagram.com/yapcreations/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://bsky.app/profile/yapcreations.com" target="_blank"><i class="fa-brands fa-bluesky"></i></a>
+        <a href="https://www.twitch.tv/yapcreations" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+        <a href="https://www.youtube.com/@YapCreations" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+</div>
+
+<main>
+    <i onclick="topFunction()" id="myBtn" title="Go to top" class="fa-solid fa-angle-up"></i>
+
+    <section class="bottom-gallery">
+        <div class="gallery-header">
+            <h1>THE YAPPERS</h1>
+            <h2>The people who inspire & hang out with me!</h2>
+        </div>
+
+        <div class="gallery-switcher-wrap">
+            <div class="gallery-switcher">
+                <button class="gallery-btn active" onclick="switchGallery(0)">GEN ∅</button>
+                <button class="gallery-btn" onclick="switchGallery(1)">GEN 1</button>
+                <button class="gallery-btn" onclick="switchGallery(2)">GEN 2</button>
+                <button class="gallery-btn" onclick="switchGallery(3)">GEN 2.5</button>
+                <button class="gallery-btn" onclick="switchGallery(4)">GEN 3</button>
+                <button class="gallery-btn" onclick="switchGallery(5)">GEN 4</button>
+                <button class="gallery-btn" onclick="switchGallery(6)">GEN 5</button>
+                <button class="gallery-btn" onclick="switchGallery(7)">GEN 6</button>
+                <button class="gallery-btn" onclick="switchGallery(8)">GEN 7</button>
+                <button class="gallery-btn" onclick="switchGallery(9)">GEN 8</button>
+                <button class="gallery-btn" onclick="switchGallery(10)">GEN 9</button>
+                <button class="gallery-btn" onclick="switchGallery(11)">GEN 10</button>
+                <button class="gallery-btn" onclick="switchGallery(12)">GEN 11</button>
+                <button class="gallery-btn" onclick="switchGallery(13)">GEN 12</button>
+                <button class="gallery-btn" onclick="switchGallery(14)">GEN 13</button>
+                <button class="gallery-btn" onclick="switchGallery(15)">SPECIAL</button>
+            </div>
+        </div>
+
+        <div class="wall-body">
+
+            <!-- ===== GEN 1 ===== -->
+            <div class="gallery-container active" id="gen1">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>Braeburnthebeef</h3></div>
+                                <img src="Images/Yappers/Brae talk.gif" alt="Brae">
+                            </div>
+                            <!-- Copy the .artist block above to add more yappers -->
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/Brae talk.gif" alt="Brae"></div>
+                        <!-- Add matching thumbnails here -->
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 2 ===== -->
+            <div class="gallery-container" id="gen2">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>Yapcreations</h3></div>
+                                <img src="Images/Yappers/yaptalk.gif" alt="Yap">
+                            </div>
+                             <div class="artist">
+                                <div class="artist-info"><h3>Nyx_Moonveil</h3></div>
+                                <img src="Images/Yappers/Jay talk.gif" alt="Jay">
+                            </div>
+                             <div class="artist">
+                                <div class="artist-info"><h3>Jejj_LimeJuice</h3></div>
+                                <img src="Images/Yappers/jejjtalk.gif" alt="Jejj">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Lazyscots</h3></div>
+                                <img src="Images/Yappers/scottalk.gif" alt="Scot">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Toru_Hoshino</h3></div>
+                                <img src="Images/Yappers/torutalk.gif" alt="Toru">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Walterken910</h3></div>
+                                <img src="Images/Yappers/walttalk.gif" alt="Walt">
+                            </div>
+                              <div class="artist">
+                                <div class="artist-info"><h3>Strm_64</h3></div>
+                                <img src="Images/Yappers/Strmtalk.gif" alt="Strm">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Drawernub</h3></div>
+                                <img src="Images/Yappers/nubtalk.gif" alt="Nub">
+                            </div>
+                        </div>
+                        
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/yaptalk.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail"><img src="Images/Yappers/Jay talk.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/jejjtalk.gif" alt="Yapper Name"></div>
+                           <div class="thumbnail"><img src="Images/Yappers/scottalk.gif" alt="Yapper Name"></div>
+                            <div class="thumbnail"><img src="Images/Yappers/torutalk.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail"><img src="Images/Yappers/walttalk.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/Strmtalk.gif" alt="Yapper Name"></div>
+                           <div class="thumbnail"><img src="Images/Yappers/nubtalk.gif" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 3 ===== -->
+            <div class="gallery-container" id="gen3">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>Makochivu</h3></div>
+                                <img src="Images/Yappers/Makocidle.gif" alt="Yapper Name">
+                            </div>
+                             <div class="artist">
+                                <div class="artist-info"><h3>Shiki_ArtScreen</h3></div>
+                                <img src="Images/Yappers/Shikitalk.gif" alt="Yapper Name">
+                            </div>
+                               <div class="artist">
+                                <div class="artist-info"><h3>Spactana</h3></div>
+                                <img src="Images/Yappers/Spactanatalk.gif" alt="Yapper Name">
+                            </div>
+                              <div class="artist">
+                                <div class="artist-info"><h3>Momichu</h3></div>
+                                <img src="Images/Yappers/Momitalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>A_Burn_Buck</h3></div>
+                                <img src="Images/Yappers/Bucktalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Rainintheforest</h3></div>
+                                <img src="Images/Yappers/Raintalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/Makocidle.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail "><img src="Images/Yappers/Shikitalk.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail "><img src="Images/Yappers/Spactanatalk.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail "><img src="Images/Yappers/Momitalk.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail "><img src="Images/Yappers/Bucktalk.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail "><img src="Images/Yappers/Raintalk.gif" alt="Yapper Name"></div>
+                         
+                    </div>
+                    
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 4 ===== -->
+            <div class="gallery-container" id="gen4">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                             <div class="artist active">
+                                <div class="artist-info"><h3>Goobercheese33</h3></div>
+                                <img src="Images/Yappers/goobetalk.gif" alt="Yapper Name">
+                            </div>
+                             <div class="artist">
+                                <div class="artist-info"><h3>Dolf</h3></div>
+                                <img src="Images/Yappers/talkdolf.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist ">
+                                <div class="artist-info"><h3>Rhealinor</h3></div>
+                                <img src="Images/Yappers/rheatalk.gif" alt="Yapper Name">
+                            </div>
+                             <div class="artist ">
+                                <div class="artist-info"><h3>Reesethatpuffs</h3></div>
+                                <img src="Images/Yappers/Reesetalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist ">
+                                <div class="artist-info"><h3>Kaips</h3></div>
+                                <img src="Images/Yappers/kaipstalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/goobetalk.gif" alt="Yapper Name"></div>
+                        <div class="thumbnail active"><img src="Images/Yappers/talkdolf.gif" alt="Yapper Name"></div>
+                        <div class="thumbnail active"><img src="Images/Yappers/rheatalk.gif" alt="Yapper Name"></div>
+                        <div class="thumbnail active"><img src="Images/Yappers/Reesetalk.gif" alt="Yapper Name"></div>
+                        <div class="thumbnail active"><img src="Images/Yappers/kaipstalk.gif" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 5 ===== -->
+            <div class="gallery-container" id="gen5">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>CrystalAura_606</h3></div>
+                                <img src="Images/Yappers/crystaltalk.gif" alt="Yapper Name">
+                            </div>
+                                <div class="artist ">
+                                <div class="artist-info"><h3>Zeedodobird</h3></div>
+                                <img src="Images/Yappers/dodotalk.gif" alt="Yapper Name">
+                            </div>
+                              <div class="artist ">
+                                <div class="artist-info"><h3>Goobercheese33</h3></div>
+                                <img src="Images/Yappers/newgoobertalk.gif" alt="Yapper Name">
+                            </div>
+                             <div class="artist ">
+                                <div class="artist-info"><h3>Drream</h3></div>
+                                <img src="Images/Yappers/reamtalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist ">
+                                <div class="artist-info"><h3>ReesethatPuff</h3></div>
+                                <img src="Images/Yappers/newreesetalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/crystaltalk.gif" alt="Yapper Name"></div>
+                        <div class="thumbnail "><img src="Images/Yappers/dodotalk.gif" alt="Yapper Name"></div>
+                        <div class="thumbnail "><img src="Images/Yappers/Goobermute.png" alt="Yapper Name"></div>
+                        <div class="thumbnail "><img src="Images/Yappers/reamtalk.gif" alt="Yapper Name"></div>
+                        <div class="thumbnail "><img src="Images/Yappers/newreesetalk.gif" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 6 ===== -->
+            <div class="gallery-container" id="gen6">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>GibbsiTentecles</h3></div>
+                                <img src="Images/Yappers/Gibbsitalk.gif" alt="Yapper Name">
+                            </div>
+                             <div class="artist">
+                                <div class="artist-info"><h3>Silly_1vy</h3></div>
+                                <img src="Images/Yappers/irahtalk.gif" alt="Yapper Name">
+                            </div>
+                              <div class="artist">
+                                <div class="artist-info"><h3>Kentra_Kaze</h3></div>
+                                <img src="Images/Yappers/kentratalk.gif" alt="Yapper Name">
+                            </div>
+                             <div class="artist">
+                                <div class="artist-info"><h3>Neranx0</h3></div>
+                                <img src="Images/Yappers/FrxnxVtalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/Gibbsitalk.gif" alt="Yapper Name"></div>
+                        <div class="thumbnail active"><img src="Images/Yappers/irahtalk.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail active"><img src="Images/Yappers/kentratalk.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail active"><img src="Images/Yappers/FrxnxVtalk.gif" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 7 ===== -->
+            <div class="gallery-container" id="gen7">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>Koyuurei</h3></div>
+                                <img src="Images/Yappers/Koy Talk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Tsukima_Kurage</h3></div>
+                                <img src="Images/Yappers/Tsukima Talk.gif" alt="Yapper Name">
+                            </div>
+                                 <div class="artist">
+                                <div class="artist-info"><h3>Tempura_Fox</h3></div>
+                                <img src="Images/Yappers/Tempuratalk.gif" alt="Yapper Name">
+                            </div>
+                             <div class="artist">
+                                <div class="artist-info"><h3>Airella_Nierling</h3></div>
+                                <img src="Images/Yappers/airellatalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Reqat</h3></div>
+                                <img src="Images/Yappers/reqattalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/Koy Talk.gif" alt="Yapper Name"></div>
+                        <div class="thumbnail "><img src="Images/Yappers/Tsukima Talk.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail "><img src="Images/Yappers/Tempuratalk.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail "><img src="Images/Yappers/airellatalk.gif" alt="Yapper Name"></div>
+                         <div class="thumbnail "><img src="Images/Yappers/reqattalk.gif" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 8 ===== -->
+            <div class="gallery-container" id="gen8">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>Lil_Devy</h3></div>
+                                <img src="Images/Yappers/lildevytalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Theonerhythm_899</h3></div>
+                                <img src="Images/Yappers/rhythmtalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Akiellafw</h3></div>
+                                <img src="Images/Yappers/Akiellatalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Yuskei</h3></div>
+                                <img src="Images/Yappers/yuskeitalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/lildevytalk.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/rhythmmutedtalk.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/Akiellatalk.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/yuskeitalk.gif" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 9 ===== -->
+            <div class="gallery-container" id="gen9">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>CarpridaeTheGoat</h3></div>
+                                <img src="Images/Yappers/capritalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Bambs_Hajime</h3></div>
+                                <img src="Images/Yappers/bambstalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Jack_Harlock</h3></div>
+                                <img src="Images/Yappers/jacktalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Phoenix_Rants</h3></div>
+                                <img src="Images/Yappers/phoenixtalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/Caprimute.png" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/bambmute.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/jackmuted.png" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/phoenixsleep.gif" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 10 ===== -->
+            <div class="gallery-container" id="gen10">
+                 <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>Maxforgevt</h3></div>
+                                <img src="Images/Yappers/Maxtalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Eaglelineartist</h3></div>
+                                <img src="Images/Yappers/eagletalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>???</h3></div>
+                                <img src="Images/Yappers/harutalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>SaayaTheFox</h3></div>
+                                <img src="Images/Yappers/sayatalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/Maxmute.png" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/eaglemuted.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/harumute.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/sayamuted.gif" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 11 ===== -->
+            <div class="gallery-container" id="gen11">
+                  <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>Cheejyg</h3></div>
+                                <img src="Images/Yappers/cheetalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Venny</h3></div>
+                                <img src="Images/Yappers/vennytalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Syathenya</h3></div>
+                                <img src="Images/Yappers/syatalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/cheemuted.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/vennnymuted.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/syamuted.png" alt="Yapper Name"></div>          
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 12 ===== -->
+            <div class="gallery-container" id="gen12">
+               <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>Sleepiistired</h3></div>
+                                <img src="Images/Yappers/sleepitalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Lil_Ashi</h3></div>
+                                <img src="Images/Yappers/ashitalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Amphibitrix</h3></div>
+                                <img src="Images/Yappers/amphitalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Xeltheries</h3></div>
+                                <img src="Images/Yappers/xeltalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/Sleepimuted.png" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/Ashimuted.png" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/amphimuted.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/Xelmuted.png" alt="Yapper Name"></div>
+                        
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+            <!-- ===== GEN 13 ===== -->
+            <div class="gallery-container" id="gen13">
+            <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>MissLevochki</h3></div>
+                                <img src="Images/Yappers/Misslevochkitalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>A_Burn_Buck</h3></div>
+                                <img src="Images/Yappers/BurntBucktalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>VoyagerLof</h3></div>
+                                <img src="Images/Yappers/loftalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Leianyx</h3></div>
+                                <img src="Images/Yappers/leianyxtalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Botan</h3></div>
+                                <img src="Images/Yappers/botantalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/MisslevochkiMuted.png" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/BurntBuckmuted.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/lofmuted.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/Leianyx Muted.png" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/BotanMuted.png" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+ <!-- ===== GEN 14 ===== -->
+            <div class="gallery-container" id="gen14">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>???</h3></div>
+                                <img src="Images/Yappers/archtalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Bouncy2D</h3></div>
+                                <img src="Images/Yappers/BouncyTalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Harvlark</h3></div>
+                                <img src="Images/Yappers/havlarktalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Patch_does</h3></div>
+                                <img src="Images/Yappers/PatchTalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Acid_n_ade</h3></div>
+                                <img src="Images/Yappers/Acidtalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/archmute.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/Bouncymuted.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/Havlarkmuted000.png" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/Patchmute.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/Acidtalk.gif" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+ <!-- ===== GEN 15 ===== -->
+            <div class="gallery-container" id="gen15">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>Valkythemeow</h3></div>
+                                <img src="Images/Yappers/valkytalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>Yamaxyl</h3></div>
+                                <img src="Images/Yappers/yamatalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>khaitalk</h3></div>
+                                <img src="Images/Yappers/khaitalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>NinaSakura</h3></div>
+                                <img src="Images/Yappers/ninatalk.gif" alt="Yapper Name">
+                            </div>
+                              <div class="artist">
+                                <div class="artist-info"><h3>Akawaquack</h3></div>
+                                <img src="Images/Yappers/akawatalk.gif" alt="Yapper Name">
+                            </div>
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/valkytalk.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/yamatalk.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/khaitalk.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/ninatalk.gif" alt="Yapper Name"></div>
+                             <div class="thumbnail"><img src="Images/Yappers/akawatalk.gif" alt="Yapper Name"></div>
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+             <!-- ===== GEN 16 ===== -->
+            <div class="gallery-container" id="gen16">
+                <div class="carousel-container">
+                    <div class="carousel">
+                        <button class="carousel-button prevbtn">&#10094;</button>
+                        <div class="carousel-inner">
+                            <div class="artist active">
+                                <div class="artist-info"><h3>AerooctoInkstics</h3></div>
+                                <img src="Images/Yappers/AerooctoTalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>KuronekoKazuyaCh</h3></div>
+                                <img src="Images/Yappers/KazuyaTalk.gif" alt="Yapper Name">
+                            </div>
+                            <div class="artist">
+                                <div class="artist-info"><h3>R.P</h3></div>
+                                <img src="Images/Yappers/talkrachel.gif" alt="Yapper Name">
+                            </div>
+                        
+                        </div>
+                        <button class="carousel-button nextbtn">&#10095;</button>
+                    </div>
+                    <div class="car-info"><span class="car-counter"></span></div>
+                </div>
+                <div class="thumbnail-wrapper">
+                    <button class="thumb-scroll left">&#10094;</button>
+                    <div class="thumbnails">
+                        <div class="thumbnail active"><img src="Images/Yappers/Aerooctomuted.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/KazuyaMute.gif" alt="Yapper Name"></div>
+                          <div class="thumbnail"><img src="Images/Yappers/muteRachel.png" alt="Yapper Name"></div>
+         
+                    </div>
+                    <button class="thumb-scroll right">&#10095;</button>
+                </div>
+            </div>
+
+             
+        </div>
+    </section>
+
+    <div class="bottom-button button-container">
+        <button class="white-button" onclick="history.back()">Back</button>
+    </div>
+</main>
+
+<!--Footer-->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-email">
+            <a href="mailto: yapcommissions@gmail.com"> yapcommissions@gmail.com </a>
+        </div>
+        <div class="footer-social">
+            <a href="https://x.com/YapCreations" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+            <a href="https://www.instagram.com/yapcreations/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="https://bsky.app/profile/yapcreations.com" target="_blank"><i class="fa-brands fa-bluesky"></i></a>
+            <a href="https://www.twitch.tv/yapcreations" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+            <a href="https://www.youtube.com/@YapCreations" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+        </div>
+        <div class="footer-copyright">
+            &copy; YAPCREATIONS
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
