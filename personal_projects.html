@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
@@ -16,11 +16,11 @@
     <!--Style Reference-->
     <link rel="stylesheet" href="Style.css">
     <!--Icon Reference-->
-    <script src="https://kit.fontawesome.com/2ced1b2fda.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/2ced1b2fda.js" crossorigin="anonymous" async></script>
     <!--JavaScript-->
     <script src="myScript.js" defer></script>
     <!--JQuery-->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
 
 </head>
 
@@ -95,11 +95,11 @@
         <div class="image-grid">
             <!-- Images for the row -->
             <div class="image-wrapper gifs">
-                <img src="Images/Portfolio/Snowgolem.gif" data-full="Images/Portfolio/Snowgolem.gif" alt="GIF 1">
+                <img loading="lazy" src="Images/Portfolio/Snowgolem.gif" data-full="Images/Portfolio/Snowgolem.gif" alt="GIF 1">
                 <div class="title">Snow Golem</div>
             </div>
             <div class="image-wrapper gifs">
-                <img src="Images/Portfolio/minecraft.gif" data-full="Images/Portfolio/minecraft.gif" alt="GIF 2">
+                <img loading="lazy" src="Images/Portfolio/minecraft.gif" data-full="Images/Portfolio/minecraft.gif" alt="GIF 2">
                 <div class="title">Minecraft</div>
             </div>
         </div>
@@ -109,7 +109,7 @@
        <div id="modal" class="modal">
         <span class="close">&#10005;</span>
         <div class="modal-content">
-            <img id="modal-img" src="" alt="Modal Image">
+            <img loading="lazy" id="modal-img" src="" alt="Modal Image">
         </div>
         <div id="caption"></div>
         <span class="prev">&#10094;</span>

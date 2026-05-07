@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
@@ -16,11 +16,11 @@
     <!--Style Reference-->
     <link rel="stylesheet" href="Style.css">
     <!--Icon Reference-->
-    <script src="https://kit.fontawesome.com/2ced1b2fda.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/2ced1b2fda.js" crossorigin="anonymous" async></script>
     <!--JavaScript-->
     <script src="myScript.js" defer></script>
     <!--JQuery-->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
 
 </head>
 
@@ -91,7 +91,7 @@
             <div class="comic-viewer">
                 <button class="carousel-button comic-nav-btn" id="comicPrev">&#10094;</button>
                 <div class="comic-display">
-                    <img id="comicImg" src="" alt="Comic Page">
+                    <img loading="lazy" id="comicImg" src="" alt="Comic Page">
                     <p class="comic-empty" id="comicEmpty">No comics in this series yet.</p>
                 </div>
                 <button class="carousel-button comic-nav-btn" id="comicNext">&#10095;</button>
@@ -109,39 +109,39 @@
             <div class="image-grid">
                 <!-- Images for the row -->
                 <div class="image-wrapper">
-                    <img src="Images/Portfolio/Ruka.png" data-full="Images/Portfolio/Ruka.png" alt="PNG 1">
+                    <img loading="lazy" src="Images/Portfolio/Ruka.png" data-full="Images/Portfolio/Ruka.png" alt="PNG 1">
                     <div class="title">Ruka Sarashina</div>
                 </div>
                 <div class="image-wrapper">
-                    <img src="Images/Portfolio/Pumpkin.png" data-full="Images/Portfolio/Pumpkin.png" alt="GIF 2">
+                    <img loading="lazy" src="Images/Portfolio/Pumpkin.png" data-full="Images/Portfolio/Pumpkin.png" alt="GIF 2">
                     <div class="title">Pumpkin Pie Cookie</div>
                 </div>
                 <div class="image-wrapper">
-                    <img src="Images/Portfolio/Yap.png" data-full="Images/Portfolio/Yap.png" alt="GIF 3">
+                    <img loading="lazy" src="Images/Portfolio/Yap.png" data-full="Images/Portfolio/Yap.png" alt="GIF 3">
                     <div class="title">Yap</div>
                 </div>
                 <div class="image-wrapper">
-                    <img src="Images/Portfolio/Rukas.png" data-full="Images/Portfolio/Rukas.png" alt="GIF 4">
+                    <img loading="lazy" src="Images/Portfolio/Rukas.png" data-full="Images/Portfolio/Rukas.png" alt="GIF 4">
                     <div class="title">Ruka</div>
                 </div>
                 <div class="image-wrapper">
-                    <img src="Images/Portfolio/Starbarians.png" data-full="Images/Portfolio/Starbarians.png" alt="GIF 5">
+                    <img loading="lazy" src="Images/Portfolio/Starbarians.png" data-full="Images/Portfolio/Starbarians.png" alt="GIF 5">
                     <div class="title">Starbarians</div>
                 </div>
                 <div class="image-wrapper">
-                    <img src="Images/Portfolio/FNF.png" data-full="Images/Portfolio/FNF.png" alt="GIF 6">
+                    <img loading="lazy" src="Images/Portfolio/FNF.png" data-full="Images/Portfolio/FNF.png" alt="GIF 6">
                     <div class="title">Ruv</div>
                 </div>
                 <div class="image-wrapper">
-                    <img src="Images/Portfolio/Soul Knight.png" data-full="Images/Portfolio/Soul Knight.png" alt="GIF 7">
+                    <img loading="lazy" src="Images/Portfolio/Soul Knight.png" data-full="Images/Portfolio/Soul Knight.png" alt="GIF 7">
                     <div class="title">Soul Knight</div>
                 </div>
                 <div class="image-wrapper">
-                    <img src="Images/Portfolio/Chibi.png" data-full="Images/Portfolio/Chibi.png" alt="GIF 8">
+                    <img loading="lazy" src="Images/Portfolio/Chibi.png" data-full="Images/Portfolio/Chibi.png" alt="GIF 8">
                     <div class="title">Chibi</div>
                 </div>
                 <div class="image-wrapper">
-                    <img src="Images/Portfolio/Marriage.png" data-full="Images/Portfolio/Marriage.png" alt="GIF 9">
+                    <img loading="lazy" src="Images/Portfolio/Marriage.png" data-full="Images/Portfolio/Marriage.png" alt="GIF 9">
                     <div class="title">Ruv's Wedding</div>
                 </div>
             </div>
@@ -153,7 +153,7 @@
        <div id="modal" class="modal">
         <span class="close">&#10005</span>
         <div class="modal-content">
-            <img id="modal-img" src="" alt="Modal Image">
+            <img loading="lazy" id="modal-img" src="" alt="Modal Image">
         </div>
         <div id="caption"></div>
         <span class="prev">&#10094;</span>

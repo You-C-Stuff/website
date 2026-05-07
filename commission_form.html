@@ -16,11 +16,11 @@
     <!--Style Reference-->
     <link rel="stylesheet" href="Style.css">
     <!--Icon Reference-->
-    <script src="https://kit.fontawesome.com/2ced1b2fda.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/2ced1b2fda.js" crossorigin="anonymous" async></script>
     <!--JavaScript-->
     <script src="myScript.js" defer> </script>
     <!--JQuery-->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
 
 </head>
 
@@ -277,15 +277,16 @@
                         <div class="form-grp form-row">
                         <div>
                             <label for="firstName">Discount Code</label>
-                            <input type="text" id="discount" name="entry.849096359" required>
+                            <input type="text" id="discount" name="entry.849096359">
                         </div>
                     </div>
                     <div class="form-grp submit-button hidden" id="submitSection">
                         <button type="submit">Submit</button>
                     </div>
-                    <div class="success-message">Commission request sent!</div>
+                
                 </form>
-            </div>    
+            </div>
+            <div class="success-message" id="formSuccessMsg">Commission request sent!</div>
     </section>
     <div class="bottom-button button-container">
         <a href="commissions.html">  <button class="white-button">Back</button></a>

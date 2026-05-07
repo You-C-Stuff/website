@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\User\\\\OneDrive\\\\Desktop\\\\Website\\\\Website\" -Recurse -File)",
+      "Bash(Select-Object FullName)",
+      "Bash(grep \"\\\\.html$\")",
+      "Bash(grep -En \"\\\\$\\\\\\(|\\\\.ajax|jQuery\\\\\\(\" \"c:\\\\Users\\\\User\\\\OneDrive\\\\Desktop\\\\Website\\\\Website\\\\myScript.js\")",
+      "Bash(awk '/\\\\{/{start=$0; next} /\\\\}/{if\\(NR>1 && $0==start\\){print NR-1\": \"start} next}' \"c:\\\\Users\\\\User\\\\OneDrive\\\\Desktop\\\\Website\\\\Website\\\\Style.css\")",
+      "Bash(powershell -Command ' *)"
     ]
   }
 }

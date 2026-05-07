@@ -974,9 +974,6 @@ color: var(--color-hover);
 .modal-content {
     position: relative;
     text-align: center;
-}
-
-.modal-content {
     max-width: 90vw;
 }
 
@@ -1435,11 +1432,10 @@ td {
     padding: 20px;
 }
 
-.toontubers h1, .toontubers h2,.toontubers h3 {
-    margin:2%;
+.toontubers h1, .toontubers h2, .toontubers h3 {
+    margin: 3%;
     color: var(--color-text);
     font-weight: normal;
-    margin: 3%;
 }
 
 
@@ -1641,25 +1637,18 @@ td {
     text-align: center;
 }
 
-.package .emote img {
-width: auto;
-height: 300px;
-max-width: 800px;
-max-height: 800px;
-object-fit: contain;
-transition: transform 0.3s ease;
-}
-
-
-    
-.more-emotes .emote img,.more-examples .emote img {
+.package .emote img,
+.more-emotes .emote img,
+.more-examples .emote img {
     width: auto;
-    height: 225px;
     max-width: 800px;
     max-height: 800px;
     object-fit: contain;
     transition: transform 0.3s ease;
 }
+
+.package .emote img { height: 300px; }
+.more-emotes .emote img, .more-examples .emote img { height: 225px; }
 
 
 .emote p {
@@ -2560,15 +2549,12 @@ input, select, textarea {
   
   .thumbnail-wrapper {
     position: relative;
-    width: 90%;
+    width: 100%;
+    max-width: 100vw;
     margin: auto;
     overflow: hidden;
     border-radius: 6px;
-    overflow: hidden;
     border: 2px solid transparent;
-    overflow: hidden;
-    width: 100%;
-    max-width: 100vw; /* Ensures it doesn't stretch beyond the viewport */
   }
   
   

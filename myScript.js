@@ -276,29 +276,22 @@ function updateFormVisibility() {
 
     updatePriceEstimate();
 }
-
-    function postToGoogleform() {
-        var formData = new FormData(document.getElementById('form'));
-
-        function resetAll() {
-            $('#form')[0].reset();
-            resetServiceSelection();
-            $('.success-message').show();
-            setTimeout(function() { $('.success-message').hide(); }, 5000);
-        }
-
-        fetch('https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse', {
-            method: 'POST',
-            body: formData
-        })
-        .then(function() { resetAll(); })
-        .catch(function(error) {
-            console.error('Error submitting the form:', error);
-            resetAll();
+function postToGoogleform() {
+        $.ajax({
+            url: "https://docs.google.com/forms/d/e/1FAIpQLScyR6bmSrZ94RadqIRs9IL5N66xVfGBVKLhKgxgSL3uYHZgHw/formResponse",
+            data: $('#form').serialize(),
+            type: "POST",
+            dataType: "xml",
+            error: function () {
+                document.getElementById('formSuccessMsg').style.display = 'block';
+                document.getElementById('form').reset();
+                resetServiceSelection();
+                setTimeout(function () { document.getElementById('formSuccessMsg').style.display = 'none'; }, 5000);
+            }
         });
-
         return false;
     }
+    
 
 
     document.addEventListener('DOMContentLoaded', () => {
