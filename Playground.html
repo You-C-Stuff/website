@@ -7,7 +7,6 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{overflow:hidden;height:100%;background:#111;font-family:system-ui,sans-serif;}
-#canvas{display:block;position:fixed;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;}
 /* small/hallway: scale the whole canvas+pets container down, origin top-centre */
 #canvasWrap{position:fixed;inset:0;transform-origin:top center;pointer-events:none;}
 body.mode-small #canvasWrap,body.mode-hallway #canvasWrap{
@@ -16,13 +15,11 @@ body.mode-small #canvasWrap,body.mode-hallway #canvasWrap{
   box-sizing:border-box;
 }
 #canvas{display:block;position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;pointer-events:all;}
-.chat-pet-el{pointer-events:none;}
 /* hallway strip sits below the scaled canvas */
 #hallwayContainer{
   display:none;position:fixed;
   background:#0a0a14;border:1px solid rgba(255,255,255,0.08);
   border-top:none;overflow:hidden;z-index:14;
-  position:fixed;/* overridden inline */
 }
 body.mode-hallway #hallwayContainer{display:block;}
 #hallwayCanvas{display:block;}
@@ -73,6 +70,7 @@ body.mode-hallway #hallwayContainer{display:block;}
 .srow input[type=color]{width:100%;height:36px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.2);cursor:pointer;background:none;padding:2px;}
 .srow input[type=number],.srow input[type=text]{width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px;font-family:inherit;}
 .srow input:focus{outline:none;border-color:#7F77DD;}
+.srow input[type=range]{flex:1;accent-color:#7F77DD;}
 .sdivider{border:none;border-top:0.5px solid rgba(255,255,255,0.08);margin:16px 0;}
 #costumeGrid{display:flex;flex-direction:column;gap:14px;}
 .costume-row{background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px;}
@@ -81,6 +79,8 @@ body.mode-hallway #hallwayContainer{display:block;}
 .costume-row-header input:focus{outline:none;border-color:#7F77DD;}
 .costume-del-btn{font-size:11px;padding:4px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;}
 .costume-del-btn:hover{background:rgba(180,50,50,0.2);}
+.snd-clear-btn{font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;}
+.snd-clear-btn:hover{background:rgba(180,50,50,0.2);}
 .costume-frames{display:flex;flex-wrap:wrap;gap:6px;}
 .frameThumb{width:48px;height:48px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);position:relative;overflow:hidden;}
 .frameThumb img{width:100%;height:100%;object-fit:cover;border-radius:6px;display:block;}
@@ -91,7 +91,7 @@ body.mode-hallway #hallwayContainer{display:block;}
 .addCostumeBtn:hover{border-color:#7F77DD;color:#b8b2ff;}
 .soundUpBtn{width:100%;padding:8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;font-family:inherit;}
 .soundUpBtn:hover{border-color:#7F77DD;}
-.snd-label{font-size:11px;color:rgba(255,255,255,0.4);margin-top:6px;min-height:16px;}
+.snd-label{font-size:11px;color:rgba(255,255,255,0.4);min-height:16px;flex:1;margin:0;}
 #fileInputHidden,#hoopFileInput,#soundInput,#victorySoundInput,#resizeSoundInput,#battleStartSoundInput,#hitSoundInput,#koSoundInput,#winSoundInput,#stompSoundInput,#dvdBounceSoundInput{display:none;}
 #hotkeyList{width:100%;border-collapse:collapse;font-size:12px;}
 #hotkeyList th{text-align:left;color:rgba(255,255,255,0.4);font-weight:400;padding:4px 6px;border-bottom:0.5px solid rgba(255,255,255,0.08);}
@@ -230,25 +230,25 @@ body.mode-hallway #hallwayContainer{display:block;}
       <div class="srow">
         <label>Walk speed</label>
         <div style="display:flex;align-items:center;gap:8px;">
-          <input type="range" id="petSpeed" min="0" max="3000" step="5" value="30" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="petSpeed" min="0" max="3000" step="5" value="30">
           <span id="petSpeedVal" style="font-size:12px;color:#fff;min-width:36px;">30%</span>
         </div>
       </div>
       <div class="srow">
         <label>Max viewers on screen</label>
-        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="maxPets" min="1" max="200" step="1" value="30" style="flex:1;accent-color:#7F77DD;"><span id="maxPetsVal" style="font-size:12px;color:#fff;min-width:36px;">30</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="maxPets" min="1" max="200" step="1" value="30"><span id="maxPetsVal" style="font-size:12px;color:#fff;min-width:36px;">30</span></div>
       </div>
       <div class="srow">
         <label>Max sprites on screen</label>
-        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="maxSpritesSlider" min="1" max="1000" step="1" value="500" style="flex:1;accent-color:#7F77DD;"><span id="maxSpritesVal" style="font-size:12px;color:#fff;min-width:36px;">500</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="maxSpritesSlider" min="1" max="1000" step="1" value="500"><span id="maxSpritesVal" style="font-size:12px;color:#fff;min-width:36px;">500</span></div>
       </div>
       <div class="srow">
         <label>Speech bubble duration (seconds)</label>
-        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="bubbleDur" min="1" max="60" step="1" value="5" style="flex:1;accent-color:#7F77DD;"><span id="bubbleDurVal" style="font-size:12px;color:#fff;min-width:36px;">5s</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="bubbleDur" min="1" max="60" step="1" value="5"><span id="bubbleDurVal" style="font-size:12px;color:#fff;min-width:36px;">5s</span></div>
       </div>
       <div class="srow">
         <label>Speech bubble font size (px)</label>
-        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="bubbleFontSize" min="6" max="48" step="1" value="11" style="flex:1;accent-color:#7F77DD;"><span id="bubbleFontSizeVal" style="font-size:12px;color:#fff;min-width:36px;">11px</span></div>
+        <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="bubbleFontSize" min="6" max="48" step="1" value="11"><span id="bubbleFontSizeVal" style="font-size:12px;color:#fff;min-width:36px;">11px</span></div>
       </div>
 
     </div>
@@ -294,33 +294,31 @@ body.mode-hallway #hallwayContainer{display:block;}
       <div class="srow">
         <label>Hoop size</label>
         <div style="display:flex;align-items:center;gap:8px;">
-          <input type="range" id="hoopSizeSlider" min="40" max="300" step="5" value="80" style="flex:1;accent-color:#EF9F27;">
+          <input type="range" id="hoopSizeSlider" min="40" max="300" step="5" value="80" style="accent-color:#EF9F27;">
           <span id="hoopSizeVal" style="font-size:12px;color:#fff;min-width:36px;">80px</span>
         </div>
       </div>
       <div class="srow">
         <label>Hoop height from top (% of screen)</label>
         <div style="display:flex;align-items:center;gap:8px;">
-          <input type="range" id="hoopHeightSlider" min="5" max="80" step="1" value="45" style="flex:1;accent-color:#EF9F27;">
+          <input type="range" id="hoopHeightSlider" min="5" max="80" step="1" value="45" style="accent-color:#EF9F27;">
           <span id="hoopHeightVal" style="font-size:12px;color:#fff;min-width:32px;">45%</span>
         </div>
       </div>
       <div class="srow">
         <label>Hoop distance from right edge (px)</label>
         <div style="display:flex;align-items:center;gap:8px;">
-          <input type="range" id="hoopRightSlider" min="0" max="300" step="5" value="30" style="flex:1;accent-color:#EF9F27;">
+          <input type="range" id="hoopRightSlider" min="0" max="300" step="5" value="30" style="accent-color:#EF9F27;">
           <span id="hoopRightVal" style="font-size:12px;color:#fff;min-width:36px;">30px</span>
         </div>
       </div>
     </div>
 
-    <div class="stabpanel" id="tab-hoop" style="display:none!important;"></div>
-
     <div class="stabpanel" id="tab-sound">
       <div class="srow">
         <label style="font-weight:600;color:rgba(255,255,255,0.8);">&#x1F50A; Master volume</label>
         <div style="display:flex;align-items:center;gap:8px;">
-          <input type="range" id="soundVol" min="0" max="3" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="soundVol" min="0" max="3" step="0.01" value="1">
           <span id="soundVolVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
         </div>
       </div>
@@ -330,40 +328,40 @@ body.mode-hallway #hallwayContainer{display:block;}
       <div class="srow">
         <label>Collision sound</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volCollision" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="volCollision" min="0" max="2" step="0.01" value="1">
           <span id="volCollisionVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
         </div>
         <button class="soundUpBtn" id="soundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="soundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="soundName" style="flex:1;margin:0;">No sound loaded</div>
-          <button id="soundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+          <div class="snd-label" id="soundName">No sound loaded</div>
+          <button id="soundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
       <div class="srow">
         <label>&#x1F3C0; Hoop scored</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volHoop" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="volHoop" min="0" max="2" step="0.01" value="1">
           <span id="volHoopVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
         </div>
         <button class="soundUpBtn" id="victorySoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="victorySoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="victorySoundName" style="flex:1;margin:0;">No sound loaded</div>
-          <button id="victorySoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+          <div class="snd-label" id="victorySoundName">No sound loaded</div>
+          <button id="victorySoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
       <div class="srow">
         <label>&#x1F522; Resize (size hotkey)</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volResize" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="volResize" min="0" max="2" step="0.01" value="1">
           <span id="volResizeVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
         </div>
         <button class="soundUpBtn" id="resizeSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="resizeSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="resizeSoundName" style="flex:1;margin:0;">No sound loaded</div>
-          <button id="resizeSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+          <div class="snd-label" id="resizeSoundName">No sound loaded</div>
+          <button id="resizeSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
       <hr class="sdivider">
@@ -371,79 +369,79 @@ body.mode-hallway #hallwayContainer{display:block;}
       <div class="srow">
         <label>&#x2694;&#xFE0F; Battle / War / Kaiju start</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volBattleStart" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="volBattleStart" min="0" max="2" step="0.01" value="1">
           <span id="volBattleStartVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
         </div>
         <button class="soundUpBtn" id="battleStartSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="battleStartSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="battleStartSoundName" style="flex:1;margin:0;">No sound loaded</div>
-          <button id="battleStartSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+          <div class="snd-label" id="battleStartSoundName">No sound loaded</div>
+          <button id="battleStartSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
       <div class="srow">
         <label>&#x1F94A; Viewer hit</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volHit" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="volHit" min="0" max="2" step="0.01" value="1">
           <span id="volHitVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
         </div>
         <button class="soundUpBtn" id="hitSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="hitSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="hitSoundName" style="flex:1;margin:0;">No sound loaded</div>
-          <button id="hitSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+          <div class="snd-label" id="hitSoundName">No sound loaded</div>
+          <button id="hitSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
       <div class="srow">
         <label>&#x1F480; Viewer KO'd</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volKO" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="volKO" min="0" max="2" step="0.01" value="1">
           <span id="volKOVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
         </div>
         <button class="soundUpBtn" id="koSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="koSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="koSoundName" style="flex:1;margin:0;">No sound loaded</div>
-          <button id="koSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+          <div class="snd-label" id="koSoundName">No sound loaded</div>
+          <button id="koSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
       <div class="srow">
         <label>&#x1F3C6; Winner declared</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volWin" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="volWin" min="0" max="2" step="0.01" value="1">
           <span id="volWinVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
         </div>
         <button class="soundUpBtn" id="winSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="winSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="winSoundName" style="flex:1;margin:0;">No sound loaded</div>
-          <button id="winSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+          <div class="snd-label" id="winSoundName">No sound loaded</div>
+          <button id="winSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
       <div class="srow">
         <label>&#x1F996; Kaiju stomp</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volStomp" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="volStomp" min="0" max="2" step="0.01" value="1">
           <span id="volStompVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
         </div>
         <button class="soundUpBtn" id="stompSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="stompSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="stompSoundName" style="flex:1;margin:0;">No sound loaded</div>
-          <button id="stompSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+          <div class="snd-label" id="stompSoundName">No sound loaded</div>
+          <button id="stompSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
       <div class="srow">
         <label>&#x1F4BF; DVD wall bounce</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volDVD" min="0" max="2" step="0.01" value="1" style="flex:1;accent-color:#7F77DD;">
+          <input type="range" id="volDVD" min="0" max="2" step="0.01" value="1">
           <span id="volDVDVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
         </div>
         <button class="soundUpBtn" id="dvdBounceSoundUpBtn">Upload (MP3, WAV, OGG)</button>
         <input type="file" id="dvdBounceSoundInput" accept="audio/*">
         <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="dvdBounceSoundName" style="flex:1;margin:0;">No sound loaded</div>
-          <button id="dvdBounceSoundClearBtn" style="font-size:11px;padding:3px 8px;border-radius:6px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.8);cursor:pointer;font-family:inherit;white-space:nowrap;">Clear</button>
+          <div class="snd-label" id="dvdBounceSoundName">No sound loaded</div>
+          <button id="dvdBounceSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
     </div>
@@ -3437,6 +3435,7 @@ function saveViewerCostumes(){try{localStorage.setItem(LS_VIEWER_COSTUMES,JSON.s
 let kaijuActive=false, kaijuStompTimer=null;
 let kaijuSize=400, kaijuStompInterval=3000, kaijuFlingForce=18, kaijuHitsToDie=4;
 let kaijuPet=null, kaijuHp=0, kaijuMaxHp=0, kaijuBarEl=null;
+const KAIJU_BAR_CSS='position:fixed;top:88px;left:50%;transform:translateX(-50%);width:500px;z-index:50;pointer-events:none;text-align:center;';
 
 // kaijuSpire: the canvas ball that becomes the Kaiju
 let kaijuSpire=null;
@@ -3517,7 +3516,7 @@ function startKaiju(){
   // HP bar top-centre
   if(kaijuBarEl)kaijuBarEl.remove();
   kaijuBarEl=document.createElement('div');
-  kaijuBarEl.style.cssText='position:fixed;top:88px;left:50%;transform:translateX(-50%);width:500px;z-index:50;pointer-events:none;text-align:center;';
+  kaijuBarEl.style.cssText=KAIJU_BAR_CSS;
   kaijuBarEl.innerHTML=
     '<div style="font-size:13px;font-weight:700;color:#50e090;letter-spacing:0.1em;margin-bottom:6px;font-family:\'Courier New\',monospace;">KAIJU HP</div>'+
     '<div style="height:26px;background:rgba(0,0,0,0.65);border-radius:4px;overflow:hidden;border:1px solid rgba(80,220,140,0.55);"><div id="kaijuBarFill" style="height:100%;width:100%;background:linear-gradient(90deg,#50e090,#20c060);border-radius:4px;transition:width 0.2s;"></div></div>'+
@@ -3699,7 +3698,7 @@ function startRaidKaiju(raiderName, raidViewers){
   // HP bar — red theme for raid
   if(kaijuBarEl)kaijuBarEl.remove();
   kaijuBarEl=document.createElement('div');
-  kaijuBarEl.style.cssText='position:fixed;top:88px;left:50%;transform:translateX(-50%);width:500px;z-index:50;pointer-events:none;text-align:center;';
+  kaijuBarEl.style.cssText=KAIJU_BAR_CSS;
   kaijuBarEl.innerHTML=
     '<div style="font-size:13px;font-weight:700;color:#ff5050;letter-spacing:0.1em;margin-bottom:6px;font-family:\'Courier New\',monospace;">RAID BOSS: '+raiderName.toUpperCase()+' ('+raidViewers+' viewers)</div>'+
     '<div style="height:26px;background:rgba(0,0,0,0.65);border-radius:4px;overflow:hidden;border:1px solid rgba(255,80,80,0.55);"><div id="kaijuBarFill" style="height:100%;width:100%;background:linear-gradient(90deg,#ff5050,#cc2020);border-radius:4px;transition:width 0.2s;"></div></div>'+

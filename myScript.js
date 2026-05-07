@@ -459,10 +459,27 @@ window.switchGallery = function(index) {
     galleryCarousels.forEach((c, i) => i === index ? c.startAuto() : c.stopAuto());
 };
 
+function applyGalleryRowBreaks() {
+    const rowSize = window.innerWidth <= 920 ? 5 : 10;
+    document.querySelectorAll('.gallery-switcher').forEach(switcher => {
+        switcher.querySelectorAll('.gallery-row-break').forEach(b => b.remove());
+        const btns = switcher.querySelectorAll('.gallery-btn');
+        btns.forEach((btn, i) => {
+            if ((i + 1) % rowSize === 0 && i < btns.length - 1) {
+                const br = document.createElement('div');
+                br.className = 'gallery-row-break';
+                btn.after(br);
+            }
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.gallery-container').forEach(g => galleryCarousels.push(makeCarousel(g)));
     switchGallery(0);
+    applyGalleryRowBreaks();
 });
+window.addEventListener('resize', applyGalleryRowBreaks);
 /*-------------------------------ILLUSTRATION CAROUSEL--------------------------------*/
 /* =====================================================================
    ADD YOUR ILLUSTRATION IMAGES HERE.

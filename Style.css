@@ -2477,6 +2477,8 @@ input, select, textarea {
     margin-bottom: 3%;
 }
 
+.bottom-gallery .gallery-header { margin-top: 5%; }
+
 .carousel-container {
     position: relative;
     max-width: 100%;
@@ -2704,6 +2706,7 @@ input, select, textarea {
     gap: 10px;
     margin: 0 auto 20px;
 }
+.gallery-row-break { flex-basis: 100%; height: 0; }
 
 /*-------------------------------FOOTER--------------------------------*/
 
@@ -2761,7 +2764,7 @@ input, select, textarea {
 
 @media (max-width: 750px){
 
-
+.bottom-gallery .gallery-header { margin-top: 15%; }
     
     .video-wrapper {
         width:82.5vw;
@@ -2803,7 +2806,7 @@ input, select, textarea {
 /* Media query for screens up to 850px */
 @media (max-width: 920px) {
 
-
+.bottom-gallery .gallery-header { margin-top: 20%; }
     table{
         border: 3px solid var(--color-text);
       }
@@ -2996,8 +2999,6 @@ input, select, textarea {
     }
 
     .gallery-switcher {
-        flex-wrap: wrap;
-        min-width: unset;
         justify-content: center;
     }
 
