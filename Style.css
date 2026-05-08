@@ -2806,7 +2806,7 @@ input, select, textarea {
 /* Media query for screens up to 850px */
 @media (max-width: 920px) {
 
-.bottom-gallery .gallery-header { margin-top: 20%; }
+
     table{
         border: 3px solid var(--color-text);
       }

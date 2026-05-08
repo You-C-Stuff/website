@@ -221,6 +221,10 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button id="testPetBtn" style="flex:1;padding:6px;border-radius:7px;border:0.5px solid rgba(255,255,255,0.15);background:transparent;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;font-family:inherit;">+ Spawn test viewer</button>
           <button id="clearTestPetsBtn" style="flex:1;padding:6px;border-radius:7px;border:0.5px solid rgba(180,50,50,0.4);background:transparent;color:rgba(220,80,80,0.7);font-size:11px;cursor:pointer;font-family:inherit;">Clear test viewers</button>
         </div>
+        <div style="display:flex;gap:6px;margin-top:6px;">
+          <input type="text" id="namedSpawnInput" placeholder="exact username…" style="flex:1;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:7px;padding:6px 8px;color:#fff;font-size:11px;font-family:inherit;">
+          <button id="namedSpawnBtn" style="padding:6px 10px;border-radius:7px;border:0.5px solid rgba(127,119,221,0.4);background:transparent;color:rgba(180,175,255,0.8);font-size:11px;cursor:pointer;font-family:inherit;white-space:nowrap;">+ Spawn</button>
+        </div>
         <button id="simulateRaidBtn" style="width:100%;margin-top:6px;padding:6px;border-radius:7px;border:0.5px solid rgba(255,150,50,0.4);background:transparent;color:rgba(255,160,60,0.8);font-size:11px;cursor:pointer;font-family:inherit;">⚡ Simulate test raid</button>
       </div>
       <div class="srow">
@@ -2285,7 +2289,8 @@ const __drawOrig=draw;
 // petMap declared early above
 const _petMapAlias=petMap; // keep ref
 function getOrCreatePet(username,color){
-  if(ignoreList.has(username.toLowerCase()))return null;
+  username=username.toLowerCase();
+  if(ignoreList.has(username))return null;
   if(petMap[username])return petMap[username];
   if(Object.keys(petMap).length>=maxPets)return null;
   const pet=new ChatPet(username,color);
@@ -2400,6 +2405,13 @@ let viewerImgMap={}; // username → data URL
   idbGet(LS_VIEWER_IMGS).then(r=>{
     if(!r)return;
     try{viewerImgMap=JSON.parse(r);}catch(e){return;}
+    // migrate any mixed-case keys to lowercase
+    const entries=Object.entries(viewerImgMap);
+    if(entries.some(([k])=>k!==k.toLowerCase())){
+      viewerImgMap={};
+      entries.forEach(([k,v])=>{viewerImgMap[k.toLowerCase()]=v;});
+      saveViewerImgs();
+    }
     // retroactively apply to any pets already on screen
     pets.forEach(p=>{if(p.username)applyViewerImgToPet(p);});
   }).catch(()=>{});
@@ -3005,6 +3017,15 @@ document.getElementById('testPetBtn').addEventListener('click',()=>{
   const pet=getOrCreatePet(name);
   if(pet){pet._isTest=true;pet.say('Hello! I am a test viewer \uD83D\uDC4B');}
 });
+document.getElementById('namedSpawnBtn').addEventListener('click',()=>{
+  const name=document.getElementById('namedSpawnInput').value.trim();
+  if(!name)return;
+  const pet=getOrCreatePet(name);
+  if(pet){pet._isTest=true;pet.say('👋 '+name);}
+});
+document.getElementById('namedSpawnInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter')document.getElementById('namedSpawnBtn').click();
+});
 document.getElementById('clearTestPetsBtn').addEventListener('click',()=>{
   const toRemove=pets.filter(p=>p._isTest);
   toRemove.forEach(p=>{if(p.username&&petMap[p.username])delete petMap[p.username];p.destroy();});
@@ -3598,6 +3619,7 @@ function endKaiju(){
 
 // ── RAID KAIJU ────────────────────────────────────────────
 function startRaidKaiju(raiderName, raidViewers){
+  raiderName=raiderName.toLowerCase();
   if(kaijuActive)endKaiju();
   if(battleRoyaleActive)endBattleRoyale();
   if(warActive)endWar();
