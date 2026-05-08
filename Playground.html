@@ -3944,7 +3944,7 @@ function startPunch(pet,target,done){
 function execViewerCmd(cmdId,username,args){
   // strip @ prefix from target usernames
   if(args&&args[0]&&args[0].startsWith('@'))args[0]=args[0].slice(1);
-  const pet=pets.find(p=>p.username===username);
+  const pet=pets.find(p=>p.username===username.toLowerCase());
   switch(cmdId){
     case 'jump':
       if(pet){pet.vy=-(8+Math.random()*4);pet.airborne=true;}
