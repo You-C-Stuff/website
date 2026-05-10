@@ -2292,6 +2292,8 @@ function getOrCreatePet(username,color){
   username=username.toLowerCase();
   if(ignoreList.has(username))return null;
   if(petMap[username])return petMap[username];
+  // block new viewers from joining mid-event
+  if(battleRoyaleActive||warActive||kaijuActive)return null;
   if(Object.keys(petMap).length>=maxPets)return null;
   const pet=new ChatPet(username,color);
   petMap[username]=pet;
@@ -4053,6 +4055,9 @@ function execViewerCmd(cmdId,username,args){
       break;
     }
     case 'eat':{
+      if(battleRoyaleActive||warActive||kaijuActive||activeDuels.size>0){
+        if(pet)pet.say('No eating during events!');break;
+      }
       const eatTgt=args&&args[0]
         ?pets.find(p=>p.username.toLowerCase()===(args[0]||'').toLowerCase()&&p!==pet)
         :null;

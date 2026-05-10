@@ -2772,7 +2772,8 @@ input, select, textarea {
     .content-left {
         left: 3%;
     }
-    .buttons button{
+    .buttons button,
+    .button-container button{
         font-size:1em;
     }
     .content h1 {
