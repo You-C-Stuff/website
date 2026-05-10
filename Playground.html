@@ -283,6 +283,7 @@ body.mode-hallway #hallwayContainer{display:block;}
       </div>
       <div class="srow" style="margin-top:8px;"><label>Animation fps</label><input type="number" id="viewerFpsInput" value="12" min="1" max="120"></div>
       <div class="srow"><label>Default viewer size (px)</label><input type="number" id="defaultViewerSize" value="84" min="8" max="300"></div>
+      <div class="srow"><label>Hallway viewer size (px)</label><input type="number" id="hallwayViewerSize" value="100" min="8" max="400"></div>
       <hr class="sdivider">
 
       <!-- ── Hoop sprite ── -->
@@ -920,7 +921,7 @@ let keepFocusForHotkeys=false;
 window.addEventListener('blur',()=>{if(keepFocusForHotkeys)setTimeout(()=>window.focus(),80);});
 
 function savePrefs(){
-  try{localStorage.setItem(LS_PREFS,JSON.stringify({bgColor,fps,hoopHeightPct,soundVol,soundThresh,keepFocusForHotkeys}));}catch(e){}
+  try{localStorage.setItem(LS_PREFS,JSON.stringify({bgColor,fps,hoopHeightPct,soundVol,soundThresh,keepFocusForHotkeys,hallwayViewerSize}));}catch(e){}
 }
 function saveAudioBuffer(key,buf){
   if(!buf){localStorage.removeItem(key);return;}
@@ -985,6 +986,7 @@ function loadAll(){
       if(p.soundVol!=null){soundVol=p.soundVol;document.getElementById('soundVol').value=volToSlider(soundVol);}
       if(p.soundThresh!=null){soundThresh=p.soundThresh;document.getElementById('soundThresh').value=soundThresh;}
       if(p.keepFocusForHotkeys!=null){keepFocusForHotkeys=p.keepFocusForHotkeys;document.getElementById('keepFocusToggle').checked=keepFocusForHotkeys;}
+      if(p.hallwayViewerSize!=null){hallwayViewerSize=p.hallwayViewerSize;document.getElementById('hallwayViewerSize').value=hallwayViewerSize;}
     }
   }catch(e){}
   try{
@@ -1640,6 +1642,10 @@ document.getElementById('defaultViewerSize').addEventListener('input',function()
   const namePx=Math.max(8,Math.round(v*0.22))+'px';
   pets.forEach(p=>{p.w=v;p.h=v;p.spriteEl.width=v;p.spriteEl.height=v;p.el.style.width=v+'px';p.nameEl.style.fontSize=namePx;});
 });
+document.getElementById('hallwayViewerSize').addEventListener('input',function(){
+  hallwayViewerSize=Math.max(8,parseInt(this.value)||100);
+  savePrefs();
+});
 document.getElementById('hoopSizeSlider').addEventListener('input',function(){
   HOOP_W=parseInt(this.value);
   HOOP_H=Math.round(HOOP_W*0.75); // maintain 4:3 ratio
@@ -1880,6 +1886,7 @@ function getPetFramesForDir(fl,mov,talking){
   if(petFramesRight.length)return petFramesRight;if(petFrames.length)return petFrames;return[];
 } // loaded images for walking animation
 let petSize=84, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
+let hallwayViewerSize=100;
 // pets declared early above
 const LS_PET='lpp_pet5', LS_TCHAN='lpp_tchan5', LS_IGNORE='lpp_ignore5', LS_PLEDGES='lpp_pledges5';
 let pledgeStore={}; // username.toLowerCase() → teamId
@@ -2321,7 +2328,7 @@ function getOrCreatePet(username,color){
     pet.el.style.position='absolute';
     pet.el.style.display='flex';
     const hwH=hallwayCanvas.height||HALLWAY_HEIGHT;
-    const HW_SIZE=100; // hallway display size — becomes petSize on graduation
+    const HW_SIZE=hallwayViewerSize;
     pet.w=HW_SIZE;pet.h=HW_SIZE;
     pet.spriteEl.width=HW_SIZE;pet.spriteEl.height=HW_SIZE;
     pet.el.style.width=HW_SIZE+'px';
