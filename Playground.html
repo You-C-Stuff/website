@@ -92,7 +92,7 @@ body.mode-hallway #hallwayContainer{display:block;}
 .soundUpBtn{width:100%;padding:8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;font-family:inherit;}
 .soundUpBtn:hover{border-color:#7F77DD;}
 .snd-label{font-size:11px;color:rgba(255,255,255,0.4);min-height:16px;flex:1;margin:0;}
-#fileInputHidden,#hoopFileInput,#soundInput,#victorySoundInput,#resizeSoundInput,#battleStartSoundInput,#hitSoundInput,#koSoundInput,#winSoundInput,#stompSoundInput,#dvdBounceSoundInput{display:none;}
+#fileInputHidden,#hoopFileInput,#soundInput,#victorySoundInput,#resizeSoundInput,#battleStartSoundInput,#hitSoundInput,#koSoundInput,#winSoundInput,#stompSoundInput,#dvdBounceSoundInput,#whipSoundInput{display:none;}
 #hotkeyList{width:100%;border-collapse:collapse;font-size:12px;}
 #hotkeyList th{text-align:left;color:rgba(255,255,255,0.4);font-weight:400;padding:4px 6px;border-bottom:0.5px solid rgba(255,255,255,0.08);}
 #hotkeyList td{padding:6px 6px;vertical-align:middle;}
@@ -450,6 +450,19 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button id="dvdBounceSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
+      <div class="srow">
+        <label>🦯 Whip hit</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volWhip" min="0" max="2" step="0.01" value="1">
+          <span id="volWhipVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
+        <button class="soundUpBtn" id="whipSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="whipSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="whipSoundName">No sound loaded</div>
+          <button id="whipSoundClearBtn" class="snd-clear-btn">Clear</button>
+        </div>
+      </div>
     </div>
     <div class="stabpanel" id="tab-hotkeys">
       <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Click a field then press any key to rebind.</p>
@@ -493,6 +506,15 @@ body.mode-hallway #hallwayContainer{display:block;}
       <div class="srow"><label>Stomp interval (ms)</label><input type="number" id="kaijuStompInterval" value="3000" min="500" max="10000" step="100"></div>
       <div class="srow"><label>Stomp fling force</label><input type="number" id="kaijuFlingForce" value="18" min="5" max="50"></div>
       <div class="srow"><label>Hits to kill a viewer (stomps)</label><input type="number" id="kaijuHitsToDie" value="4" min="1" max="20"></div>
+      <div class="sdivider"></div>
+      <div style="font-size:12px;font-weight:500;color:rgba(240,180,60,0.8);margin-bottom:10px;">🦯 Whip</div>
+      <div class="srow"><label>Segment length (px) — shorter = tighter, longer = longer reach</label><input type="number" id="whipSegLenInput" value="1" min="1" max="60" step="1"></div>
+      <div class="sdivider"></div>
+      <div style="font-size:12px;font-weight:500;color:rgba(220,80,80,0.85);margin-bottom:8px;">⚔️ Custom Battle Royale</div>
+      <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">Clears all current viewers and balls, spawns these names, and runs a simulated fight to pick a winner. Costumes are loaded if saved.</p>
+      <textarea id="simBRNames" rows="6" placeholder="name1&#10;name2&#10;name3" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;color:#fff;font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;margin-bottom:8px;"></textarea>
+      <button id="simBRStartBtn" style="width:100%;background:transparent;border:0.5px solid rgba(220,60,60,0.5);border-radius:6px;color:rgba(220,80,80,0.9);font-size:11px;font-family:inherit;padding:6px 0;cursor:pointer;">⚔️ Start Simulation</button>
+      <div id="simBRMsg" style="font-size:11px;color:rgba(255,150,100,0.9);margin-top:6px;min-height:16px;"></div>
     </div>
     <div class="stabpanel" id="tab-commands">
       <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Customise command triggers. Commands starting with ! can be renamed. Leave a field blank to disable that command.</p>
@@ -849,10 +871,10 @@ let hoopSliding=false;
 let hoopSlideDir=0;    // +1 = sliding out, -1 = sliding in
 
 let collisionBuffer=null,victoryBuffer=null,resizeBuffer=null;
-let battleStartBuffer=null,hitBuffer=null,koBuffer=null,winBuffer=null,stompBuffer=null,dvdBounceBuffer=null;
+let battleStartBuffer=null,hitBuffer=null,koBuffer=null,winBuffer=null,stompBuffer=null,dvdBounceBuffer=null,whipBuffer=null;
 let audioCtx=null,soundVol=0.02,soundThresh=3,lastSoundTime=0,lastResizeSound=0,lastVictoryTime=0;
 // per-sound volume multipliers (0–2, default 1)
-const perSoundVol={collision:1,hoop:1,resize:1,battleStart:1,hit:1,ko:1,win:1,stomp:1,dvd:1};
+const perSoundVol={collision:1,hoop:1,resize:1,battleStart:1,hit:1,ko:1,win:1,stomp:1,dvd:1,whip:1};
 const LS_PERVOL='lpp_pervol5';
 (function(){try{const r=localStorage.getItem(LS_PERVOL);if(r)Object.assign(perSoundVol,JSON.parse(r));}catch(e){}})();
 function savePerVol(){try{localStorage.setItem(LS_PERVOL,JSON.stringify(perSoundVol));}catch(e){}}
@@ -893,7 +915,7 @@ ACTIONS.forEach(a=>hotkeys[a.id]=a.default?[a.default]:[]);
 
 const LS_C='lpp_c5',LS_A='lpp_a5',LS_H='lpp_h5',LS_HK='lpp_hk5',LS_PREFS='lpp_prefs5';
 const LS_SND='lpp_snd5',LS_VSND='lpp_vsnd5',LS_RSND='lpp_rsnd5';
-const LS_BSND='lpp_bsnd5',LS_HSND='lpp_hsnd5',LS_KOSND='lpp_kosnd5',LS_WINSND='lpp_winsnd5',LS_STOMPSND='lpp_stompsnd5',LS_DVDSND='lpp_dvdsnd5';
+const LS_BSND='lpp_bsnd5',LS_HSND='lpp_hsnd5',LS_KOSND='lpp_kosnd5',LS_WINSND='lpp_winsnd5',LS_STOMPSND='lpp_stompsnd5',LS_DVDSND='lpp_dvdsnd5',LS_WHIPSND='lpp_whipsnd5';
 
 // ── IndexedDB image store (replaces localStorage for large image blobs) ──
 let _idb=null;
@@ -1035,6 +1057,7 @@ function loadSoundsFromLS(){
   loadAudioBuffer(LS_WINSND,buf=>{winBuffer=buf;document.getElementById('winSoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_STOMPSND,buf=>{stompBuffer=buf;document.getElementById('stompSoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_DVDSND,buf=>{dvdBounceBuffer=buf;document.getElementById('dvdBounceSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_WHIPSND,buf=>{whipBuffer=buf;document.getElementById('whipSoundName').textContent='✓ (saved)';});
 }
 
 class Spire{
@@ -1779,6 +1802,7 @@ wireAudio('koSoundUpBtn','koSoundInput','koSoundName',buf=>{koBuffer=buf;saveAud
 wireAudio('winSoundUpBtn','winSoundInput','winSoundName',buf=>{winBuffer=buf;saveAudioBuffer(LS_WINSND,buf);});
 wireAudio('stompSoundUpBtn','stompSoundInput','stompSoundName',buf=>{stompBuffer=buf;saveAudioBuffer(LS_STOMPSND,buf);});
 wireAudio('dvdBounceSoundUpBtn','dvdBounceSoundInput','dvdBounceSoundName',buf=>{dvdBounceBuffer=buf;saveAudioBuffer(LS_DVDSND,buf);});
+wireAudio('whipSoundUpBtn','whipSoundInput','whipSoundName',buf=>{whipBuffer=buf;saveAudioBuffer(LS_WHIPSND,buf);});
 
 document.getElementById('soundClearBtn').addEventListener('click',()=>{collisionBuffer=null;localStorage.removeItem(LS_SND);document.getElementById('soundName').textContent='No sound loaded';});
 document.getElementById('victorySoundClearBtn').addEventListener('click',()=>{victoryBuffer=null;localStorage.removeItem(LS_VSND);document.getElementById('victorySoundName').textContent='No sound loaded';});
@@ -1789,6 +1813,7 @@ document.getElementById('koSoundClearBtn').addEventListener('click',()=>{koBuffe
 document.getElementById('winSoundClearBtn').addEventListener('click',()=>{winBuffer=null;localStorage.removeItem(LS_WINSND);document.getElementById('winSoundName').textContent='No sound loaded';});
 document.getElementById('stompSoundClearBtn').addEventListener('click',()=>{stompBuffer=null;localStorage.removeItem(LS_STOMPSND);document.getElementById('stompSoundName').textContent='No sound loaded';});
 document.getElementById('dvdBounceSoundClearBtn').addEventListener('click',()=>{dvdBounceBuffer=null;localStorage.removeItem(LS_DVDSND);document.getElementById('dvdBounceSoundName').textContent='No sound loaded';});
+document.getElementById('whipSoundClearBtn').addEventListener('click',()=>{whipBuffer=null;localStorage.removeItem(LS_WHIPSND);document.getElementById('whipSoundName').textContent='No sound loaded';});
 
 
 document.getElementById('soundVol').addEventListener('input',function(){
@@ -1807,6 +1832,7 @@ wireVolSlider('volKO','volKOVal','ko');
 wireVolSlider('volWin','volWinVal','win');
 wireVolSlider('volStomp','volStompVal','stomp');
 wireVolSlider('volDVD','volDVDVal','dvd');
+wireVolSlider('volWhip','volWhipVal','whip');
 document.getElementById('soundThresh').addEventListener('input',function(){soundThresh=parseFloat(this.value)||3;savePrefs();});
 document.addEventListener('pointerdown',()=>ensureAudio());
 
@@ -2553,6 +2579,7 @@ function applyViewerImgToPet(pet){
 // ── BATTLE ROYALE ─────────────────────────────────────────
 let battleRoyaleActive=false;
 let brInterval=null;
+let _simBrCleanup=false;
 
 function startBattleRoyale(){
   if(pets.length<2){return;}
@@ -2574,76 +2601,78 @@ function startBattleRoyale(){
     p.el.style.filter='none';
   });
   clearInterval(brInterval);
-  brInterval=setInterval(()=>{
-    if(!battleRoyaleActive)return;
-    const alive=pets.filter(p=>p.alive);
-    // check win condition
-    if(alive.length<=1){
-      if(alive.length===1){
-        alive[0].say('👑 I WIN!');ensureAudio();playEventSound(winBuffer,'win');
-        alive[0].brAngleTarget=0;
-      }
-      endBattleRoyale();
-      return;
+  brInterval=setInterval(_brTick,brCheckInterval);
+}
+
+function _brTick(){
+  if(!battleRoyaleActive)return;
+  const alive=pets.filter(p=>p.alive);
+  if(alive.length<=1){
+    if(alive.length===1){alive[0].say('👑 I WIN!');ensureAudio();playEventSound(winBuffer,'win');alive[0].brAngleTarget=0;}
+    endBattleRoyale();return;
+  }
+  for(const p of alive){
+    if(p.grabbed||p.pinned)continue;
+    let nearest=null,nearDist=Infinity;
+    for(const q of alive){
+      if(q===p)continue;
+      const d=Math.hypot((q.x+q.w/2)-(p.x+p.w/2),(q.y+q.h/2)-(p.y+p.h/2));
+      if(d<nearDist){nearDist=d;nearest=q;}
     }
-    for(const p of alive){
-      if(p.grabbed||p.pinned)continue;
-      // find nearest opponent
-      let nearest=null,nearDist=Infinity;
-      for(const q of alive){
-        if(q===p)continue;
-        const d=Math.hypot((q.x+q.w/2)-(p.x+p.w/2),(q.y+q.h/2)-(p.y+p.h/2));
-        if(d<nearDist){nearDist=d;nearest=q;}
-      }
-      if(!nearest)continue;
-      const dx=(nearest.x+nearest.w/2)-(p.x+p.w/2);
-      const dy=(nearest.y+nearest.h/2)-(p.y+p.h/2);
-      const dist=Math.sqrt(dx*dx+dy*dy)||1;
-      // point toward nearest
-      p.brAngleTarget=Math.atan2(dy,dx)+Math.PI/2;
-      // wander toward
-      const dir=dx>0?1:-1;
-      p.vx+=dir*0.5;
-      if(Math.abs(p.vx)>petSpeed*3)p.vx=dir*petSpeed*3;
-      p.facingLeft=dir<0;
-      // attack if in range
-      if(p.brCooldown>0){p.brCooldown--;continue;}
-      const range=p.w*2.8;
-      if(dist<range){
-        if(Math.random()<0.5){
-          // hit
-          const dmg=8+Math.floor(Math.random()*4); // avg 10hp per hit
-          nearest.hp=Math.max(0,nearest.hp-dmg);
-          const nx=dx/dist, ny=dy/dist;
-          nearest.vx+=nx*5;nearest.vy-=4;nearest.airborne=true;
-          p.brCooldown=35+Math.floor(Math.random()*25);
-          p.brAngleTarget+=Math.PI*0.5*(Math.random()<0.5?1:-1);
-          ensureAudio();playEventSound(hitBuffer,'hit');
-          if(nearest.hp<=0){
-            nearest.alive=false;
-            if(nearest.bubble){nearest.bubble.remove();nearest.bubble=null;}
-            nearest.healthBarWrap.style.display='none';
-            nearest.brAngleTarget=Math.PI*4*(Math.random()<0.5?1:-1);
-            nearest.vx=(Math.random()<0.5?-1:1)*(10+Math.random()*8);
-            nearest.vy=-(8+Math.random()*5);
-            nearest.airborne=true;
-            nearest.el.style.transition='opacity 0.8s'; nearest.el.style.opacity='0';
-            playEventSound(koBuffer,'ko');
-            setTimeout(()=>{if(!nearest.alive)nearest.el.style.display='none';},900);
-          }
-        } else {
-          // miss — stumble
-          p.brCooldown=15;
-          p.vx-=dx/dist*2;
+    if(!nearest)continue;
+    const dx=(nearest.x+nearest.w/2)-(p.x+p.w/2);
+    const dy=(nearest.y+nearest.h/2)-(p.y+p.h/2);
+    const dist=Math.sqrt(dx*dx+dy*dy)||1;
+    p.brAngleTarget=Math.atan2(dy,dx)+Math.PI/2;
+    const dir=dx>0?1:-1;
+    p.vx+=dir*0.5;
+    if(Math.abs(p.vx)>petSpeed*3)p.vx=dir*petSpeed*3;
+    p.facingLeft=dir<0;
+    if(p.brCooldown>0){p.brCooldown--;continue;}
+    const range=p.w*brAttackRange;
+    if(dist<range){
+      if(Math.random()<0.5){
+        const dmg=8+Math.floor(Math.random()*4);
+        nearest.hp=Math.max(0,nearest.hp-dmg);
+        const nx=dx/dist;
+        nearest.vx+=nx*5;nearest.vy-=4;nearest.airborne=true;
+        p.brCooldown=35+Math.floor(Math.random()*25);
+        p.brAngleTarget+=Math.PI*0.5*(Math.random()<0.5?1:-1);
+        ensureAudio();playEventSound(hitBuffer,'hit');
+        if(nearest.hp<=0){
+          nearest.alive=false;
+          if(nearest.bubble){nearest.bubble.remove();nearest.bubble=null;}
+          nearest.healthBarWrap.style.display='none';
+          nearest.brAngleTarget=Math.PI*4*(Math.random()<0.5?1:-1);
+          nearest.vx=(Math.random()<0.5?-1:1)*(10+Math.random()*8);
+          nearest.vy=-(8+Math.random()*5);nearest.airborne=true;
+          nearest.el.style.transition='opacity 0.8s';nearest.el.style.opacity='0';
+          playEventSound(koBuffer,'ko');
+          setTimeout(()=>{if(!nearest.alive)nearest.el.style.display='none';},900);
         }
-      }
+      } else {p.brCooldown=15;p.vx-=dx/dist*2;}
     }
-  },180);
+  }
 }
 
 function endBattleRoyale(){
   battleRoyaleActive=false;
   clearInterval(brInterval);brInterval=null;
+  const doClean=_simBrCleanup;
+  _simBrCleanup=false;
+  if(doClean){
+    setTimeout(()=>{
+      const dead=pets.slice();
+      pets=[];for(const k in petMap)delete petMap[k];
+      hallwayWalkers=[];
+      dead.forEach(p=>{
+        p.el.style.transition='opacity 0.8s';
+        requestAnimationFrame(()=>{p.el.style.opacity='0';});
+        setTimeout(()=>p.destroy(),900);
+      });
+    },2500);
+    return;
+  }
   setTimeout(()=>{
     pets.forEach(p=>{
       p.alive=true;p.hp=p.maxHp||100;
@@ -2661,6 +2690,63 @@ function endBattleRoyale(){
     });
   },2500);
 }
+
+function startSimBattleRoyale(){
+  const msgEl=document.getElementById('simBRMsg');
+  const textarea=document.getElementById('simBRNames');
+  const rawNames=textarea?textarea.value.split('\n').map(s=>s.trim().toLowerCase()).filter(Boolean):[];
+  const names=[...new Set(rawNames)];
+  if(names.length<2){
+    if(msgEl)msgEl.textContent='Need at least 2 names.';
+    setTimeout(()=>{if(msgEl)msgEl.textContent='';},3000);
+    return;
+  }
+  if(msgEl)msgEl.textContent='Starting…';
+  // stop any active events
+  if(kaijuActive)endKaiju();
+  if(warActive)endWar();
+  if(battleRoyaleActive){battleRoyaleActive=false;clearInterval(brInterval);brInterval=null;}
+  // clear the canvas
+  pets.forEach(p=>p.destroy());
+  pets=[];for(const k in petMap)delete petMap[k];
+  hallwayWalkers=[];spires=[];
+  // spawn sim pets — all guards pass since battleRoyaleActive is false
+  names.forEach(name=>getOrCreatePet(name));
+  // wait ~600ms for saved costumes to load from IndexedDB
+  setTimeout(()=>{
+    // if hallway mode, move pets onto main canvas
+    hallwayWalkers=[];
+    pets.forEach(p=>{
+      if(!p._inHallway)return;
+      p._inHallway=false;
+      canvasWrap.appendChild(p.el);
+      p.el.style.position='';p.el.style.left='';p.el.style.bottom='';
+      p.w=petSize;p.h=petSize;p.spriteEl.width=petSize;p.spriteEl.height=petSize;p.el.style.width=petSize+'px';
+    });
+    if(pets.length<2){
+      if(msgEl)msgEl.textContent='Could not spawn enough pets.';
+      setTimeout(()=>{if(msgEl)msgEl.textContent='';},3000);
+      pets.forEach(p=>{if(petMap[p.username])delete petMap[p.username];p.destroy();});
+      pets=[];
+      return;
+    }
+    if(msgEl)msgEl.textContent='';
+    _simBrCleanup=true;
+    battleRoyaleActive=true;spires=[];
+    const maxHP=Math.min(10,pets.length)*10;
+    pets.forEach(p=>{
+      p.hp=maxHP;p.maxHp=maxHP;p.alive=true;p.brCooldown=0;p.brAngle=0;p.brAngleTarget=0;
+      p.x=Math.random()*(canvas.width-p.w);p.y=canvas.height-p.h;
+      p.vx=(Math.random()-.5)*4;p.vy=-3-Math.random()*3;p.airborne=true;
+      p.el.style.transition='none';p.el.style.display='flex';p.el.style.opacity='1';p.el.style.filter='none';
+      p.nameEl.textContent='⚔ '+p.username;p.nameEl.style.color=p.color;
+    });
+    clearInterval(brInterval);
+    brInterval=setInterval(_brTick,brCheckInterval);
+    ensureAudio();playEventSound(battleStartBuffer,'battleStart');
+  },600);
+}
+document.getElementById('simBRStartBtn').addEventListener('click',startSimBattleRoyale);
 
 // ── FIGHT SETTINGS ────────────────────────────────────────
 // ── Multi-team war ─────────────────────────────────────────
@@ -2862,6 +2948,7 @@ document.querySelectorAll('.stab[data-tab="fights"]').forEach(b=>b.addEventListe
 buildTeamConfigUI();
 document.getElementById('brInterval').addEventListener('input',function(){brCheckInterval=Math.max(50,parseInt(this.value)||180);});
 document.getElementById('brRange').addEventListener('input',function(){brAttackRange=Math.max(1,parseFloat(this.value)||2.8);});
+document.getElementById('whipSegLenInput').addEventListener('input',function(){whipSegLen=Math.max(8,Math.min(60,parseInt(this.value)||22));});
 document.getElementById('kaijuSize').addEventListener('input',function(){kaijuSize=Math.max(80,parseInt(this.value)||200);});
 document.getElementById('kaijuStompInterval').addEventListener('input',function(){kaijuStompInterval=Math.max(500,parseInt(this.value)||3000);});
 document.getElementById('kaijuFlingForce').addEventListener('input',function(){kaijuFlingForce=Math.max(5,parseInt(this.value)||18);});
@@ -3753,9 +3840,9 @@ let caneActive=false;
 let _caneSvg=null,_caneSegs=[];
 let _caneMouseX=0,_caneMouseY=0,_caneRafId=null;
 let _caneHitTime={};
-let _caneRegenTimer=null;
-const CANE_DMG=20,CANE_RATE_MS=400,CANE_REGEN_MS=30000;
-const WHIP_N=8,WHIP_SEG_LEN=22,WHIP_GRAVITY=0.9,WHIP_DAMPING=0.90,WHIP_SUBSTEPS=4;
+const CANE_DMG=20,CANE_RATE_MS=400;
+let whipSegLen=1;
+const WHIP_N=8,WHIP_GRAVITY=0.9,WHIP_DAMPING=0.90,WHIP_SUBSTEPS=4;
 let _whipNodes=[];
 
 function toggleCane(){if(caneActive)endCane();else startCane();}
@@ -3784,7 +3871,7 @@ function startCane(){
   _caneSvg.style.display='block';
   document.body.style.cursor='none';
   _whipNodes=[];
-  for(let i=0;i<=WHIP_N;i++){const nx=_caneMouseX,ny=_caneMouseY+i*WHIP_SEG_LEN;_whipNodes.push({x:nx,y:ny,px:nx,py:ny});}
+  for(let i=0;i<=WHIP_N;i++){const nx=_caneMouseX,ny=_caneMouseY+i*whipSegLen;_whipNodes.push({x:nx,y:ny,px:nx,py:ny});}
   if(_caneRafId)cancelAnimationFrame(_caneRafId);
   const _nSeg=[WHIP_N+1,Math.round(WHIP_N*0.75)+1,Math.round(WHIP_N*0.5)+1,3];
   function _buildPath(count){
@@ -3812,7 +3899,7 @@ function startCane(){
         const a=_whipNodes[i],b=_whipNodes[i+1];
         const dx=b.x-a.x,dy=b.y-a.y;
         const dist=Math.sqrt(dx*dx+dy*dy)||0.001;
-        const diff=(dist-WHIP_SEG_LEN)/dist;
+        const diff=(dist-whipSegLen)/dist;
         if(i===0){b.x-=dx*diff;b.y-=dy*diff;}
         else{a.x+=dx*diff*0.5;a.y+=dy*diff*0.5;b.x-=dx*diff*0.5;b.y-=dy*diff*0.5;}
       }
@@ -3828,6 +3915,7 @@ function startCane(){
       const rect=p.el.getBoundingClientRect();
       if(tip.x<rect.left||tip.x>rect.right||tip.y<rect.top||tip.y>rect.bottom)return;
       _caneHitTime[p.username]=now;
+      ensureAudio();playEventSound(whipBuffer||hitBuffer,'whip');
       if(p._isRaidBoss&&kaijuActive){kaijuTakeDamage(CANE_DMG,'cane');return;}
       if(!p.maxHp)p.maxHp=CANE_HP;
       p.hp=Math.max(0,p.hp-CANE_DMG);
@@ -3862,21 +3950,12 @@ function startCane(){
     }
     _caneRafId=requestAnimationFrame(_caneLoop);
   })();
-  _caneRegenTimer=setInterval(()=>{
-    if(!caneActive)return;
-    const t=Date.now();
-    pets.forEach(p=>{
-      if(!p.alive||p._isRaidBoss||p.hp>=p.maxHp)return;
-      if(t-(_caneHitTime[p.username]||0)>=CANE_REGEN_MS)p.hp=p.maxHp;
-    });
-  },2000);
   const btn=document.getElementById('whipTopBtn');
   if(btn){btn.style.borderColor='rgba(255,190,40,0.8)';btn.style.color='rgba(255,210,60,1)';btn.textContent='🦯 Whip ON';}
 }
 
 function endCane(){
   caneActive=false;
-  clearInterval(_caneRegenTimer);_caneRegenTimer=null;
   if(_caneSvg)_caneSvg.style.display='none';
   if(_caneRafId){cancelAnimationFrame(_caneRafId);_caneRafId=null;}
   document.body.style.cursor='';
