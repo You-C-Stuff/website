@@ -510,6 +510,13 @@ body.mode-hallway #hallwayContainer{display:block;}
       <div style="font-size:12px;font-weight:500;color:rgba(240,180,60,0.8);margin-bottom:10px;">🦯 Whip</div>
       <div class="srow"><label>Segment length (px) — shorter = tighter, longer = longer reach</label><input type="number" id="whipSegLenInput" value="1" min="1" max="60" step="1"></div>
       <div class="sdivider"></div>
+      <div style="font-size:12px;font-weight:500;color:rgba(200,50,50,0.85);margin-bottom:10px;">🩸 Blood</div>
+      <div class="srow" style="align-items:center;">
+        <label>Enable blood splatter</label>
+        <input type="checkbox" id="bloodEnabledToggle" checked style="accent-color:#cc3333;width:16px;height:16px;cursor:pointer;">
+      </div>
+      <div class="srow"><label>Scale (auto-scales with viewer size)</label><input type="number" id="bloodScaleInput" value="1" min="0.1" max="5" step="0.1"></div>
+      <div class="sdivider"></div>
       <div style="font-size:12px;font-weight:500;color:rgba(220,80,80,0.85);margin-bottom:8px;">⚔️ Custom Battle Royale</div>
       <p style="font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:8px;">Clears all current viewers and balls, spawns these names, and runs a simulated fight to pick a winner. Costumes are loaded if saved.</p>
       <textarea id="simBRNames" rows="6" placeholder="name1&#10;name2&#10;name3" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:6px 8px;color:#fff;font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;margin-bottom:8px;"></textarea>
@@ -946,31 +953,32 @@ window.addEventListener('blur',()=>{if(keepFocusForHotkeys)setTimeout(()=>window
 function savePrefs(){
   try{localStorage.setItem(LS_PREFS,JSON.stringify({bgColor,fps,hoopHeightPct,soundVol,soundThresh,keepFocusForHotkeys,hallwayViewerSize}));}catch(e){}
 }
-function saveAudioBuffer(key,buf){
-  if(!buf){localStorage.removeItem(key);return;}
+function saveAudioBytes(key,arrayBuffer){
+  if(!arrayBuffer){localStorage.removeItem(key);return;}
   try{
-    // render to wav-like PCM via OfflineAudioContext isn't feasible — store as ArrayBuffer base64
-    // We stored it from the original file read, so we re-encode from the AudioBuffer's channel data
-    const ch=buf.numberOfChannels,sr=buf.sampleRate,len=buf.length;
-    const raw=new Float32Array(len*ch);
-    for(let c=0;c<ch;c++){const d=buf.getChannelData(c);for(let i=0;i<len;i++)raw[i*ch+c]=d[i];}
-    // encode as base64 in chunks to avoid stack overflow
-    const bytes=new Uint8Array(raw.buffer);
+    const bytes=new Uint8Array(arrayBuffer);
     let b64='';const chunk=8192;
     for(let i=0;i<bytes.length;i+=chunk){b64+=String.fromCharCode(...bytes.subarray(i,i+chunk));}
-    localStorage.setItem(key,JSON.stringify({b64:btoa(b64),ch,sr,len}));
+    localStorage.setItem(key,JSON.stringify({raw:btoa(b64)}));
   }catch(e){console.warn('Could not save audio to localStorage (may be too large):',e);}
 }
 function loadAudioBuffer(key,cb){
   try{
-    const raw=localStorage.getItem(key);if(!raw)return;
-    const {b64,ch,sr,len}=JSON.parse(raw);
-    const bytes=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
-    const floats=new Float32Array(bytes.buffer);
+    const stored=localStorage.getItem(key);if(!stored)return;
+    const parsed=JSON.parse(stored);
     ensureAudio();
-    const buf=audioCtx.createBuffer(ch,len,sr);
-    for(let c=0;c<ch;c++){const d=buf.getChannelData(c);for(let i=0;i<len;i++)d[i]=floats[i*ch+c];}
-    cb(buf);
+    if(parsed.raw){
+      // new format: original file bytes — decode directly
+      const bytes=Uint8Array.from(atob(parsed.raw),c=>c.charCodeAt(0));
+      audioCtx.decodeAudioData(bytes.buffer.slice(0),buf=>cb(buf),()=>{});
+    }else if(parsed.b64){
+      // old format: decoded PCM floats — reconstruct AudioBuffer
+      const bytes=Uint8Array.from(atob(parsed.b64),c=>c.charCodeAt(0));
+      const floats=new Float32Array(bytes.buffer);
+      const buf=audioCtx.createBuffer(parsed.ch,parsed.len,parsed.sr);
+      for(let c=0;c<parsed.ch;c++){const d=buf.getChannelData(c);for(let i=0;i<parsed.len;i++)d[i]=floats[i*parsed.ch+c];}
+      cb(buf);
+    }
   }catch(e){}
 }
 function genId(){return'id_'+Date.now()+'_'+Math.random().toString(36).slice(2);}
@@ -1780,29 +1788,32 @@ document.getElementById('hoopFileInput').addEventListener('change',function(){
 function loadAudioFile(file,cb){
   ensureAudio();
   const reader=new FileReader();
-  reader.onload=ev=>{audioCtx.decodeAudioData(ev.target.result.slice(0),buf=>cb(null,buf),()=>cb('err'));};
+  reader.onload=ev=>{
+    const raw=ev.target.result;
+    audioCtx.decodeAudioData(raw.slice(0),buf=>cb(null,buf,raw),()=>cb('err'));
+  };
   reader.readAsArrayBuffer(file);
 }
 function wireAudio(btnId,inputId,labelId,onLoad){
   document.getElementById(btnId).addEventListener('click',()=>document.getElementById(inputId).click());
   document.getElementById(inputId).addEventListener('change',function(){
     const file=this.files[0];if(!file)return;
-    loadAudioFile(file,(err,buf)=>{
+    loadAudioFile(file,(err,buf,raw)=>{
       document.getElementById(labelId).textContent=err?'Error decoding':'✓ '+file.name;
-      if(!err)onLoad(buf);
+      if(!err)onLoad(buf,raw);
     });this.value='';
   });
 }
-wireAudio('soundUpBtn','soundInput','soundName',buf=>{collisionBuffer=buf;saveAudioBuffer(LS_SND,buf);});
-wireAudio('victorySoundUpBtn','victorySoundInput','victorySoundName',buf=>{victoryBuffer=buf;saveAudioBuffer(LS_VSND,buf);});
-wireAudio('resizeSoundUpBtn','resizeSoundInput','resizeSoundName',buf=>{resizeBuffer=buf;saveAudioBuffer(LS_RSND,buf);});
-wireAudio('battleStartSoundUpBtn','battleStartSoundInput','battleStartSoundName',buf=>{battleStartBuffer=buf;saveAudioBuffer(LS_BSND,buf);});
-wireAudio('hitSoundUpBtn','hitSoundInput','hitSoundName',buf=>{hitBuffer=buf;saveAudioBuffer(LS_HSND,buf);});
-wireAudio('koSoundUpBtn','koSoundInput','koSoundName',buf=>{koBuffer=buf;saveAudioBuffer(LS_KOSND,buf);});
-wireAudio('winSoundUpBtn','winSoundInput','winSoundName',buf=>{winBuffer=buf;saveAudioBuffer(LS_WINSND,buf);});
-wireAudio('stompSoundUpBtn','stompSoundInput','stompSoundName',buf=>{stompBuffer=buf;saveAudioBuffer(LS_STOMPSND,buf);});
-wireAudio('dvdBounceSoundUpBtn','dvdBounceSoundInput','dvdBounceSoundName',buf=>{dvdBounceBuffer=buf;saveAudioBuffer(LS_DVDSND,buf);});
-wireAudio('whipSoundUpBtn','whipSoundInput','whipSoundName',buf=>{whipBuffer=buf;saveAudioBuffer(LS_WHIPSND,buf);});
+wireAudio('soundUpBtn','soundInput','soundName',(buf,raw)=>{collisionBuffer=buf;saveAudioBytes(LS_SND,raw);});
+wireAudio('victorySoundUpBtn','victorySoundInput','victorySoundName',(buf,raw)=>{victoryBuffer=buf;saveAudioBytes(LS_VSND,raw);});
+wireAudio('resizeSoundUpBtn','resizeSoundInput','resizeSoundName',(buf,raw)=>{resizeBuffer=buf;saveAudioBytes(LS_RSND,raw);});
+wireAudio('battleStartSoundUpBtn','battleStartSoundInput','battleStartSoundName',(buf,raw)=>{battleStartBuffer=buf;saveAudioBytes(LS_BSND,raw);});
+wireAudio('hitSoundUpBtn','hitSoundInput','hitSoundName',(buf,raw)=>{hitBuffer=buf;saveAudioBytes(LS_HSND,raw);});
+wireAudio('koSoundUpBtn','koSoundInput','koSoundName',(buf,raw)=>{koBuffer=buf;saveAudioBytes(LS_KOSND,raw);});
+wireAudio('winSoundUpBtn','winSoundInput','winSoundName',(buf,raw)=>{winBuffer=buf;saveAudioBytes(LS_WINSND,raw);});
+wireAudio('stompSoundUpBtn','stompSoundInput','stompSoundName',(buf,raw)=>{stompBuffer=buf;saveAudioBytes(LS_STOMPSND,raw);});
+wireAudio('dvdBounceSoundUpBtn','dvdBounceSoundInput','dvdBounceSoundName',(buf,raw)=>{dvdBounceBuffer=buf;saveAudioBytes(LS_DVDSND,raw);});
+wireAudio('whipSoundUpBtn','whipSoundInput','whipSoundName',(buf,raw)=>{whipBuffer=buf;saveAudioBytes(LS_WHIPSND,raw);});
 
 document.getElementById('soundClearBtn').addEventListener('click',()=>{collisionBuffer=null;localStorage.removeItem(LS_SND);document.getElementById('soundName').textContent='No sound loaded';});
 document.getElementById('victorySoundClearBtn').addEventListener('click',()=>{victoryBuffer=null;localStorage.removeItem(LS_VSND);document.getElementById('victorySoundName').textContent='No sound loaded';});
@@ -2639,6 +2650,7 @@ function _brTick(){
         p.brCooldown=35+Math.floor(Math.random()*25);
         p.brAngleTarget+=Math.PI*0.5*(Math.random()<0.5?1:-1);
         ensureAudio();playEventSound(hitBuffer,'hit');
+        spawnBloodSplatter(nearest);
         if(nearest.hp<=0){
           nearest.alive=false;
           if(nearest.bubble){nearest.bubble.remove();nearest.bubble=null;}
@@ -2795,6 +2807,7 @@ function buildTeamConfigUI(){
 // legacy compat vars (kept in case other code refs them)
 let teamAEmoji='⚔️', teamBEmoji='🛡️', teamACry='For glory!', teamBCry='Hold the line!';
 let brCheckInterval=180, brAttackRange=2.8;
+let bloodEnabled=true, bloodScale=1;
 
 // ══════════════════════════════════════════════════════════
 // WAR MODE
@@ -2890,6 +2903,7 @@ function startWar(){
           nearest.vx+=nx*5;nearest.vy-=4;nearest.airborne=true;
           p.brCooldown=35+Math.floor(Math.random()*25);
           p.brAngleTarget+=Math.PI*0.5*(Math.random()<0.5?1:-1);
+          spawnBloodSplatter(nearest);
           if(nearest.hp<=0){
             nearest.alive=false;
             if(nearest.bubble){nearest.bubble.remove();nearest.bubble=null;}
@@ -2948,7 +2962,9 @@ document.querySelectorAll('.stab[data-tab="fights"]').forEach(b=>b.addEventListe
 buildTeamConfigUI();
 document.getElementById('brInterval').addEventListener('input',function(){brCheckInterval=Math.max(50,parseInt(this.value)||180);});
 document.getElementById('brRange').addEventListener('input',function(){brAttackRange=Math.max(1,parseFloat(this.value)||2.8);});
-document.getElementById('whipSegLenInput').addEventListener('input',function(){whipSegLen=Math.max(8,Math.min(60,parseInt(this.value)||22));});
+document.getElementById('whipSegLenInput').addEventListener('input',function(){whipSegLen=Math.max(1,Math.min(60,parseInt(this.value)||1));});
+document.getElementById('bloodEnabledToggle').addEventListener('change',function(){bloodEnabled=this.checked;});
+document.getElementById('bloodScaleInput').addEventListener('input',function(){bloodScale=Math.max(0.1,parseFloat(this.value)||1);});
 document.getElementById('kaijuSize').addEventListener('input',function(){kaijuSize=Math.max(80,parseInt(this.value)||200);});
 document.getElementById('kaijuStompInterval').addEventListener('input',function(){kaijuStompInterval=Math.max(500,parseInt(this.value)||3000);});
 document.getElementById('kaijuFlingForce').addEventListener('input',function(){kaijuFlingForce=Math.max(5,parseInt(this.value)||18);});
@@ -3835,6 +3851,35 @@ function startRaidKaiju(raiderName, raidViewers){
   ensureAudio(); playEventSound(battleStartBuffer,'battleStart');
 }
 
+// ── BLOOD SPLATTER ────────────────────────────────────────
+function spawnBloodSplatter(targetPet){
+  if(!bloodEnabled)return;
+  const rect=targetPet.el.getBoundingClientRect();
+  const cx=rect.left+rect.width/2, cy=rect.top+rect.height*0.35;
+  const sc=(targetPet.w/84)*bloodScale;
+  const n=Math.max(2,Math.round((5+Math.floor(Math.random()*5))*Math.min(sc,2)));
+  for(let i=0;i<n;i++){
+    const el=document.createElement('div');
+    const sz=(3+Math.random()*6)*sc;
+    const ang=Math.random()*Math.PI*2;
+    const spd=(60+Math.random()*100)*sc;
+    const vx=Math.cos(ang)*spd, vy=Math.sin(ang)*spd-80*sc;
+    const life=300+Math.random()*200;
+    el.style.cssText=`position:fixed;width:${sz}px;height:${sz}px;border-radius:50%;background:hsl(${350+Math.floor(Math.random()*8)},88%,${26+Math.floor(Math.random()*10)}%);pointer-events:none;z-index:9999;left:${cx}px;top:${cy}px;transform:translate(-50%,-50%);`;
+    document.body.appendChild(el);
+    const start=performance.now();
+    (function tick(ts){
+      const t=(ts-start)/life;
+      if(t>=1){el.remove();return;}
+      const s=(ts-start)/1000;
+      el.style.left=(cx+vx*s)+'px';
+      el.style.top=(cy+vy*s+150*sc*s*s)+'px';
+      el.style.opacity=1-t;
+      requestAnimationFrame(tick);
+    })(performance.now());
+  }
+}
+
 // ── WHIP ──────────────────────────────────────────────────
 let caneActive=false;
 let _caneSvg=null,_caneSegs=[];
@@ -3927,9 +3972,12 @@ function startCane(){
         p.alive=false;
         if(p.bubble){p.bubble.remove();p.bubble=null;}
         p.healthBarWrap.style.display='none';
-        p.brAngleTarget=Math.PI*4*(Math.random()<0.5?1:-1);
         p.el.style.transition='opacity 0.8s';p.el.style.opacity='0';
-        setTimeout(()=>{if(!p.alive)p.el.style.display='none';},900);
+        setTimeout(()=>{
+          const idx=pets.indexOf(p);if(idx>-1)pets.splice(idx,1);
+          delete petMap[p.username];
+          p.destroy();
+        },900);
       }
     });
     // hit spires (balls) and kaiju spire
@@ -4116,13 +4164,13 @@ function startDuel(pet,target){
         duelState.hpA=Math.max(0,duelState.hpA-dmg);
         pet.hp=duelState.hpA;pet.maxHp=hp;
         target.vx=Math.sign(-dx)*3;target.vy=-2;target.airborne=true;
-        ensureAudio();playEventSound(hitBuffer,'hit');
+        ensureAudio();playEventSound(hitBuffer,'hit');spawnBloodSplatter(target);
       } else {
         const dmg=8+Math.floor(Math.random()*10);
         duelState.hpB=Math.max(0,duelState.hpB-dmg);
         target.hp=duelState.hpB;target.maxHp=hp;
         pet.vx=Math.sign(dx)*3;pet.vy=-2;pet.airborne=true;
-        ensureAudio();playEventSound(hitBuffer,'hit');
+        ensureAudio();playEventSound(hitBuffer,'hit');spawnBloodSplatter(pet);
       }
       // check win
       if(duelState.hpA<=0||duelState.hpB<=0){
@@ -4168,7 +4216,7 @@ function startPunch(pet,target,done){
       const nx=Math.sign(dx)||1;
       target.vx=nx*14;target.vy=-7;target.airborne=true;
       target.say('OW!');
-      ensureAudio();playEventSound(hitBuffer,'hit');
+      ensureAudio();playEventSound(hitBuffer,'hit');spawnBloodSplatter(target);
       pet.vx=-nx*3;pet.vy=-2;pet.airborne=true;
       pet._inPunch=false;target._inPunch=false;
       setTimeout(()=>{if(done)done();},500);
@@ -4178,6 +4226,7 @@ function startPunch(pet,target,done){
 }
 
 function execViewerCmd(cmdId,username,args){
+  if((battleRoyaleActive||warActive)&&cmdId!=='jump')return;
   // strip @ prefix from target usernames
   if(args&&args[0]&&args[0].startsWith('@'))args[0]=args[0].slice(1);
   const pet=pets.find(p=>p.username===username.toLowerCase());
