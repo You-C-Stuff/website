@@ -868,6 +868,359 @@ document.querySelectorAll('.overlay-toggle').forEach(btn => {
         updateComic();
     });
 
-    switchSeries(0);
+    var urlSeries = parseInt(new URLSearchParams(window.location.search).get('series'));
+    switchSeries(isNaN(urlSeries) ? 0 : Math.min(urlSeries, COMIC_SERIES.length - 1));
 })();
 
+
+// ════════════════════════════════════════════════
+// CHARACTERS PAGE
+// ════════════════════════════════════════════════
+(function () {
+    if (!document.getElementById('seriesList')) return;
+
+    // ── CHARACTER DATA ──────────────────────────
+    // art:   full-body PNG (transparent bg preferred)
+    // thumb: portrait crop for carousel
+    // bg:    wide scene image (will be blurred + panned)
+    var SERIES = [
+        {
+            name: 'Series One',
+            characters: [
+                {
+                    name: 'Character A', age: '??',
+                    accent: '#FFC603',
+                    comic: 'comics.html',
+                    desc: 'A brief description of this character. Who are they? What drives them? What role do they play in the story?',
+                    likes: 'Coffee, rainy days, old books', dislikes: 'Loud noises, dishonesty',
+                    tags: ['Mysterious', 'Introspective', 'Resilient'],
+                    quote: 'Every step forward is a step worth taking.',
+                    art:   'Images/Commission/cyidle.gif',
+                    thumb: 'Images/Commission/cyidle.gif',
+                    bg:    'Images'
+                },
+                {
+                    name: 'Character B', age: '24',
+                    accent: '#FF6B6B',
+                    comic: 'comics.html',
+                    desc: 'Another character in this series. Add their backstory, personality, and defining traits here.',
+                    likes: 'Sparring, open skies, music', dislikes: 'Sitting still, overcooked food',
+                    tags: ['Hot-Headed', 'Loyal', 'Courageous'],
+                    quote: 'Strength isn\'t just muscle — it\'s resolve.',
+                    art:   'Images/Characters/Series1/charB.png',
+                    thumb: 'Images/Characters/Series1/charB-thumb.png',
+                    bg:    'Images/Characters/Series1/charB-bg.jpg'
+                },
+                {
+                    name: 'Character C', age: '19',
+                    accent: '#7EC8E3',
+                    desc: 'Third character of the series. Describe their unique role, personality quirks, and relationships.',
+                    likes: 'Stargazing, tea ceremonies, precision', dislikes: 'Chaos, being underestimated',
+                    tags: ['Calm', 'Calculating', 'Disciplined'],
+                    quote: 'Patience is the sharpest weapon.',
+                    art:   'Images/Characters/Series1/charC.png',
+                    thumb: 'Images/Characters/Series1/charC-thumb.png',
+                    bg:    'Images/Characters/Series1/charC-bg.jpg'
+                }
+            ]
+        },
+        /* HIDDEN — uncomment to restore
+        {
+            name: 'Series Two',
+            characters: [
+                {
+                    name: 'Character D', age: '30',
+                    accent: '#A8E6CF',
+                    desc: 'First character of Series Two. Use this space to introduce them and their world.',
+                    likes: 'Architecture, dusk, strategy games', dislikes: 'Recklessness, broken promises',
+                    tags: ['Strategic', 'Stoic', 'Ambitious'],
+                    quote: 'A fortress begins with a single stone.',
+                    art:   'Images/Characters/Series2/charD.png',
+                    thumb: 'Images/Characters/Series2/charD-thumb.png',
+                    bg:    'Images/Characters/Series2/charD-bg.jpg'
+                },
+                {
+                    name: 'Character E', age: '17',
+                    accent: '#FFB347',
+                    desc: 'Second character of Series Two. Describe their arc, motivations, and personality here.',
+                    likes: 'Speed, street food, neon lights', dislikes: 'Rules, waiting in line',
+                    tags: ['Reckless', 'Energetic', 'Free-Spirited'],
+                    quote: 'Rules are just suggestions for the slow.',
+                    art:   'Images/Characters/Series2/charE.png',
+                    thumb: 'Images/Characters/Series2/charE-thumb.png',
+                    bg:    'Images/Characters/Series2/charE-bg.jpg'
+                }
+            ]
+        },
+        {
+            name: 'Series Three',
+            characters: [
+                {
+                    name: 'Character F', age: 'Unknown',
+                    accent: '#C9B1FF',
+                    desc: 'First character of Series Three. Paint a picture of who they are in a few sentences.',
+                    likes: 'Silence, deep forests, puzzles', dislikes: 'Crowds, bright lights, small talk',
+                    tags: ['Enigmatic', 'Solitary', 'Perceptive'],
+                    quote: 'The unseen hand moves the world.',
+                    art:   'Images/Characters/Series3/charF.png',
+                    thumb: 'Images/Characters/Series3/charF-thumb.png',
+                    bg:    'Images/Characters/Series3/charF-bg.jpg'
+                },
+                {
+                    name: 'Character G', age: '28',
+                    accent: '#FF8FAB',
+                    desc: 'Second character of Series Three. Describe their role in the narrative and what makes them memorable.',
+                    likes: 'Competition, loyal friends, storms', dislikes: 'Betrayal, cowardice, indecision',
+                    tags: ['Fierce', 'Passionate', 'Unyielding'],
+                    quote: 'The storm doesn\'t apologise for the rain.',
+                    art:   'Images/Characters/Series3/charG.png',
+                    thumb: 'Images/Characters/Series3/charG-thumb.png',
+                    bg:    'Images/Characters/Series3/charG-bg.jpg'
+                }
+            ]
+        },
+        {
+            name: 'Series Four',
+            characters: [
+                {
+                    name: 'Character H', age: '22',
+                    accent: '#90EE90',
+                    desc: 'First character of Series Four. Introduce them, their world, and the conflict they face.',
+                    likes: 'Cooking, travel, old maps', dislikes: 'Injustice, predictability',
+                    tags: ['Curious', 'Warm-Hearted', 'Adventurous'],
+                    quote: 'Every horizon hides a new adventure.',
+                    art:   'Images/Characters/Series4/charH.png',
+                    thumb: 'Images/Characters/Series4/charH-thumb.png',
+                    bg:    'Images/Characters/Series4/charH-bg.jpg'
+                },
+                {
+                    name: 'Character I', age: '35',
+                    accent: '#B0C4DE',
+                    desc: 'Second character of Series Four. Veteran, mentor, or rival — describe what they bring to the story.',
+                    likes: 'Discipline, teaching, strong coffee', dislikes: 'Excuses, wasted potential',
+                    tags: ['Stern', 'Wise', 'Principled'],
+                    quote: 'A student surpassing their master is the greatest reward.',
+                    art:   'Images/Characters/Series4/charI.png',
+                    thumb: 'Images/Characters/Series4/charI-thumb.png',
+                    bg:    'Images/Characters/Series4/charI-bg.jpg'
+                }
+            ]
+        },
+        END HIDDEN */
+    ];
+
+    // ── STATE ───────────────────────────────────
+    var activeSeries   = 0;
+    var activeChar     = 0;
+    var carouselOffset = 0;
+    var CAROUSEL_VISIBLE = 5;
+    var transitioning  = false;
+
+    // ── DOM REFS ────────────────────────────────
+    var elCharPage      = document.querySelector('.char-page');
+    var elSeriesList    = document.getElementById('seriesList');
+    var elCharName      = document.getElementById('charName');
+    var elCharAge       = document.getElementById('charAge');
+    var elCharDesc      = document.getElementById('charDesc');
+    var elCharLikes     = document.getElementById('charLikes');
+    var elCharDislikes  = document.getElementById('charDislikes');
+    var elCharQuote     = document.getElementById('charQuote');
+    var elCharArt       = document.getElementById('charArt');
+    var elCharArtPH     = document.getElementById('charArtPlaceholder');
+    var elCharInfo      = document.getElementById('charInfo');
+    var elCharArtCol    = document.getElementById('charArtCol');
+    var elCharBgImg     = document.getElementById('charBgImg');
+    var elCarouselTrack = document.getElementById('carouselTrack');
+    var elWatermarkName = document.getElementById('seriesWatermarkName');
+
+    // ── SERIES NAV ──────────────────────────────
+    function buildSeriesNav() {
+        elSeriesList.innerHTML = '';
+        SERIES.forEach(function (s, i) {
+            var li = document.createElement('li');
+            li.textContent = s.name;
+            li.dataset.series = i;
+            if (i === activeSeries) li.classList.add('active');
+            li.addEventListener('click', function () { selectSeries(i); });
+            elSeriesList.appendChild(li);
+        });
+    }
+
+    function selectSeries(idx) {
+        if (idx === activeSeries || transitioning) return;
+        activeSeries = idx;
+        activeChar = 0;
+        carouselOffset = 0;
+        document.querySelectorAll('#seriesList li').forEach(function (li, i) {
+            li.classList.toggle('active', i === idx);
+        });
+        transitionTo(activeChar);
+    }
+
+    // ── CAROUSEL ────────────────────────────────
+    function buildCarousel() {
+        elCarouselTrack.innerHTML = '';
+        var chars = SERIES[activeSeries].characters;
+        var total = chars.length;
+        var needsScroll = total > CAROUSEL_VISIBLE;
+        elCarouselTrack.classList.toggle('scrollable', needsScroll);
+        updateCarouselBtns();
+        var start = needsScroll ? carouselOffset : 0;
+        var end = needsScroll ? Math.min(carouselOffset + CAROUSEL_VISIBLE, total) : total;
+        for (var i = start; i < end; i++) {
+            (function (idx) {
+                var c = chars[idx];
+                var thumb = document.createElement('div');
+                thumb.className = 'carousel-thumb' + (idx === activeChar ? ' active' : '');
+                thumb.dataset.charIdx = idx;
+                if (c.thumb) {
+                    var img = document.createElement('img');
+                    img.src = c.thumb;
+                    img.alt = c.name;
+                    img.onerror = function () { img.style.display = 'none'; showThumbPH(thumb); };
+                    thumb.appendChild(img);
+                } else {
+                    showThumbPH(thumb);
+                }
+                var label = document.createElement('div');
+                label.className = 'thumb-name';
+                label.textContent = c.name.toUpperCase();
+                thumb.appendChild(label);
+                thumb.addEventListener('click', function () {
+                    if (+thumb.dataset.charIdx === activeChar || transitioning) return;
+                    transitionTo(+thumb.dataset.charIdx);
+                });
+                elCarouselTrack.appendChild(thumb);
+            }(i));
+        }
+    }
+
+    function showThumbPH(parent) {
+        var ph = document.createElement('div');
+        ph.className = 'thumb-placeholder';
+        ph.innerHTML = '<i class="fa-regular fa-user"></i>';
+        parent.insertBefore(ph, parent.firstChild);
+    }
+
+    var elCarouselPrev = document.getElementById('carouselPrev');
+    var elCarouselNext = document.getElementById('carouselNext');
+
+    function updateCarouselBtns() {
+        elCarouselPrev.disabled = false;
+        elCarouselNext.disabled = false;
+    }
+
+    elCarouselPrev.addEventListener('click', function () {
+        if (transitioning) return;
+        var chars = SERIES[activeSeries].characters;
+        transitionTo(activeChar > 0 ? activeChar - 1 : chars.length - 1);
+    });
+    elCarouselNext.addEventListener('click', function () {
+        if (transitioning) return;
+        var chars = SERIES[activeSeries].characters;
+        transitionTo(activeChar < chars.length - 1 ? activeChar + 1 : 0);
+    });
+
+    // ── POPULATE ────────────────────────────────
+    function populateChar(idx) {
+        var c = SERIES[activeSeries].characters[idx];
+        elCharName.textContent     = c.name.toUpperCase();
+        elCharAge.textContent      = c.age      || '—';
+        elCharDesc.textContent     = c.desc     || '—';
+        elCharLikes.textContent    = c.likes    || '—';
+        elCharDislikes.textContent = c.dislikes || '—';
+        elCharQuote.textContent    = c.quote    || '—';
+        elWatermarkName.textContent = SERIES[activeSeries].name.toUpperCase();
+        elCharPage.style.setProperty('--color-accent', c.accent || '#FFC603');
+
+        var elCharTags = document.getElementById('charTags');
+        elCharTags.innerHTML = '';
+        if (c.tags && c.tags.length) {
+            c.tags.forEach(function (t) {
+                var span = document.createElement('span');
+                span.className = 'char-tag';
+                span.textContent = t.toUpperCase();
+                elCharTags.appendChild(span);
+            });
+        }
+
+        var elCharComicLink = document.getElementById('charComicLink');
+        if (c.comic) {
+            elCharComicLink.href = c.comic;
+            elCharComicLink.style.display = '';
+        } else {
+            elCharComicLink.style.display = 'none';
+        }
+
+        if (c.art) {
+            elCharArt.src = c.art;
+            elCharArt.alt = c.name;
+            elCharArt.style.display = 'block';
+            elCharArtPH.style.display = 'none';
+            elCharArt.onerror = function () {
+                elCharArt.style.display = 'none';
+                elCharArtPH.style.display = 'flex';
+            };
+        } else {
+            elCharArt.style.display = 'none';
+            elCharArtPH.style.display = 'flex';
+        }
+
+        if (c.bg) {
+            var tmp = new Image();
+            tmp.onload  = function () { elCharBgImg.src = c.bg; };
+            tmp.onerror = function () { elCharBgImg.src = ''; };
+            tmp.src = c.bg;
+        } else {
+            elCharBgImg.src = '';
+        }
+    }
+
+    // ── TRANSITION ──────────────────────────────
+    // Info text fades in place; art slides right out then left in
+    function transitionTo(newIdx) {
+        if (transitioning) return;
+        transitioning = true;
+
+        elCharInfo.classList.add('info-anim-exit');
+        elCharArtCol.classList.add('art-anim-exit');
+
+        setTimeout(function () {
+            elCharInfo.classList.remove('info-anim-exit');
+            elCharArtCol.classList.remove('art-anim-exit');
+            elCharInfo.style.opacity = '0';
+            elCharArtCol.style.opacity = '0';
+
+            activeChar = newIdx;
+            // keep activeChar visible in the scroll window
+            if (activeChar < carouselOffset) carouselOffset = activeChar;
+            else if (activeChar >= carouselOffset + CAROUSEL_VISIBLE) carouselOffset = activeChar - CAROUSEL_VISIBLE + 1;
+            populateChar(activeChar);
+            buildCarousel();
+
+            void elCharInfo.offsetWidth;
+            elCharInfo.style.opacity = '';
+            elCharArtCol.style.opacity = '';
+            elCharInfo.classList.add('info-anim-enter');
+            elCharArtCol.classList.add('art-anim-enter');
+
+            setTimeout(function () {
+                elCharInfo.classList.remove('info-anim-enter');
+                elCharArtCol.classList.remove('art-anim-enter');
+                transitioning = false;
+            }, 480);
+        }, 310);
+    }
+
+    // ── KEYBOARD NAV ────────────────────────────
+    document.addEventListener('keydown', function (e) {
+        var chars = SERIES[activeSeries].characters;
+        if (e.key === 'ArrowRight' && activeChar < chars.length - 1) transitionTo(activeChar + 1);
+        if (e.key === 'ArrowLeft'  && activeChar > 0)                transitionTo(activeChar - 1);
+    });
+
+    // ── INIT ────────────────────────────────────
+    buildSeriesNav();
+    populateChar(activeChar);
+    buildCarousel();
+}());
