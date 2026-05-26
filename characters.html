@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="Keywords" content="2D Animator,YapCreations,Characters,OC">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta property="og:title" content="Characters">
+    <meta property="og:site_name" content="YapCreations">
+    <meta property="og:url" content="https://yapcreations.com">
+    <meta property="og:description" content="Commissions status: OPEN">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://yapcreations.com/Images/Meta.png">
+    <title>Characters</title>
+    <link rel="icon" type="image/jpg" href="Images/favicon.png">
+    <link rel="stylesheet" href="Style.css">
+    <script src="https://kit.fontawesome.com/2ced1b2fda.js" crossorigin="anonymous" async></script>
+    <script src="myScript.js" defer></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous" defer></script>
+</head>
+
+<body>
+
+<!--Top Header-->
+<header class="header">
+    <div class="logo-text">
+        <a href="index.html">
+            <img src="Images/Icon.png" alt="YapCreations" class="logo">
+            <span class="company-name">YAPCREATIONS</span>
+        </a>
+    </div>
+    <nav class="nav">
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="commissions.html">Commissions</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="community.html">Community</a></li>
+            <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
+        </ul>
+        <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+    </nav>
+</header>
+
+<div class="overlay" id="overlay">
+    <ul class="overlay-menu">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="commissions.html">Commissions</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="community.html">Community</a></li>
+        <li><a href="https://linktr.ee/yapcreations" target="_blank">linktr.ee</a></li>
+    </ul>
+    <div class="overlay-social">
+        <a href="https://x.com/YapCreations" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+        <a href="https://www.instagram.com/yapcreations/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://bsky.app/profile/yapcreations.com" target="_blank"><i class="fa-brands fa-bluesky"></i></a>
+        <a href="https://www.twitch.tv/yapcreations" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+        <a href="https://www.youtube.com/@YapCreations" target="_blank"><i class="fa-brands fa-youtube"></i></a>
+    </div>
+</div>
+
+<!-- ══ CHARACTER PAGE ══ -->
+<div class="char-page">
+
+    <a href="index.html" class="char-back-btn"><i class="fa-solid fa-chevron-left"></i> BACK</a>
+
+    <!-- Sliding blurred background -->
+    <div class="char-bg-wrap" id="charBgWrap">
+        <img id="charBgImg" src="" alt="">
+    </div>
+    <div class="char-bg-overlay"></div>
+
+    <!-- Character art — full-height, sits behind all UI, extends under carousel -->
+    <div class="char-art-col" id="charArtCol">
+        <img id="charArt" src="" alt="" style="display:none;">
+        <div class="char-art-placeholder" id="charArtPlaceholder">
+            <i class="fa-regular fa-image"></i>
+            <span>ART COMING SOON</span>
+        </div>
+    </div>
+
+    <!-- Body row: series nav + main content -->
+    <div class="char-body">
+
+        <!-- Left: series list -->
+        <nav class="char-series-nav">
+            <ul id="seriesList"></ul>
+        </nav>
+
+        <!-- Centre: character info -->
+        <div class="char-main">
+
+            <!-- Series watermark -->
+            <div class="char-series-watermark" id="seriesWatermark">
+                <small>&#9670; &#9670; &#9670; CHARACTER INTRODUCTION</small>
+                <span id="seriesWatermarkName"></span>
+            </div>
+
+            <!-- Info panel -->
+            <div class="char-info" id="charInfo">
+                <h1 class="char-name" id="charName">&mdash;</h1>
+                <div class="char-name-divider"></div>
+                <div class="char-age-badge">
+                    <i class="fa-solid fa-diamond"></i>
+                    <span>Age: <span id="charAge">&mdash;</span></span>
+                </div>
+                <div class="char-desc-box" id="charDesc">&mdash;</div>
+                <div class="char-details">
+                    <div class="char-detail-row">
+                        <span class="char-detail-label">LIKES</span>
+                        <span class="char-detail-val" id="charLikes">&mdash;</span>
+                    </div>
+                    <div class="char-detail-row">
+                        <span class="char-detail-label">DISLIKES</span>
+                        <span class="char-detail-val" id="charDislikes">&mdash;</span>
+                    </div>
+                </div>
+                <div class="char-tags" id="charTags"></div>
+                <a class="char-comic-link" id="charComicLink" href="#" target="_blank" style="display:none;">
+                    <i class="fa-solid fa-book-open"></i> READ COMIC
+                </a>
+                <div class="char-quote-inline">
+                    <span class="bracket">"</span>
+                    <span id="charQuote">&mdash;</span>
+                    <span class="bracket">"</span>
+                </div>
+            </div>
+
+        </div><!-- /.char-main -->
+    </div><!-- /.char-body -->
+
+    <!-- Carousel -->
+    <div class="char-carousel-wrap">
+        <div class="carousel-inner">
+            <button class="carousel-btn" id="carouselPrev">&#10094;</button>
+            <div class="carousel-track" id="carouselTrack"></div>
+            <button class="carousel-btn" id="carouselNext">&#10095;</button>
+        </div>
+    </div>
+
+</div><!-- /.char-page -->
+
+</body>
+</html>
