@@ -333,6 +333,155 @@ function postToGoogleform() {
 /*-------------------------------GALLERY--------------------------------*/
 const galleryCarousels = [];
 
+const PLATFORM_ICONS = {
+    twitter:   'fa-brands fa-twitter',
+    instagram: 'fa-brands fa-instagram',
+    twitch:    'fa-brands fa-twitch',
+    bluesky:   'fa-brands fa-bluesky',
+    youtube:   'fa-brands fa-youtube',
+    carrd:     'fa-solid fa-address-card',
+};
+
+function buildGalleryContainer(slides, isFirst) {
+    const container = document.createElement('div');
+    container.className = 'gallery-container' + (isFirst ? ' active' : '');
+
+    const carouselContainer = document.createElement('div');
+    carouselContainer.className = 'carousel-container';
+
+    const carousel = document.createElement('div');
+    carousel.className = 'carousel';
+
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'carousel-button prevbtn';
+    prevBtn.innerHTML = '&#10094;';
+
+    const inner = document.createElement('div');
+    inner.className = 'carousel-inner';
+
+    slides.forEach(function (s, i) {
+        const slide = document.createElement('div');
+        slide.className = 'artist' + (i === 0 ? ' active' : '');
+
+        const info = document.createElement('div');
+        info.className = 'artist-info';
+        const h3 = document.createElement('h3');
+        h3.textContent = s.name;
+        info.appendChild(h3);
+
+        if (s.links) {
+            s.links.forEach(function (link) {
+                if (!link.url) return;
+                const a = document.createElement('a');
+                a.href = link.url;
+                a.target = '_blank';
+                a.rel = 'noopener';
+                const icon = document.createElement('i');
+                icon.className = PLATFORM_ICONS[link.type] || 'fa-solid fa-link';
+                a.appendChild(icon);
+                info.appendChild(a);
+            });
+        }
+
+        const img = document.createElement('img');
+        img.loading = 'lazy';
+        img.src = s.img;
+        img.alt = s.name;
+
+        slide.appendChild(info);
+        slide.appendChild(img);
+        inner.appendChild(slide);
+    });
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'carousel-button nextbtn';
+    nextBtn.innerHTML = '&#10095;';
+
+    carousel.appendChild(prevBtn);
+    carousel.appendChild(inner);
+    carousel.appendChild(nextBtn);
+
+    const carInfo = document.createElement('div');
+    carInfo.className = 'car-info';
+    const counter = document.createElement('span');
+    counter.className = 'car-counter';
+    carInfo.appendChild(counter);
+
+    carouselContainer.appendChild(carousel);
+    carouselContainer.appendChild(carInfo);
+
+    const thumbWrapper = document.createElement('div');
+    thumbWrapper.className = 'thumbnail-wrapper';
+
+    const thumbLeft = document.createElement('button');
+    thumbLeft.className = 'thumb-scroll left';
+    thumbLeft.innerHTML = '&#10094;';
+
+    const thumbnails = document.createElement('div');
+    thumbnails.className = 'thumbnails';
+
+    slides.forEach(function (s, i) {
+        const thumb = document.createElement('div');
+        thumb.className = 'thumbnail' + (i === 0 ? ' active' : '');
+        const tImg = document.createElement('img');
+        tImg.loading = 'lazy';
+        tImg.src = s.thumb;
+        tImg.alt = s.name;
+        thumb.appendChild(tImg);
+        thumbnails.appendChild(thumb);
+    });
+
+    const thumbRight = document.createElement('button');
+    thumbRight.className = 'thumb-scroll right';
+    thumbRight.innerHTML = '&#10095;';
+
+    thumbWrapper.appendChild(thumbLeft);
+    thumbWrapper.appendChild(thumbnails);
+    thumbWrapper.appendChild(thumbRight);
+
+    container.appendChild(carouselContainer);
+    container.appendChild(thumbWrapper);
+    return container;
+}
+
+function buildFanartGalleries() {
+    const switcher = document.getElementById('fanartSwitcher');
+    const wall = document.getElementById('fanartWall');
+    if (!switcher || !wall || typeof FANART_GALLERIES === 'undefined') return;
+
+    FANART_GALLERIES.forEach(function (gallery, gi) {
+        const btn = document.createElement('button');
+        btn.className = 'gallery-btn' + (gi === 0 ? ' active' : '');
+        btn.textContent = gallery.label;
+        btn.addEventListener('click', function () { switchGallery(gi); });
+        switcher.appendChild(btn);
+
+        const slides = gallery.artists.map(function (a) {
+            return { name: a.name, img: a.img, thumb: a.thumb, links: a.links };
+        });
+        wall.appendChild(buildGalleryContainer(slides, gi === 0));
+    });
+}
+
+function buildYappersGalleries() {
+    const switcher = document.getElementById('yappersSwitcher');
+    const wall = document.getElementById('yappersWall');
+    if (!switcher || !wall || typeof YAPPERS_GENS === 'undefined') return;
+
+    YAPPERS_GENS.forEach(function (gen, gi) {
+        const btn = document.createElement('button');
+        btn.className = 'gallery-btn' + (gi === 0 ? ' active' : '');
+        btn.textContent = gen.label;
+        btn.addEventListener('click', function () { switchGallery(gi); });
+        switcher.appendChild(btn);
+
+        const slides = gen.yappers.map(function (y) {
+            return { name: y.name, img: y.talk, thumb: y.mute };
+        });
+        wall.appendChild(buildGalleryContainer(slides, gi === 0));
+    });
+}
+
 function makeCarousel(container) {
     const slides = Array.from(container.querySelectorAll('.artist'));
     const thumbContainer = container.querySelector('.thumbnails');
@@ -475,23 +624,14 @@ function applyGalleryRowBreaks() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    buildFanartGalleries();
+    buildYappersGalleries();
     document.querySelectorAll('.gallery-container').forEach(g => galleryCarousels.push(makeCarousel(g)));
     switchGallery(0);
     applyGalleryRowBreaks();
 });
 window.addEventListener('resize', applyGalleryRowBreaks);
 /*-------------------------------ILLUSTRATION CAROUSEL--------------------------------*/
-/* =====================================================================
-   ADD YOUR ILLUSTRATION IMAGES HERE.
-   Each entry: { src: 'path/to/image.jpg', alt: 'description' }
-   Add or remove lines freely — the carousel adjusts automatically.
-   ===================================================================== */
-const illustrationImages = [
-    { src: 'Images/Portfolio/Ruka.png',        alt: 'Ruka Sarashina' },
-    { src: 'Images/Portfolio/Pumpkin.png',     alt: 'Pumpkin Pie Cookie' },
-    { src: 'Images/Portfolio/Yap.png',         alt: 'Yap' },
-];
-
 (function () {
     const TRANSITION_MS = 650;
 
@@ -775,17 +915,6 @@ document.querySelectorAll('.overlay-toggle').forEach(btn => {
 (function () {
     if (!document.getElementById('comicImg')) return;
 
-    // Add comics as: { title: "Chapter 1", src: "Images/Comics/s1/ch1.png" }
-    // Last entry in each array = latest comic, shown by default
-    var COMIC_SERIES = [
-        { name: "Don't Open Me", comics: [
-            //{ title: 'Page 1', src: 'Images/Portfolio/Ruka.png' },
-        ]},
-        { name: 'Personal', comics: [
-            //{ title: 'Page 1', src: 'Images/Portfolio/Chibi.png' },
-        ]}
-    ];
-
     var activeSeries = 0, activeComic = 0;
 
     function getComics() { return COMIC_SERIES[activeSeries].comics; }
@@ -878,136 +1007,6 @@ document.querySelectorAll('.overlay-toggle').forEach(btn => {
 // ════════════════════════════════════════════════
 (function () {
     if (!document.getElementById('seriesList')) return;
-
-    // ── CHARACTER DATA ──────────────────────────
-    // art:   full-body PNG (transparent bg preferred)
-    // thumb: portrait crop for carousel
-    // bg:    wide scene image (will be blurred + panned)
-    var SERIES = [
-        {
-            name: 'Series One',
-            characters: [
-                {
-                    name: 'Character A', age: '??',
-                    accent: '#FFC603',
-                    comic: 'comics.html',
-                    desc: 'A brief description of this character. Who are they? What drives them? What role do they play in the story?',
-                    likes: 'Coffee, rainy days, old books', dislikes: 'Loud noises, dishonesty',
-                    tags: ['Mysterious', 'Introspective', 'Resilient'],
-                    quote: 'Every step forward is a step worth taking.',
-                    art:   'Images/Commission/cyidle.gif',
-                    thumb: 'Images/Commission/cyidle.gif',
-                    bg:    'Images'
-                },
-                {
-                    name: 'Character B', age: '24',
-                    accent: '#FF6B6B',
-                    comic: 'comics.html',
-                    desc: 'Another character in this series. Add their backstory, personality, and defining traits here.',
-                    likes: 'Sparring, open skies, music', dislikes: 'Sitting still, overcooked food',
-                    tags: ['Hot-Headed', 'Loyal', 'Courageous'],
-                    quote: 'Strength isn\'t just muscle — it\'s resolve.',
-                    art:   'Images/Characters/Series1/charB.png',
-                    thumb: 'Images/Characters/Series1/charB-thumb.png',
-                    bg:    'Images/Characters/Series1/charB-bg.jpg'
-                },
-                {
-                    name: 'Character C', age: '19',
-                    accent: '#7EC8E3',
-                    desc: 'Third character of the series. Describe their unique role, personality quirks, and relationships.',
-                    likes: 'Stargazing, tea ceremonies, precision', dislikes: 'Chaos, being underestimated',
-                    tags: ['Calm', 'Calculating', 'Disciplined'],
-                    quote: 'Patience is the sharpest weapon.',
-                    art:   'Images/Characters/Series1/charC.png',
-                    thumb: 'Images/Characters/Series1/charC-thumb.png',
-                    bg:    'Images/Characters/Series1/charC-bg.jpg'
-                }
-            ]
-        },
-        /* HIDDEN — uncomment to restore
-        {
-            name: 'Series Two',
-            characters: [
-                {
-                    name: 'Character D', age: '30',
-                    accent: '#A8E6CF',
-                    desc: 'First character of Series Two. Use this space to introduce them and their world.',
-                    likes: 'Architecture, dusk, strategy games', dislikes: 'Recklessness, broken promises',
-                    tags: ['Strategic', 'Stoic', 'Ambitious'],
-                    quote: 'A fortress begins with a single stone.',
-                    art:   'Images/Characters/Series2/charD.png',
-                    thumb: 'Images/Characters/Series2/charD-thumb.png',
-                    bg:    'Images/Characters/Series2/charD-bg.jpg'
-                },
-                {
-                    name: 'Character E', age: '17',
-                    accent: '#FFB347',
-                    desc: 'Second character of Series Two. Describe their arc, motivations, and personality here.',
-                    likes: 'Speed, street food, neon lights', dislikes: 'Rules, waiting in line',
-                    tags: ['Reckless', 'Energetic', 'Free-Spirited'],
-                    quote: 'Rules are just suggestions for the slow.',
-                    art:   'Images/Characters/Series2/charE.png',
-                    thumb: 'Images/Characters/Series2/charE-thumb.png',
-                    bg:    'Images/Characters/Series2/charE-bg.jpg'
-                }
-            ]
-        },
-        {
-            name: 'Series Three',
-            characters: [
-                {
-                    name: 'Character F', age: 'Unknown',
-                    accent: '#C9B1FF',
-                    desc: 'First character of Series Three. Paint a picture of who they are in a few sentences.',
-                    likes: 'Silence, deep forests, puzzles', dislikes: 'Crowds, bright lights, small talk',
-                    tags: ['Enigmatic', 'Solitary', 'Perceptive'],
-                    quote: 'The unseen hand moves the world.',
-                    art:   'Images/Characters/Series3/charF.png',
-                    thumb: 'Images/Characters/Series3/charF-thumb.png',
-                    bg:    'Images/Characters/Series3/charF-bg.jpg'
-                },
-                {
-                    name: 'Character G', age: '28',
-                    accent: '#FF8FAB',
-                    desc: 'Second character of Series Three. Describe their role in the narrative and what makes them memorable.',
-                    likes: 'Competition, loyal friends, storms', dislikes: 'Betrayal, cowardice, indecision',
-                    tags: ['Fierce', 'Passionate', 'Unyielding'],
-                    quote: 'The storm doesn\'t apologise for the rain.',
-                    art:   'Images/Characters/Series3/charG.png',
-                    thumb: 'Images/Characters/Series3/charG-thumb.png',
-                    bg:    'Images/Characters/Series3/charG-bg.jpg'
-                }
-            ]
-        },
-        {
-            name: 'Series Four',
-            characters: [
-                {
-                    name: 'Character H', age: '22',
-                    accent: '#90EE90',
-                    desc: 'First character of Series Four. Introduce them, their world, and the conflict they face.',
-                    likes: 'Cooking, travel, old maps', dislikes: 'Injustice, predictability',
-                    tags: ['Curious', 'Warm-Hearted', 'Adventurous'],
-                    quote: 'Every horizon hides a new adventure.',
-                    art:   'Images/Characters/Series4/charH.png',
-                    thumb: 'Images/Characters/Series4/charH-thumb.png',
-                    bg:    'Images/Characters/Series4/charH-bg.jpg'
-                },
-                {
-                    name: 'Character I', age: '35',
-                    accent: '#B0C4DE',
-                    desc: 'Second character of Series Four. Veteran, mentor, or rival — describe what they bring to the story.',
-                    likes: 'Discipline, teaching, strong coffee', dislikes: 'Excuses, wasted potential',
-                    tags: ['Stern', 'Wise', 'Principled'],
-                    quote: 'A student surpassing their master is the greatest reward.',
-                    art:   'Images/Characters/Series4/charI.png',
-                    thumb: 'Images/Characters/Series4/charI-thumb.png',
-                    bg:    'Images/Characters/Series4/charI-bg.jpg'
-                }
-            ]
-        },
-        END HIDDEN */
-    ];
 
     // ── STATE ───────────────────────────────────
     var activeSeries   = 0;
