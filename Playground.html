@@ -68,7 +68,7 @@ body.mode-hallway #hallwayContainer{display:block;}
 .srow{margin-bottom:16px;}
 .srow>label{display:block;font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:6px;}
 .srow input[type=color]{width:100%;height:36px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.2);cursor:pointer;background:none;padding:2px;}
-.srow input[type=number],.srow input[type=text]{width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px;font-family:inherit;}
+.srow input[type=number],.srow input[type=text],.srow input[type=password]{width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px;font-family:inherit;}
 .srow input:focus{outline:none;border-color:#7F77DD;}
 .srow input[type=range]{flex:1;accent-color:#7F77DD;}
 .sdivider{border:none;border-top:0.5px solid rgba(255,255,255,0.08);margin:16px 0;}
@@ -92,7 +92,7 @@ body.mode-hallway #hallwayContainer{display:block;}
 .soundUpBtn{width:100%;padding:8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;font-family:inherit;}
 .soundUpBtn:hover{border-color:#7F77DD;}
 .snd-label{font-size:11px;color:rgba(255,255,255,0.4);min-height:16px;flex:1;margin:0;}
-#fileInputHidden,#hoopFileInput,#soundInput,#victorySoundInput,#resizeSoundInput,#battleStartSoundInput,#hitSoundInput,#koSoundInput,#winSoundInput,#stompSoundInput,#dvdBounceSoundInput,#whipSoundInput{display:none;}
+#fileInputHidden,#hoopFileInput,#soundInput,#victorySoundInput,#resizeSoundInput,#battleStartSoundInput,#hitSoundInput,#stompSoundInput,#whipSoundInput,#bombSoundInput,#nukeSoundInput,#flashbangSoundInput{display:none;}
 #hotkeyList{width:100%;border-collapse:collapse;font-size:12px;}
 #hotkeyList th{text-align:left;color:rgba(255,255,255,0.4);font-weight:400;padding:4px 6px;border-bottom:0.5px solid rgba(255,255,255,0.08);}
 #hotkeyList td{padding:6px 6px;vertical-align:middle;}
@@ -256,6 +256,32 @@ body.mode-hallway #hallwayContainer{display:block;}
         <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="bubbleFontSize" min="6" max="48" step="1" value="11"><span id="bubbleFontSizeVal" style="font-size:12px;color:#fff;min-width:36px;">11px</span></div>
       </div>
 
+      <hr class="sdivider">
+      <div style="font-size:12px;font-weight:500;color:rgba(127,119,221,0.9);margin-bottom:8px;">📡 Broadcaster (Redemptions)</div>
+      <div class="srow"><label>Broadcaster OAuth token — channel:read:redemptions (hidden)</label><input type="password" id="broadcasterToken" placeholder="oauth:xxxxxxxxxxxxxx or raw token"></div>
+      <div class="srow"><label>Client ID (hidden)</label><input type="password" id="botClientId" placeholder="your Twitch app client ID"></div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button id="broadcasterConnectBtn" style="flex:1;background:transparent;border:0.5px solid rgba(127,119,221,0.5);border-radius:8px;color:#b8b2ff;font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Connect</button>
+        <button id="broadcasterDisconnectBtn" style="flex:1;background:transparent;border:0.5px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(255,255,255,0.6);font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Disconnect</button>
+      </div>
+      <div id="broadcasterStatus" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:-10px;margin-bottom:12px;min-height:16px;">Not connected</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:4px;">Redemption log</div>
+      <div id="redemptionLog" style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 8px;font-size:11px;font-family:monospace;color:rgba(255,255,255,0.55);min-height:48px;max-height:140px;overflow-y:auto;margin-bottom:16px;display:flex;flex-direction:column;gap:3px;"><span data-empty style="color:rgba(255,255,255,0.2);">No redemptions yet</span></div>
+
+      <hr class="sdivider">
+      <div style="font-size:12px;font-weight:500;color:rgba(127,119,221,0.9);margin-bottom:8px;">🤖 Bot (Chat — optional)</div>
+      <div class="srow"><label>Bot username</label><input type="text" id="botUsername" placeholder="your bot account name"></div>
+      <div class="srow"><label>Bot OAuth token — chat:edit (hidden)</label><input type="password" id="botToken" placeholder="oauth:xxxxxxxxxxxxxx or raw token"></div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button id="botConnectBtn" style="flex:1;background:transparent;border:0.5px solid rgba(127,119,221,0.5);border-radius:8px;color:#b8b2ff;font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Connect</button>
+        <button id="botDisconnectBtn" style="flex:1;background:transparent;border:0.5px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(255,255,255,0.6);font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Disconnect</button>
+      </div>
+      <div id="botStatus" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:-10px;margin-bottom:12px;min-height:16px;">Not connected</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <input type="text" id="botTestMsg" placeholder="Send a test message…" style="flex:1;">
+        <button id="botTestSendBtn" style="padding:7px 14px;border-radius:8px;border:0.5px solid rgba(127,119,221,0.5);background:transparent;color:#b8b2ff;font-size:13px;font-family:inherit;cursor:pointer;white-space:nowrap;">Send</button>
+      </div>
+
     </div>
     <div class="stabpanel active" id="tab-costumes">
       <!-- ── Background ── -->
@@ -398,32 +424,7 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button id="hitSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
-      <div class="srow">
-        <label>&#x1F480; Viewer KO'd</label>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volKO" min="0" max="2" step="0.01" value="1">
-          <span id="volKOVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
-        </div>
-        <button class="soundUpBtn" id="koSoundUpBtn">Upload (MP3, WAV, OGG)</button>
-        <input type="file" id="koSoundInput" accept="audio/*">
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="koSoundName">No sound loaded</div>
-          <button id="koSoundClearBtn" class="snd-clear-btn">Clear</button>
-        </div>
-      </div>
-      <div class="srow">
-        <label>&#x1F3C6; Winner declared</label>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volWin" min="0" max="2" step="0.01" value="1">
-          <span id="volWinVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
-        </div>
-        <button class="soundUpBtn" id="winSoundUpBtn">Upload (MP3, WAV, OGG)</button>
-        <input type="file" id="winSoundInput" accept="audio/*">
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="winSoundName">No sound loaded</div>
-          <button id="winSoundClearBtn" class="snd-clear-btn">Clear</button>
-        </div>
-      </div>
+
       <div class="srow">
         <label>&#x1F996; Kaiju stomp</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -437,19 +438,7 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button id="stompSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
-      <div class="srow">
-        <label>&#x1F4BF; DVD wall bounce</label>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volDVD" min="0" max="2" step="0.01" value="1">
-          <span id="volDVDVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
-        </div>
-        <button class="soundUpBtn" id="dvdBounceSoundUpBtn">Upload (MP3, WAV, OGG)</button>
-        <input type="file" id="dvdBounceSoundInput" accept="audio/*">
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="dvdBounceSoundName">No sound loaded</div>
-          <button id="dvdBounceSoundClearBtn" class="snd-clear-btn">Clear</button>
-        </div>
-      </div>
+
       <div class="srow">
         <label>🦯 Whip hit</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -463,21 +452,53 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button id="whipSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
+      <div class="srow">
+        <label>💣 Bomb</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volBomb" min="0" max="2" step="0.01" value="1">
+          <span id="volBombVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
+        <button class="soundUpBtn" id="bombSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="bombSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="bombSoundName">No sound loaded</div>
+          <button id="bombSoundClearBtn" class="snd-clear-btn">Clear</button>
+        </div>
+      </div>
+      <div class="srow">
+        <label>☢️ Nuke</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volNuke" min="0" max="2" step="0.01" value="1">
+          <span id="volNukeVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
+        <button class="soundUpBtn" id="nukeSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="nukeSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="nukeSoundName">No sound loaded</div>
+          <button id="nukeSoundClearBtn" class="snd-clear-btn">Clear</button>
+        </div>
+      </div>
+      <div class="srow">
+        <label>🌟 Flashbang</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volFlashbang" min="0" max="2" step="0.01" value="1">
+          <span id="volFlashbangVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
+        <button class="soundUpBtn" id="flashbangSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="flashbangSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="flashbangSoundName">No sound loaded</div>
+          <button id="flashbangSoundClearBtn" class="snd-clear-btn">Clear</button>
+        </div>
+      </div>
     </div>
     <div class="stabpanel" id="tab-hotkeys">
       <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Click a field then press any key to rebind.</p>
-      <div class="srow" style="margin-bottom:14px;">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.7);">
-          <input type="checkbox" id="keepFocusToggle" style="accent-color:#7F77DD;">
-          Keep focus for hotkeys (recommended for OBS / overlay use)
-        </label>
-        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;padding-left:20px;">When enabled, the page automatically recaptures keyboard focus so hotkeys work outside the browser.</div>
-      </div>
       <table id="hotkeyList"><tr><th>Action</th><th>Key</th></tr></table>
     </div>
 
     <div class="stabpanel" id="tab-fights">
-      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Configure War teams (2–4). Viewers type <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge Red</code> / <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge Blue</code> etc. to join. Owner triggers <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!war</code> to start.</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Configure War teams (2–4). Viewers type <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge A</code> / <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge B</code> etc. to join. Owner triggers <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!war</code> to start.</p>
       <div class="sdivider"></div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
         <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);">⚔️ War teams</span>
@@ -511,6 +532,12 @@ body.mode-hallway #hallwayContainer{display:block;}
       <div class="srow"><label>Segment length (px) — shorter = tighter, longer = longer reach</label><input type="number" id="whipSegLenInput" value="1" min="1" max="60" step="1"></div>
       <div class="sdivider"></div>
       <div style="font-size:12px;font-weight:500;color:rgba(255,198,3,0.9);margin-bottom:10px;">🪙 Coins</div>
+      <div class="srow"><label>API URL (hidden for stream safety)</label><input type="password" id="coinsApiInput" placeholder="Paste Google Apps Script URL"></div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button id="coinsApiSaveBtn" style="flex:1;background:transparent;border:0.5px solid rgba(255,198,3,0.4);border-radius:8px;color:rgba(255,198,3,0.9);font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Save URL</button>
+        <button id="coinsApiClearBtn" style="flex:1;background:transparent;border:0.5px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(255,255,255,0.6);font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Clear</button>
+      </div>
+      <div id="coinsApiMsg" style="font-size:12px;color:rgba(255,198,3,0.8);margin-top:-10px;margin-bottom:16px;min-height:16px;"></div>
       <div class="srow"><label>Username</label><input type="text" id="coinUser" placeholder="viewer name"></div>
       <div class="srow"><label>Amount (negative to subtract)</label><input type="number" id="coinAmount" value="100"></div>
       <div style="display:flex;gap:8px;margin-bottom:16px;">
@@ -887,10 +914,10 @@ let hoopSliding=false;
 let hoopSlideDir=0;    // +1 = sliding out, -1 = sliding in
 
 let collisionBuffer=null,victoryBuffer=null,resizeBuffer=null;
-let battleStartBuffer=null,hitBuffer=null,koBuffer=null,winBuffer=null,stompBuffer=null,dvdBounceBuffer=null,whipBuffer=null;
+let battleStartBuffer=null,hitBuffer=null,stompBuffer=null,whipBuffer=null,bombBuffer=null,nukeBuffer=null,flashbangBuffer=null;
 let audioCtx=null,soundVol=0.02,soundThresh=3,lastSoundTime=0,lastResizeSound=0,lastVictoryTime=0;
 // per-sound volume multipliers (0–2, default 1)
-const perSoundVol={collision:1,hoop:1,resize:1,battleStart:1,hit:1,ko:1,win:1,stomp:1,dvd:1,whip:1};
+const perSoundVol={collision:1,hoop:1,resize:1,battleStart:1,hit:1,stomp:1,whip:1,bomb:1,nuke:1,flashbang:1};
 const LS_PERVOL='lpp_pervol5';
 (function(){try{const r=localStorage.getItem(LS_PERVOL);if(r)Object.assign(perSoundVol,JSON.parse(r));}catch(e){}})();
 function savePerVol(){try{localStorage.setItem(LS_PERVOL,JSON.stringify(perSoundVol));}catch(e){}}
@@ -931,7 +958,9 @@ ACTIONS.forEach(a=>hotkeys[a.id]=a.default?[a.default]:[]);
 
 const LS_C='lpp_c5',LS_A='lpp_a5',LS_H='lpp_h5',LS_HK='lpp_hk5',LS_PREFS='lpp_prefs5';
 const LS_SND='lpp_snd5',LS_VSND='lpp_vsnd5',LS_RSND='lpp_rsnd5';
-const LS_BSND='lpp_bsnd5',LS_HSND='lpp_hsnd5',LS_KOSND='lpp_kosnd5',LS_WINSND='lpp_winsnd5',LS_STOMPSND='lpp_stompsnd5',LS_DVDSND='lpp_dvdsnd5',LS_WHIPSND='lpp_whipsnd5';
+const LS_BSND='lpp_bsnd5',LS_HSND='lpp_hsnd5',LS_STOMPSND='lpp_stompsnd5',LS_WHIPSND='lpp_whipsnd5',LS_BOMBSND='lpp_bombsnd5',LS_NUKESND='lpp_nukesnd5',LS_FLASHBANGSND='lpp_flashbangsnd5';
+const LS_COINS_API='lpp_coinsapi5';
+const LS_BOT_USER='lpp_botuser5',LS_BOT_TOKEN='lpp_bottoken5',LS_BOT_CLIENTID='lpp_botclientid5',LS_BROADCASTER_TOKEN='lpp_bcasttoken5';
 
 // ── IndexedDB image store (replaces localStorage for large image blobs) ──
 let _idb=null;
@@ -946,6 +975,7 @@ function _openIDB(){
 }
 function idbSet(key,val){return _openIDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('imgs','readwrite');tx.objectStore('imgs').put(val,key);tx.oncomplete=res;tx.onerror=rej;}));}
 function idbGet(key){return _openIDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('imgs','readonly');const r=tx.objectStore('imgs').get(key);r.onsuccess=()=>res(r.result);r.onerror=rej;}));}
+function idbDel(key){return _openIDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('imgs','readwrite');tx.objectStore('imgs').delete(key);tx.oncomplete=res;tx.onerror=rej;}));}
 // ── End IndexedDB ──
 
 // Volume uses a square curve: slider value s ∈ [0,1] → actual vol = s² * 0.04
@@ -956,32 +986,31 @@ function volToSlider(v){ return Math.sqrt(Math.max(0,v)/0.04); }
 function saveHotkeys(){
   try{localStorage.setItem(LS_HK,JSON.stringify(hotkeys));}catch(e){}
 }
-let keepFocusForHotkeys=false;
-window.addEventListener('blur',()=>{if(keepFocusForHotkeys)setTimeout(()=>window.focus(),80);});
 
 function savePrefs(){
-  try{localStorage.setItem(LS_PREFS,JSON.stringify({bgColor,fps,hoopHeightPct,soundVol,soundThresh,keepFocusForHotkeys,hallwayViewerSize}));}catch(e){}
+  try{localStorage.setItem(LS_PREFS,JSON.stringify({bgColor,fps,hoopHeightPct,soundVol,soundThresh,hallwayViewerSize}));}catch(e){}
 }
 function saveAudioBytes(key,arrayBuffer){
-  if(!arrayBuffer){localStorage.removeItem(key);return;}
-  try{
-    const bytes=new Uint8Array(arrayBuffer);
-    let b64='';const chunk=8192;
-    for(let i=0;i<bytes.length;i+=chunk){b64+=String.fromCharCode(...bytes.subarray(i,i+chunk));}
-    localStorage.setItem(key,JSON.stringify({raw:btoa(b64)}));
-  }catch(e){console.warn('Could not save audio to localStorage (may be too large):',e);}
+  if(!arrayBuffer){idbDel(key).catch(()=>{});localStorage.removeItem(key);return;}
+  idbSet(key,arrayBuffer).catch(()=>{
+    // fallback: localStorage (may fail for large files)
+    try{
+      const bytes=new Uint8Array(arrayBuffer);
+      let b64='';const chunk=8192;
+      for(let i=0;i<bytes.length;i+=chunk){b64+=String.fromCharCode(...bytes.subarray(i,i+chunk));}
+      localStorage.setItem(key,JSON.stringify({raw:btoa(b64)}));
+    }catch(e){console.warn('Could not save audio:',e);}
+  });
 }
-function loadAudioBuffer(key,cb){
+function _loadAudioFromLS(key,cb){
   try{
     const stored=localStorage.getItem(key);if(!stored)return;
     const parsed=JSON.parse(stored);
     ensureAudio();
     if(parsed.raw){
-      // new format: original file bytes — decode directly
       const bytes=Uint8Array.from(atob(parsed.raw),c=>c.charCodeAt(0));
       audioCtx.decodeAudioData(bytes.buffer.slice(0),buf=>cb(buf),()=>{});
     }else if(parsed.b64){
-      // old format: decoded PCM floats — reconstruct AudioBuffer
       const bytes=Uint8Array.from(atob(parsed.b64),c=>c.charCodeAt(0));
       const floats=new Float32Array(bytes.buffer);
       const buf=audioCtx.createBuffer(parsed.ch,parsed.len,parsed.sr);
@@ -989,6 +1018,16 @@ function loadAudioBuffer(key,cb){
       cb(buf);
     }
   }catch(e){}
+}
+function loadAudioBuffer(key,cb){
+  idbGet(key).then(val=>{
+    if(val instanceof ArrayBuffer){
+      ensureAudio();
+      audioCtx.decodeAudioData(val.slice(0),buf=>cb(buf),()=>{});
+    }else{
+      _loadAudioFromLS(key,cb);
+    }
+  }).catch(()=>_loadAudioFromLS(key,cb));
 }
 function genId(){return'id_'+Date.now()+'_'+Math.random().toString(36).slice(2);}
 function saveCostumes(){
@@ -1025,7 +1064,6 @@ function loadAll(){
       if(p.hoopHeightPct!=null){hoopHeightPct=p.hoopHeightPct;document.getElementById('hoopHeightSlider').value=hoopHeightPct;document.getElementById('hoopHeightVal').textContent=hoopHeightPct+'%';}
       if(p.soundVol!=null){soundVol=p.soundVol;document.getElementById('soundVol').value=volToSlider(soundVol);}
       if(p.soundThresh!=null){soundThresh=p.soundThresh;document.getElementById('soundThresh').value=soundThresh;}
-      if(p.keepFocusForHotkeys!=null){keepFocusForHotkeys=p.keepFocusForHotkeys;document.getElementById('keepFocusToggle').checked=keepFocusForHotkeys;}
       if(p.hallwayViewerSize!=null){hallwayViewerSize=p.hallwayViewerSize;document.getElementById('hallwayViewerSize').value=hallwayViewerSize;}
     }
   }catch(e){}
@@ -1070,11 +1108,11 @@ function loadSoundsFromLS(){
   loadAudioBuffer(LS_RSND,buf=>{resizeBuffer=buf;document.getElementById('resizeSoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_BSND,buf=>{battleStartBuffer=buf;document.getElementById('battleStartSoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_HSND,buf=>{hitBuffer=buf;document.getElementById('hitSoundName').textContent='✓ (saved)';});
-  loadAudioBuffer(LS_KOSND,buf=>{koBuffer=buf;document.getElementById('koSoundName').textContent='✓ (saved)';});
-  loadAudioBuffer(LS_WINSND,buf=>{winBuffer=buf;document.getElementById('winSoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_STOMPSND,buf=>{stompBuffer=buf;document.getElementById('stompSoundName').textContent='✓ (saved)';});
-  loadAudioBuffer(LS_DVDSND,buf=>{dvdBounceBuffer=buf;document.getElementById('dvdBounceSoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_WHIPSND,buf=>{whipBuffer=buf;document.getElementById('whipSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_BOMBSND,buf=>{bombBuffer=buf;document.getElementById('bombSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_NUKESND,buf=>{nukeBuffer=buf;document.getElementById('nukeSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_FLASHBANGSND,buf=>{flashbangBuffer=buf;document.getElementById('flashbangSoundName').textContent='✓ (saved)';});
 }
 
 class Spire{
@@ -1675,7 +1713,6 @@ document.querySelectorAll('.stab').forEach(btn=>{
   });
 });
 document.getElementById('bgColor').addEventListener('input',function(){bgColor=this.value;savePrefs();});
-document.getElementById('keepFocusToggle').addEventListener('change',function(){keepFocusForHotkeys=this.checked;savePrefs();});
 document.getElementById('fps').addEventListener('input',function(){fps=Math.max(1,parseInt(this.value)||12);frameTime=1000/fps;savePrefs();});
 document.getElementById('viewerFpsInput').addEventListener('input',function(){viewerFps=Math.max(1,parseInt(this.value)||12);viewerFrameTime=1000/viewerFps;});
 document.getElementById('defaultPetSize').addEventListener('input',function(){
@@ -1827,22 +1864,22 @@ wireAudio('victorySoundUpBtn','victorySoundInput','victorySoundName',(buf,raw)=>
 wireAudio('resizeSoundUpBtn','resizeSoundInput','resizeSoundName',(buf,raw)=>{resizeBuffer=buf;saveAudioBytes(LS_RSND,raw);});
 wireAudio('battleStartSoundUpBtn','battleStartSoundInput','battleStartSoundName',(buf,raw)=>{battleStartBuffer=buf;saveAudioBytes(LS_BSND,raw);});
 wireAudio('hitSoundUpBtn','hitSoundInput','hitSoundName',(buf,raw)=>{hitBuffer=buf;saveAudioBytes(LS_HSND,raw);});
-wireAudio('koSoundUpBtn','koSoundInput','koSoundName',(buf,raw)=>{koBuffer=buf;saveAudioBytes(LS_KOSND,raw);});
-wireAudio('winSoundUpBtn','winSoundInput','winSoundName',(buf,raw)=>{winBuffer=buf;saveAudioBytes(LS_WINSND,raw);});
 wireAudio('stompSoundUpBtn','stompSoundInput','stompSoundName',(buf,raw)=>{stompBuffer=buf;saveAudioBytes(LS_STOMPSND,raw);});
-wireAudio('dvdBounceSoundUpBtn','dvdBounceSoundInput','dvdBounceSoundName',(buf,raw)=>{dvdBounceBuffer=buf;saveAudioBytes(LS_DVDSND,raw);});
 wireAudio('whipSoundUpBtn','whipSoundInput','whipSoundName',(buf,raw)=>{whipBuffer=buf;saveAudioBytes(LS_WHIPSND,raw);});
+wireAudio('bombSoundUpBtn','bombSoundInput','bombSoundName',(buf,raw)=>{bombBuffer=buf;saveAudioBytes(LS_BOMBSND,raw);});
+wireAudio('nukeSoundUpBtn','nukeSoundInput','nukeSoundName',(buf,raw)=>{nukeBuffer=buf;saveAudioBytes(LS_NUKESND,raw);});
+wireAudio('flashbangSoundUpBtn','flashbangSoundInput','flashbangSoundName',(buf,raw)=>{flashbangBuffer=buf;saveAudioBytes(LS_FLASHBANGSND,raw);});
 
-document.getElementById('soundClearBtn').addEventListener('click',()=>{collisionBuffer=null;localStorage.removeItem(LS_SND);document.getElementById('soundName').textContent='No sound loaded';});
-document.getElementById('victorySoundClearBtn').addEventListener('click',()=>{victoryBuffer=null;localStorage.removeItem(LS_VSND);document.getElementById('victorySoundName').textContent='No sound loaded';});
-document.getElementById('resizeSoundClearBtn').addEventListener('click',()=>{resizeBuffer=null;localStorage.removeItem(LS_RSND);document.getElementById('resizeSoundName').textContent='No sound loaded';});
-document.getElementById('battleStartSoundClearBtn').addEventListener('click',()=>{battleStartBuffer=null;localStorage.removeItem(LS_BSND);document.getElementById('battleStartSoundName').textContent='No sound loaded';});
-document.getElementById('hitSoundClearBtn').addEventListener('click',()=>{hitBuffer=null;localStorage.removeItem(LS_HSND);document.getElementById('hitSoundName').textContent='No sound loaded';});
-document.getElementById('koSoundClearBtn').addEventListener('click',()=>{koBuffer=null;localStorage.removeItem(LS_KOSND);document.getElementById('koSoundName').textContent='No sound loaded';});
-document.getElementById('winSoundClearBtn').addEventListener('click',()=>{winBuffer=null;localStorage.removeItem(LS_WINSND);document.getElementById('winSoundName').textContent='No sound loaded';});
-document.getElementById('stompSoundClearBtn').addEventListener('click',()=>{stompBuffer=null;localStorage.removeItem(LS_STOMPSND);document.getElementById('stompSoundName').textContent='No sound loaded';});
-document.getElementById('dvdBounceSoundClearBtn').addEventListener('click',()=>{dvdBounceBuffer=null;localStorage.removeItem(LS_DVDSND);document.getElementById('dvdBounceSoundName').textContent='No sound loaded';});
-document.getElementById('whipSoundClearBtn').addEventListener('click',()=>{whipBuffer=null;localStorage.removeItem(LS_WHIPSND);document.getElementById('whipSoundName').textContent='No sound loaded';});
+document.getElementById('soundClearBtn').addEventListener('click',()=>{collisionBuffer=null;idbDel(LS_SND).catch(()=>{});localStorage.removeItem(LS_SND);document.getElementById('soundName').textContent='No sound loaded';});
+document.getElementById('victorySoundClearBtn').addEventListener('click',()=>{victoryBuffer=null;idbDel(LS_VSND).catch(()=>{});localStorage.removeItem(LS_VSND);document.getElementById('victorySoundName').textContent='No sound loaded';});
+document.getElementById('resizeSoundClearBtn').addEventListener('click',()=>{resizeBuffer=null;idbDel(LS_RSND).catch(()=>{});localStorage.removeItem(LS_RSND);document.getElementById('resizeSoundName').textContent='No sound loaded';});
+document.getElementById('battleStartSoundClearBtn').addEventListener('click',()=>{battleStartBuffer=null;idbDel(LS_BSND).catch(()=>{});localStorage.removeItem(LS_BSND);document.getElementById('battleStartSoundName').textContent='No sound loaded';});
+document.getElementById('hitSoundClearBtn').addEventListener('click',()=>{hitBuffer=null;idbDel(LS_HSND).catch(()=>{});localStorage.removeItem(LS_HSND);document.getElementById('hitSoundName').textContent='No sound loaded';});
+document.getElementById('stompSoundClearBtn').addEventListener('click',()=>{stompBuffer=null;idbDel(LS_STOMPSND).catch(()=>{});localStorage.removeItem(LS_STOMPSND);document.getElementById('stompSoundName').textContent='No sound loaded';});
+document.getElementById('whipSoundClearBtn').addEventListener('click',()=>{whipBuffer=null;idbDel(LS_WHIPSND).catch(()=>{});localStorage.removeItem(LS_WHIPSND);document.getElementById('whipSoundName').textContent='No sound loaded';});
+document.getElementById('bombSoundClearBtn').addEventListener('click',()=>{bombBuffer=null;idbDel(LS_BOMBSND).catch(()=>{});localStorage.removeItem(LS_BOMBSND);document.getElementById('bombSoundName').textContent='No sound loaded';});
+document.getElementById('nukeSoundClearBtn').addEventListener('click',()=>{nukeBuffer=null;idbDel(LS_NUKESND).catch(()=>{});localStorage.removeItem(LS_NUKESND);document.getElementById('nukeSoundName').textContent='No sound loaded';});
+document.getElementById('flashbangSoundClearBtn').addEventListener('click',()=>{flashbangBuffer=null;idbDel(LS_FLASHBANGSND).catch(()=>{});localStorage.removeItem(LS_FLASHBANGSND);document.getElementById('flashbangSoundName').textContent='No sound loaded';});
 
 
 document.getElementById('soundVol').addEventListener('input',function(){
@@ -1857,15 +1894,14 @@ wireVolSlider('volHoop','volHoopVal','hoop');
 wireVolSlider('volResize','volResizeVal','resize');
 wireVolSlider('volBattleStart','volBattleStartVal','battleStart');
 wireVolSlider('volHit','volHitVal','hit');
-wireVolSlider('volKO','volKOVal','ko');
-wireVolSlider('volWin','volWinVal','win');
 wireVolSlider('volStomp','volStompVal','stomp');
-wireVolSlider('volDVD','volDVDVal','dvd');
 wireVolSlider('volWhip','volWhipVal','whip');
+wireVolSlider('volBomb','volBombVal','bomb');
+wireVolSlider('volNuke','volNukeVal','nuke');
+wireVolSlider('volFlashbang','volFlashbangVal','flashbang');
 document.getElementById('soundThresh').addEventListener('input',function(){soundThresh=parseFloat(this.value)||3;savePrefs();});
 document.addEventListener('pointerdown',()=>ensureAudio());
 
-function codeToDisplay(code){if(code==='Space')return'Space';if(code==='Equal')return'=';if(code==='Minus')return'-';return code.replace(/^Key/,'').replace(/^Digit/,'').replace(/^Arrow/,'');}
 function renderHotkeyRow(action,tr){
   tr.innerHTML='';
   const td1=document.createElement('td');td1.textContent=action.label;tr.appendChild(td1);
@@ -1933,12 +1969,8 @@ buildHotkeyTable(); // rebuild after load so restored keys are shown
 
 // ── pet state ─────────────────────────────────────────────
 let petFrames=[];
-let petFramesLeft=[],petFramesRight=[],petFramesIdle=[];
-// petFramesTalk: viewer costume talk state frames
-let petFramesTalk=[];
-let petFramesLeftTalk=[], petFramesRightTalk=[];
+let petFramesRight=[];
 function getPetFramesForDir(fl,mov,talking){
-  if(talking&&petFramesRightTalk.length)return petFramesRightTalk;
   if(petFramesRight.length)return petFramesRight;if(petFrames.length)return petFrames;return[];
 } // loaded images for walking animation
 let petSize=84, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
@@ -1978,12 +2010,15 @@ class ChatPet{
     this.grabbed=false; this.grabVX=0; this.grabVY=0;
     this.airborne=false;
     this.pinned=false; // when true, locked in place
+    this._stonesNeeded=0;
+    this._stealPinTimer=null;
     this.customImg=null; // per-viewer directional image overrides
     this.customImgForward=null;
     this.customImgLeft=null;
     this.customImgRight=null;
     // Battle Royale state
     this.hp=100; this.maxHp=100; this.alive=true;
+    this._showHPUntil=0;
     this.brCooldown=0;
     this.brAngle=0; // current rotation angle for attack animation
     this.brAngleTarget=0; // target rotation
@@ -2057,7 +2092,7 @@ class ChatPet{
     const isTalking=!!(this.bubble&&this.bubbleTimer>0);
     const dirFrames=customFrame?null:getPetFramesForDir(this.facingLeft,isMoving,isTalking);
     const frames=customFrame?[customFrame]:(dirFrames&&dirFrames.length>0?dirFrames:[]);
-    const hasDir=(petFramesLeft.length>0||petFramesRight.length>0||petFramesIdle.length>0);
+    const hasDir=(petFramesRight.length>0||petFrames.length>0);
 
     if(frames.length>0){
       // hold on talk frame while talking — only cycle when not talking
@@ -2109,7 +2144,7 @@ class ChatPet{
     }
 
     // update DOM health bar
-    if((battleRoyaleActive||warActive||(kaijuActive&&!this._isRaidBoss)||this._inDuel||caneActive)&&this.alive){
+    if((battleRoyaleActive||warActive||(kaijuActive&&!this._isRaidBoss)||this._inDuel||caneActive||Date.now()<this._showHPUntil)&&this.alive){
       this.healthBarWrap.style.display='block';
       const ratio=Math.max(0,this.hp/this.maxHp);
       this.healthBarFill.style.width=(ratio*100)+'%';
@@ -2128,6 +2163,7 @@ class ChatPet{
     // pinned or menu-frozen — stay put, just draw
     if(this.pinned||this._menuFrozen){
       this.vx=0;this.vy=0;
+      if(this.bubbleTimer>0){this.bubbleTimer--;if(this.bubbleTimer<=0&&this.bubble){this.bubble.remove();this.bubble=null;this._talking=false;}}
       placePetEl(this);
       this.drawSprite(now);
       return;
@@ -2349,8 +2385,6 @@ const __drawOrig=draw;
 })();
 
 // ── pet management ────────────────────────────────────────
-// petMap declared early above
-const _petMapAlias=petMap; // keep ref
 function getOrCreatePet(username,color){
   username=username.toLowerCase();
   if(ignoreList.has(username))return null;
@@ -2541,6 +2575,8 @@ document.getElementById('petPinBtn').addEventListener('click',()=>{
     petImgTarget.vx=0;petImgTarget.vy=0;petImgTarget.airborne=false;
     petImgTarget.nameEl.textContent='📌 '+petImgTarget.username;
   } else {
+    petImgTarget._stonesNeeded=0;
+    clearTimeout(petImgTarget._stealPinTimer);petImgTarget._stealPinTimer=null;
     petImgTarget.nameEl.textContent=petImgTarget.username;
   }
   closePetImagePicker();
@@ -2638,7 +2674,7 @@ function _brTick(){
   const alive=pets.filter(p=>p.alive);
   if(alive.length<=1){
     if(alive.length===1){
-      alive[0].say('👑 I WIN!');ensureAudio();playEventSound(winBuffer,'win');alive[0].brAngleTarget=0;
+      alive[0].say('👑 I WIN!');alive[0].brAngleTarget=0;
       addCoins(alive[0].username, COIN_BR_WIN);
       setTimeout(() => getCoins(alive[0].username, c => alive[0].say('🪙 +' + COIN_BR_WIN + ' (' + c + ' total)')), 1500);
     }
@@ -2681,7 +2717,7 @@ function _brTick(){
           nearest.vx=(Math.random()<0.5?-1:1)*(10+Math.random()*8);
           nearest.vy=-(8+Math.random()*5);nearest.airborne=true;
           nearest.el.style.transition='opacity 0.8s';nearest.el.style.opacity='0';
-          playEventSound(koBuffer,'ko');
+
           setTimeout(()=>{if(!nearest.alive)nearest.el.style.display='none';},900);
         }
       } else {p.brCooldown=15;p.vx-=dx/dist*2;}
@@ -2826,19 +2862,33 @@ function buildTeamConfigUI(){
   });
 }
 
-// legacy compat vars (kept in case other code refs them)
-let teamAEmoji='⚔️', teamBEmoji='🛡️', teamACry='For glory!', teamBCry='Hold the line!';
 let brCheckInterval=180, brAttackRange=2.8;
 let bloodEnabled=true, bloodScale=1;
 
 // ══════════════════════════════════════════════════════════
 // COIN SYSTEM
 // ══════════════════════════════════════════════════════════
-const COINS_API    = 'https://script.google.com/macros/s/AKfycbwCgSbszPkbVBh5FIySrfM5JrWcgtXRQH1piDYSJCLS0KMfWL9xsCnfsd6A5s1NwxF4/exec';
+let COINS_API = localStorage.getItem(LS_COINS_API) || '';
 const COIN_DUEL_WIN  = 100;
 const COIN_DUEL_LOSE = 50;
 const COIN_BR_WIN    = 300;
 const COIN_WAR_WIN   = 150;
+
+const SLOT_SYMBOLS=[
+  {sym:'🍒',weight:35,pay:3},
+  {sym:'🍋',weight:25,pay:5},
+  {sym:'🍊',weight:18,pay:8},
+  {sym:'🍇',weight:12,pay:15},
+  {sym:'🔔',weight:6, pay:25},
+  {sym:'⭐',weight:3, pay:50},
+  {sym:'💎',weight:1, pay:200},
+];
+function _slotRoll(){
+  const total=SLOT_SYMBOLS.reduce((s,x)=>s+x.weight,0);
+  let r=Math.random()*total;
+  for(const s of SLOT_SYMBOLS){r-=s.weight;if(r<=0)return s;}
+  return SLOT_SYMBOLS[SLOT_SYMBOLS.length-1];
+}
 
 function addCoins(username, delta) {
   fetch(COINS_API, {
@@ -2849,7 +2899,7 @@ function addCoins(username, delta) {
 }
 
 function getCoins(username, cb) {
-  fetch(COINS_API + '?user=' + encodeURIComponent(username.toLowerCase()))
+  fetch(COINS_API + '?user=' + encodeURIComponent(username.toLowerCase()) + '&_=' + Date.now())
     .then(r => r.json())
     .then(d => cb(d.coins ?? 0))
     .catch(() => cb(0));
@@ -2863,8 +2913,22 @@ function buyItem(username, item, cb) {
   }).then(r => r.json()).then(cb).catch(() => cb({ error: 'network' }));
 }
 
+function getShop(cb){
+  fetch(COINS_API+'?action=shop&_='+Date.now())
+    .then(r=>r.json())
+    .then(d=>cb(d.shop??[]))
+    .catch(()=>cb([]));
+}
+
+function getLeaderboard(cb){
+  fetch(COINS_API+'?action=leaderboard&_='+Date.now())
+    .then(r=>r.json())
+    .then(d=>cb(d.leaderboard??[]))
+    .catch(()=>cb([]));
+}
+
 function getInventory(username, cb) {
-  fetch(COINS_API + '?action=inventory&user=' + encodeURIComponent(username.toLowerCase()))
+  fetch(COINS_API + '?action=inventory&user=' + encodeURIComponent(username.toLowerCase()) + '&_=' + Date.now())
     .then(r => r.json())
     .then(d => cb(d.inventory ?? []))
     .catch(() => cb([]));
@@ -2940,7 +3004,6 @@ function startWar(){
           addCoins(p.username, COIN_WAR_WIN);
           setTimeout(() => getCoins(p.username, c => p.say('🪙 +' + COIN_WAR_WIN + ' (' + c + ' total)')), 1500);
         });
-        ensureAudio();playEventSound(winBuffer,'win');
       }
       endWar();return;
     }
@@ -3022,10 +3085,6 @@ function endWar(){
   },2500);
 }
 
-// also expose warActive to health bar drawing
-// (reuse battleRoyaleActive check — patch drawSprite to also show HP in war)
-const _origBattleCheck=()=>battleRoyaleActive||warActive;
-
 // ── fight settings wiring ─────────────────────────────────
 document.getElementById('numWarTeams').addEventListener('change',function(){
   numWarTeamsCount=parseInt(this.value)||2;
@@ -3050,6 +3109,25 @@ document.getElementById('coinCheckBtn').addEventListener('click',function(){
   const msg=document.getElementById('coinMsg');
   if(!user){msg.textContent='Enter a username.';return;}
   getCoins(user,c=>{msg.textContent=user+': 🪙 '+c+' coins';});
+});
+(function(){
+  const saved=localStorage.getItem(LS_COINS_API);
+  if(saved)document.getElementById('coinsApiMsg').textContent='✓ Custom URL saved';
+})();
+document.getElementById('coinsApiSaveBtn').addEventListener('click',function(){
+  const val=document.getElementById('coinsApiInput').value.trim();
+  const msg=document.getElementById('coinsApiMsg');
+  if(!val){msg.textContent='Paste a URL first.';return;}
+  COINS_API=val;
+  localStorage.setItem(LS_COINS_API,val);
+  document.getElementById('coinsApiInput').value='';
+  msg.textContent='✓ URL saved';
+});
+document.getElementById('coinsApiClearBtn').addEventListener('click',function(){
+  COINS_API='';
+  localStorage.removeItem(LS_COINS_API);
+  document.getElementById('coinsApiInput').value='';
+  document.getElementById('coinsApiMsg').textContent='URL cleared';
 });
 document.getElementById('bloodEnabledToggle').addEventListener('change',function(){bloodEnabled=this.checked;});
 document.getElementById('bloodScaleInput').addEventListener('input',function(){bloodScale=Math.max(0.1,parseFloat(this.value)||1);});
@@ -3140,12 +3218,20 @@ function _doConnect(){
         const raiderCount=parseInt(tags['msg-param-viewerCount']||'1',10)||1;
         setTimeout(()=>startRaidKaiju(raiderName,raiderCount),1000);
       }
+      // sub/resub/giftsub celebration
+      const subMsgIds=['sub','resub','subgift','submysterygift','giftpaidupgrade','primepaidupgrade'];
+      if(un&&subMsgIds.includes(tags['msg-id'])){
+        const subberName=tags['display-name']||tags['login']||'';
+        celebratePets(subberName,'sub');
+      }
       if(pm){
         const username=tags['display-name']||pm[1];
         const text=pm[2].trim();
         const color=tags['color']||null;
         const pet=getOrCreatePet(username,color||undefined);
         if(pet&&!text.startsWith('!'))pet.say(text,tags['emotes']||'');
+        // bits (cheer) celebration
+        if(tags['bits']&&parseInt(tags['bits'])>0)celebratePets(username,'bits');
         const cmdText=text.trim().toLowerCase();
         const cmdParts=cmdText.split(/\s+/);
         const cmdTrigger=cmdParts[0];
@@ -3156,15 +3242,17 @@ function _doConnect(){
           if(cmdTrigger===cmd('battleroyale'))setTimeout(startBattleRoyale,500);
           if(cmdTrigger===cmd('war'))setTimeout(startWar,500);
           if(cmdTrigger===cmd('kaiju'))setTimeout(startKaiju,500);
-          if(cmdTrigger==='!addcoin'||cmdTrigger==='!removecoin'){
+          if(cmdTrigger==='!addcoin'||cmdTrigger==='!addcoins'||cmdTrigger==='!removecoin'||cmdTrigger==='!removecoins'){
             const target=(cmdArgs[0]||'').replace(/^@/,'').toLowerCase();
             const amount=parseInt(cmdArgs[1])||0;
             if(target&&amount>0){
-              const delta=cmdTrigger==='!addcoin'?amount:-amount;
+              const delta=(cmdTrigger==='!addcoin'||cmdTrigger==='!addcoins')?amount:-amount;
               addCoins(target,delta);
               setTimeout(()=>getCoins(target,c=>{
                 const p=petMap[username.toLowerCase()];
                 if(p)p.say((delta>0?'+ ':'- ')+Math.abs(delta)+' 🪙 → '+target+': '+c);
+                const sign=delta>0?'+':'-';
+                sendBotMsg('@'+target+' '+sign+Math.abs(delta)+' 🪙 ('+c+' total)');
               }),1200);
             }
           }
@@ -3174,6 +3262,8 @@ function _doConnect(){
         if(cmdTrigger===cmd('jump'))execViewerCmd('jump',username,cmdArgs);
         if(cmdTrigger===cmd('duel'))execViewerCmd('duel',username,cmdArgs);
         if(cmdTrigger===cmd('fight'))execViewerCmd('duel',username,cmdArgs);
+        if(cmdTrigger==='!accept')execViewerCmd('accept',username,cmdArgs);
+        if(cmdTrigger==='!decline')execViewerCmd('decline',username,cmdArgs);
         if(cmdTrigger===cmd('punch'))execViewerCmd('punch',username,cmdArgs);
         if(cmdTrigger===cmd('pledge'))execViewerCmd('pledge',username,cmdArgs);
         if(cmdTrigger===cmd('spawn'))execViewerCmd('spawn',username,cmdArgs);
@@ -3188,10 +3278,18 @@ function _doConnect(){
         if(cmdTrigger===cmd('v'))execViewerCmd('lurk',username,cmdArgs);
         if(cmdTrigger===cmd('hug'))execViewerCmd('hug',username,cmdArgs);
         if(cmdTrigger===cmd('eat'))execViewerCmd('eat',username,cmdArgs);
-        if(cmdTrigger===cmd('coins'))execViewerCmd('coins',username,cmdArgs);
+        if(cmdTrigger===cmd('coins')||cmdTrigger===cmd('coins').replace(/s$/,'')||cmdTrigger===cmd('coins')+'s')execViewerCmd('coins',username,cmdArgs);
         if(cmdTrigger===cmd('inventory'))execViewerCmd('inventory',username,cmdArgs);
+        if(cmdTrigger===cmd('shop'))execViewerCmd('shop',username,cmdArgs);
         if(cmdTrigger===cmd('buy'))execViewerCmd('buy',username,cmdArgs);
+        if(cmdTrigger==='!leaderboard'||cmdTrigger==='!lb')execViewerCmd('leaderboard',username,cmdArgs);
         if(cmdTrigger===cmd('bomb'))execViewerCmd('bomb',username,cmdArgs);
+        if(cmdTrigger===cmd('flashbang'))execViewerCmd('flashbang',username,cmdArgs);
+        if(cmdTrigger===cmd('nuke'))execViewerCmd('nuke',username,cmdArgs);
+        if(cmdTrigger===cmd('steal'))execViewerCmd('steal',username,cmdArgs);
+        if(cmdTrigger===cmd('stone'))execViewerCmd('stone',username,cmdArgs);
+        if(cmdTrigger===cmd('gift'))execViewerCmd('gift',username,cmdArgs);
+        if(cmdTrigger===cmd('bet')||cmdTrigger==='!gamble')execViewerCmd('bet',username,cmdArgs);
       }
     }
   };
@@ -3214,6 +3312,167 @@ function setTwitchStatus(msg,color){
   if(el){el.textContent=msg;el.style.color=color||'rgba(255,255,255,0.35)';}
 }
 
+// ── Bot IRC + EventSub ────────────────────────────────────
+let botWS=null,botConnected=false;
+let _botUser='',_botToken='',_broadcasterToken='',_botClientId='',_broadcasterId='';
+let _eventSubWS=null,_botIRCReconnectTimer=null,_eventSubReconnectTimer=null;
+let _tokenExpiryAt=0,_tokenExpiryInterval=null;
+
+function _fmtExpiry(secsRemaining){
+  if(secsRemaining<=0)return'expired';
+  const h=Math.floor(secsRemaining/3600);
+  const m=Math.floor((secsRemaining%3600)/60);
+  return h>0?h+'h '+m+'m':m+'m';
+}
+
+async function _startTokenExpiryWatch(token){
+  clearInterval(_tokenExpiryInterval);
+  try{
+    const v=await fetch('https://id.twitch.tv/oauth2/validate',{
+      headers:{'Authorization':'OAuth '+token}
+    }).then(r=>r.json());
+    if(v.status===401){setBroadcasterStatus('Redemptions active ✓ — ⚠️ token invalid!','rgba(220,150,50,0.9)');return;}
+    _tokenExpiryAt=Date.now()+(v.expires_in*1000);
+    const update=()=>{
+      const secs=Math.max(0,Math.floor((_tokenExpiryAt-Date.now())/1000));
+      const color=secs<3600?'rgba(220,150,50,0.9)':'rgba(30,200,100,0.8)';
+      setBroadcasterStatus('Redemptions active ✓ — token expires in '+_fmtExpiry(secs),color);
+      if(secs===0){clearInterval(_tokenExpiryInterval);setBroadcasterStatus('Redemptions active ✓ — ⚠️ token expired — reconnect may fail','rgba(220,80,80,0.9)');}
+    };
+    update();
+    _tokenExpiryInterval=setInterval(update,60000);
+  }catch(e){setBroadcasterStatus('Redemptions active ✓ — could not check token expiry','rgba(30,200,100,0.8)');}
+}
+
+function setBotStatus(msg,color){
+  const el=document.getElementById('botStatus');
+  if(el){el.textContent=msg;el.style.color=color||'rgba(255,255,255,0.35)';}
+}
+function setBroadcasterStatus(msg,color){
+  const el=document.getElementById('broadcasterStatus');
+  if(el){el.textContent=msg;el.style.color=color||'rgba(255,255,255,0.35)';}
+}
+
+function sendBotMsg(text){
+  if(!botWS||!botConnected||!twitchChannel)return;
+  botWS.send('PRIVMSG #'+twitchChannel+' :'+text);
+}
+
+function handleRedemption(rewardTitle,username,userInput){
+  if(rewardTitle==='FIRST!'){
+    addCoins(username,250);
+    setTimeout(()=>getCoins(username,c=>{
+      sendBotMsg('@'+username+' scored FIRST! 🥇 +250 🪙 ('+c+' total)');
+    }),1200);
+  } else if(rewardTitle==='CHECK IN'){
+    addCoins(username,50);
+    setTimeout(()=>getCoins(username,c=>{
+      sendBotMsg('@'+username+' checked in! ✅ +50 🪙 ('+c+' total)');
+    }),1200);
+  }
+  const log=document.getElementById('redemptionLog');
+  if(log){
+    if(log.querySelector('span[data-empty]'))log.innerHTML='';
+    const now=new Date();
+    const ts=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+    const row=document.createElement('div');
+    row.style.cssText='border-bottom:0.5px solid rgba(255,255,255,0.06);padding-bottom:3px;';
+    row.innerHTML='<span style="color:rgba(255,255,255,0.3);">['+ts+']</span> <span style="color:#b8b2ff;">'+username+'</span> → <span style="color:rgba(255,198,3,0.9);">'+rewardTitle+'</span>'+(userInput?'<span style="color:rgba(255,255,255,0.4);"> — '+userInput+'</span>':'');
+    log.appendChild(row);
+    while(log.children.length>20)log.removeChild(log.firstChild);
+    log.scrollTop=log.scrollHeight;
+  }
+}
+
+function _connectBotIRC(){
+  if(botWS){try{botWS.onclose=null;botWS.close();}catch(e){}botWS=null;}
+  clearTimeout(_botIRCReconnectTimer);
+  if(!_botToken||!twitchChannel)return;
+  const ws=new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+  botWS=ws;
+  ws.onopen=()=>{
+    ws.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
+    ws.send('PASS oauth:'+_botToken);
+    ws.send('NICK '+_botUser);
+    ws.send('JOIN #'+twitchChannel);
+  };
+  ws.onmessage=ev=>{
+    for(const line of ev.data.split('\r\n')){
+      if(!line)continue;
+      if(line.startsWith('PING')){ws.send('PONG :tmi.twitch.tv');continue;}
+      if(/\s376\s|\s001\s/.test(line)){botConnected=true;setBotStatus('Bot connected as '+_botUser+' ✓','rgba(30,200,100,0.8)');}
+      if(line.includes('Login authentication failed')){setBotStatus('Bot auth failed — check token','rgba(220,80,80,0.8)');}
+    }
+  };
+  ws.onerror=()=>setBotStatus('Bot IRC error','rgba(220,80,80,0.8)');
+  ws.onclose=()=>{
+    botConnected=false;
+    if(_botToken&&twitchChannel)_botIRCReconnectTimer=setTimeout(_connectBotIRC,10000);
+  };
+}
+
+function _connectEventSub(url){
+  if(_eventSubWS){try{_eventSubWS.onclose=null;_eventSubWS.close();}catch(e){}}_eventSubWS=null;
+  clearTimeout(_eventSubReconnectTimer);
+  if(!_broadcasterToken||!_broadcasterId)return;
+  const ws=new WebSocket(url||'wss://eventsub.wss.twitch.tv/ws');
+  _eventSubWS=ws;
+  ws.onmessage=async ev=>{
+    let msg;try{msg=JSON.parse(ev.data);}catch(e){return;}
+    const type=msg.metadata?.message_type;
+    if(type==='session_welcome'){
+      const sid=msg.payload.session.id;
+      try{
+        const r=await fetch('https://api.twitch.tv/helix/eventsub/subscriptions',{
+          method:'POST',
+          headers:{'Client-Id':_botClientId,'Authorization':'Bearer '+_broadcasterToken,'Content-Type':'application/json'},
+          body:JSON.stringify({type:'channel.channel_points_custom_reward_redemption.add',version:'1',
+            condition:{broadcaster_user_id:_broadcasterId},transport:{method:'websocket',session_id:sid}})
+        }).then(r=>r.json());
+        if(r.data){_startTokenExpiryWatch(_broadcasterToken);}
+        else{setBroadcasterStatus('Sub failed: '+(r.message||'unknown'),'rgba(220,80,80,0.8)');}
+      }catch(e){setBroadcasterStatus('Sub error: '+e.message,'rgba(220,80,80,0.8)');}
+    }
+    if(type==='session_reconnect'){_connectEventSub(msg.payload.session.reconnect_url);}
+    if(type==='notification'&&msg.payload?.event){
+      const evt=msg.payload.event;
+      handleRedemption(evt.reward.title,evt.user_name||evt.user_login,evt.user_input||'');
+    }
+  };
+  ws.onclose=()=>{
+    if(_broadcasterToken&&_broadcasterId)_eventSubReconnectTimer=setTimeout(()=>_connectEventSub('wss://eventsub.wss.twitch.tv/ws'),10000);
+  };
+}
+
+function connectBroadcaster(broadcasterToken,clientId,broadcasterId){
+  _broadcasterToken=broadcasterToken.replace(/^oauth:/i,'');
+  _botClientId=clientId;
+  _broadcasterId=broadcasterId;
+  _connectEventSub('wss://eventsub.wss.twitch.tv/ws');
+}
+
+function disconnectBroadcaster(){
+  _broadcasterToken='';_botClientId='';_broadcasterId='';
+  clearTimeout(_eventSubReconnectTimer);
+  clearInterval(_tokenExpiryInterval);_tokenExpiryInterval=null;
+  if(_eventSubWS){try{_eventSubWS.onclose=null;_eventSubWS.close();}catch(e){}}_eventSubWS=null;
+  setBroadcasterStatus('Disconnected','rgba(255,255,255,0.35)');
+}
+
+function connectBotChat(user,botToken){
+  _botUser=user.toLowerCase();
+  _botToken=botToken.replace(/^oauth:/i,'');
+  _connectBotIRC();
+}
+
+function disconnectBotChat(){
+  _botToken='';
+  clearTimeout(_botIRCReconnectTimer);
+  if(botWS){try{botWS.onclose=null;botWS.close();}catch(e){}botWS=null;}
+  botConnected=false;
+  setBotStatus('Disconnected','rgba(255,255,255,0.35)');
+}
+
 // ── Twitch settings wiring ────────────────────────────────
 document.getElementById('ignoreListInput').addEventListener('input',function(){ignoreList=new Set(this.value.split('\n').map(s=>s.trim().toLowerCase()).filter(Boolean));saveIgnoreList();});
 (function(){try{const r=localStorage.getItem(LS_IGNORE);if(r)document.getElementById('ignoreListInput').value=JSON.parse(r).join('\n');}catch(e){}})();
@@ -3228,6 +3487,70 @@ document.getElementById('twitchDisconnectBtn').addEventListener('click',()=>{
   localStorage.removeItem(LS_TCHAN);
   setTwitchStatus('Disconnected','rgba(255,255,255,0.35)');
 });
+// ── Bot wiring ────────────────────────────────────────────
+(function(){
+  if(localStorage.getItem(LS_BROADCASTER_TOKEN))setBroadcasterStatus('✓ Credentials saved','rgba(255,198,3,0.7)');
+  if(localStorage.getItem(LS_BOT_TOKEN))setBotStatus('✓ Credentials saved','rgba(255,198,3,0.7)');
+})();
+document.getElementById('broadcasterConnectBtn').addEventListener('click',async function(){
+  let broadcasterToken=document.getElementById('broadcasterToken').value.trim();
+  let clientId=document.getElementById('botClientId').value.trim();
+  if(!broadcasterToken)broadcasterToken=localStorage.getItem(LS_BROADCASTER_TOKEN)||'';
+  if(!clientId)clientId=localStorage.getItem(LS_BOT_CLIENTID)||'';
+  if(!broadcasterToken||!clientId){setBroadcasterStatus('Fill in token and Client ID','rgba(220,80,80,0.8)');return;}
+  if(!twitchChannel){setBroadcasterStatus('Connect to a Twitch channel first','rgba(220,80,80,0.8)');return;}
+  setBroadcasterStatus('Looking up broadcaster…','rgba(255,200,50,0.8)');
+  const cleanToken=broadcasterToken.replace(/^oauth:/i,'');
+  localStorage.setItem(LS_BROADCASTER_TOKEN,cleanToken);
+  localStorage.setItem(LS_BOT_CLIENTID,clientId);
+  document.getElementById('broadcasterToken').value='';
+  document.getElementById('botClientId').value='';
+  let broadcasterId='';
+  try{
+    const d=await fetch('https://api.twitch.tv/helix/users?login='+encodeURIComponent(twitchChannel),{
+      headers:{'Client-Id':clientId,'Authorization':'Bearer '+cleanToken}
+    }).then(r=>r.json());
+    broadcasterId=d?.data?.[0]?.id||'';
+  }catch(e){}
+  if(!broadcasterId){setBroadcasterStatus('Could not look up broadcaster ID — check credentials','rgba(220,80,80,0.8)');return;}
+  connectBroadcaster(cleanToken,clientId,broadcasterId);
+});
+document.getElementById('broadcasterDisconnectBtn').addEventListener('click',()=>{
+  localStorage.removeItem(LS_BROADCASTER_TOKEN);
+  localStorage.removeItem(LS_BOT_CLIENTID);
+  disconnectBroadcaster();
+});
+document.getElementById('botConnectBtn').addEventListener('click',function(){
+  let user=document.getElementById('botUsername').value.trim();
+  let botToken=document.getElementById('botToken').value.trim();
+  if(!user)user=localStorage.getItem(LS_BOT_USER)||'';
+  if(!botToken)botToken=localStorage.getItem(LS_BOT_TOKEN)||'';
+  if(!user||!botToken){setBotStatus('Fill in username and token','rgba(220,80,80,0.8)');return;}
+  if(!twitchChannel){setBotStatus('Connect to a Twitch channel first','rgba(220,80,80,0.8)');return;}
+  const cleanToken=botToken.replace(/^oauth:/i,'');
+  localStorage.setItem(LS_BOT_USER,user);
+  localStorage.setItem(LS_BOT_TOKEN,cleanToken);
+  document.getElementById('botUsername').value='';
+  document.getElementById('botToken').value='';
+  connectBotChat(user,cleanToken);
+});
+document.getElementById('botDisconnectBtn').addEventListener('click',()=>{
+  localStorage.removeItem(LS_BOT_USER);
+  localStorage.removeItem(LS_BOT_TOKEN);
+  disconnectBotChat();
+});
+(function(){
+  function sendTest(){
+    const input=document.getElementById('botTestMsg');
+    const text=input.value.trim();
+    if(!text)return;
+    if(!botConnected){setBotStatus('Bot not connected','rgba(220,80,80,0.8)');return;}
+    sendBotMsg(text);
+    input.value='';
+  }
+  document.getElementById('botTestSendBtn').addEventListener('click',sendTest);
+  document.getElementById('botTestMsg').addEventListener('keydown',e=>{if(e.key==='Enter')sendTest();});
+})();
 document.getElementById('testPetBtn').addEventListener('click',()=>{
   const names=['StreamerFan','CoolViewer','PixelDude','ChatBot42','GamerGal'];
   const name=names[Math.floor(Math.random()*names.length)]+'_'+Math.floor(Math.random()*99);
@@ -3802,7 +4125,6 @@ function kaijuTakeDamage(dmg,username){
       addCoins(p.username, 50);
       setTimeout(()=>getCoins(p.username, c=>p.say('🪙 +50 ('+c+' total)')), 1500);
     });
-    ensureAudio();playEventSound(winBuffer,'win');
     if(kaijuSpire){kaijuSpire.vx=(Math.random()-.5)*20;kaijuSpire.vy=-15;}
     if(kaijuPet){kaijuPet.vx=(Math.random()-.5)*10;kaijuPet.vy=-8;kaijuPet.airborne=true;}
     endKaiju();
@@ -3837,6 +4159,32 @@ function endKaiju(){
     });
     if(!kaijuActive){kaijuSpire=null;kaijuPet=null;}
   },2500);
+}
+
+function celebratePets(triggerName, reason){
+  const sayOptions = reason==='sub'
+    ? ['PogChamp!','LET\'S GO!','🎉','GG!','HYPE!','WOOOO!']
+    : ['Pog!','🎉','HYPE!','WOOOO!','let\'s go!'];
+  const alive=pets.filter(p=>p.alive&&!p._hidden);
+  alive.forEach((p,i)=>{
+    setTimeout(()=>{
+      p.vy=-(8+Math.random()*5);
+      p.airborne=true;
+      if(i===0||p.username===triggerName.toLowerCase()){
+        p.say(sayOptions[Math.floor(Math.random()*sayOptions.length)]);
+      }
+    },i*80);
+  });
+  // second bounce wave
+  setTimeout(()=>{
+    alive.forEach((p,i)=>{
+      setTimeout(()=>{
+        if(!p.alive||p._hidden)return;
+        p.vy=-(6+Math.random()*4);
+        p.airborne=true;
+      },i*80);
+    });
+  },600);
 }
 
 // ── RAID KAIJU ────────────────────────────────────────────
@@ -3991,9 +4339,10 @@ function triggerBomb(thrower) {
   flash.style.opacity = '0';
   setTimeout(() => flash.remove(), 550);
 
-  // Push all nearby viewers (canvas space)
+  // Push and damage all nearby viewers except thrower
+  ensureAudio();playBomb();
   pets.forEach(p => {
-    if (!p.alive) return;
+    if (!p.alive || p === thrower) return;
     const px = p.x + p.w / 2;
     const py = p.y + p.h / 2;
     const dx = px - cx;
@@ -4004,8 +4353,248 @@ function triggerBomb(thrower) {
       p.vx += (dx / dist) * force;
       p.vy += (dy / dist) * force - 4;
       p.airborne = true;
+      const dmg = Math.round((1 - dist / blastRadius) * 25);
+      p.hp = Math.max(0, p.hp - dmg);
+      p._showHPUntil = Date.now() + 3000;
+      spawnBloodSplatter(p);
+      if (p.hp <= 0) { p.alive = false; p.healthBarWrap.style.display = 'none'; }
     }
   });
+}
+
+// ── FLASHBANG ─────────────────────────────────────────────
+function triggerFlashbang() {
+  ensureAudio();playFlashbang();
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:#fff;opacity:1;pointer-events:none;z-index:99999;transition:opacity 2s ease-out;';
+  document.body.appendChild(overlay);
+  overlay.getBoundingClientRect();
+  overlay.style.opacity = '0';
+  setTimeout(() => overlay.remove(), 2200);
+}
+
+// ── NUKE ──────────────────────────────────────────────────
+function triggerNuke(thrower) {
+  const rect = thrower.el.getBoundingClientRect();
+  const vcx = rect.left + rect.width / 2;
+  const vcy = rect.top + rect.height / 2;
+  const cx = thrower.x + thrower.w / 2;
+  const cy = thrower.y + thrower.h / 2;
+  const blastRadius = 700;
+
+  ensureAudio();playNuke();
+  // Screen flash
+  const sflash = document.createElement('div');
+  sflash.style.cssText = 'position:fixed;inset:0;background:rgba(255,220,100,0.85);pointer-events:none;z-index:9998;transition:opacity 0.6s ease-out;opacity:1;';
+  document.body.appendChild(sflash);
+  sflash.getBoundingClientRect();
+  sflash.style.opacity = '0';
+  setTimeout(() => sflash.remove(), 700);
+
+  // Massive shockwave ring
+  const ring = document.createElement('div');
+  ring.style.cssText = 'position:fixed;left:'+vcx+'px;top:'+vcy+'px;width:0;height:0;border-radius:50%;background:radial-gradient(circle,rgba(255,240,100,0.8) 0%,rgba(255,120,0,0.5) 40%,transparent 70%);transform:translate(-50%,-50%);z-index:9997;pointer-events:none;transition:width 0.6s ease-out,height 0.6s ease-out,opacity 0.6s ease-out;';
+  document.body.appendChild(ring);
+  ring.getBoundingClientRect();
+  ring.style.width  = (blastRadius * 2) + 'px';
+  ring.style.height = (blastRadius * 2) + 'px';
+  ring.style.opacity = '0';
+  setTimeout(() => ring.remove(), 700);
+
+  // Outer shockwave border
+  const border = document.createElement('div');
+  border.style.cssText = 'position:fixed;left:'+vcx+'px;top:'+vcy+'px;width:0;height:0;border-radius:50%;border:6px solid rgba(255,200,50,0.95);transform:translate(-50%,-50%);z-index:9997;pointer-events:none;transition:width 0.8s ease-out,height 0.8s ease-out,opacity 0.8s ease-out;opacity:1;';
+  document.body.appendChild(border);
+  border.getBoundingClientRect();
+  border.style.width  = (blastRadius * 2.5) + 'px';
+  border.style.height = (blastRadius * 2.5) + 'px';
+  border.style.opacity = '0';
+  setTimeout(() => border.remove(), 900);
+
+  // Screen shake
+  const canvasEl = document.getElementById('canvasWrap') || document.body;
+  let shakeFrame = 0;
+  const shakeInterval = setInterval(() => {
+    shakeFrame++;
+    const mag = Math.max(0, 14 - shakeFrame * 0.7);
+    canvasEl.style.transform = `translate(${(Math.random()-0.5)*mag*2}px,${(Math.random()-0.5)*mag*2}px)`;
+    if (shakeFrame >= 20) { clearInterval(shakeInterval); canvasEl.style.transform = ''; }
+  }, 30);
+
+  // Push and damage EVERYONE except thrower — massive force and damage
+  pets.forEach(p => {
+    if (!p.alive || p === thrower) return;
+    const px = p.x + p.w / 2;
+    const py = p.y + p.h / 2;
+    const dx = px - cx;
+    const dy = py - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < blastRadius && dist > 0) {
+      const force = (1 - dist / blastRadius) * 55;
+      p.vx += (dx / dist) * force;
+      p.vy += (dy / dist) * force - 12;
+      p.airborne = true;
+      const dmg = Math.round((1 - dist / blastRadius) * 90);
+      p.hp = Math.max(0, p.hp - dmg);
+      p._showHPUntil = Date.now() + 3000;
+      spawnBloodSplatter(p);
+      if (p.hp <= 0) { p.alive = false; p.healthBarWrap.style.display = 'none'; }
+    }
+  });
+}
+
+// ── SLOT MACHINE ──────────────────────────────────────────
+function triggerSlotMachine(username, bet, petObj){
+  const rolls=[_slotRoll(),_slotRoll(),_slotRoll()];
+  let multiplier=0, resultMsg='';
+  if(rolls[0].sym===rolls[1].sym&&rolls[1].sym===rolls[2].sym){
+    multiplier=rolls[0].pay;
+    resultMsg=multiplier>=50?'🎉 JACKPOT! '+rolls[0].sym+rolls[0].sym+rolls[0].sym:'🎊 '+rolls[0].sym+rolls[0].sym+rolls[0].sym+' — WIN!';
+  } else if(rolls[0].sym===rolls[1].sym){
+    multiplier=2; resultMsg='✨ '+rolls[0].sym+rolls[1].sym+' Pair!';
+  } else if(rolls[0].sym==='🍒'){
+    multiplier=1; resultMsg='🍒 Cherry — Break Even';
+  } else {
+    multiplier=0; resultMsg='💸 No luck...';
+  }
+  const payout=Math.floor(bet*multiplier);
+
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(160deg,#1a0a5e,#2d1b8e);border:4px solid #ffd700;border-radius:28px;padding:44px 56px;text-align:center;z-index:9995;box-shadow:0 0 80px rgba(255,215,0,0.35),inset 0 0 40px rgba(0,0,0,0.5);min-width:520px;font-family:inherit;pointer-events:none;';
+
+  const titleEl=document.createElement('div');
+  titleEl.textContent='🎰 SLOT MACHINE';
+  titleEl.style.cssText='color:#ffd700;font-size:32px;font-weight:700;letter-spacing:2px;margin-bottom:10px;text-shadow:0 0 18px rgba(255,215,0,0.8);';
+  box.appendChild(titleEl);
+
+  const playerEl=document.createElement('div');
+  playerEl.textContent='@'+username+' · bet: '+bet+' 🪙';
+  playerEl.style.cssText='color:rgba(255,255,255,0.6);font-size:16px;margin-bottom:26px;';
+  box.appendChild(playerEl);
+
+  const reelsRow=document.createElement('div');
+  reelsRow.style.cssText='display:flex;gap:18px;justify-content:center;margin-bottom:28px;';
+  const reelEls=[];
+  for(let i=0;i<3;i++){
+    const cell=document.createElement('div');
+    cell.style.cssText='width:140px;height:140px;background:rgba(0,0,0,0.5);border:3px solid rgba(255,215,0,0.3);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:80px;transition:border-color 0.3s,box-shadow 0.3s;';
+    cell.textContent='🎰';
+    reelsRow.appendChild(cell);
+    reelEls.push(cell);
+  }
+  box.appendChild(reelsRow);
+
+  const resultEl=document.createElement('div');
+  resultEl.style.cssText='color:#fff;font-size:26px;font-weight:700;min-height:36px;';
+  box.appendChild(resultEl);
+  const coinsEl=document.createElement('div');
+  coinsEl.style.cssText='font-size:20px;margin-top:10px;min-height:26px;';
+  box.appendChild(coinsEl);
+
+  document.body.appendChild(box);
+
+  const stopDelays=[1400,2100,2900];
+  let reelsDone=0;
+  reelEls.forEach((el,i)=>{
+    const finalSym=rolls[i].sym;
+    let elapsed=0, spinMs=55;
+    function spin(){
+      el.textContent=SLOT_SYMBOLS[Math.floor(Math.random()*SLOT_SYMBOLS.length)].sym;
+      elapsed+=spinMs;
+      if(elapsed<stopDelays[i]-500){setTimeout(spin,spinMs);}
+      else if(elapsed<stopDelays[i]){spinMs=Math.min(240,spinMs*1.4);setTimeout(spin,spinMs);}
+      else{
+        el.textContent=finalSym;
+        el.style.borderColor='rgba(255,215,0,0.9)';
+        el.style.boxShadow='0 0 12px rgba(255,215,0,0.4)';
+        if(++reelsDone===3)setTimeout(showResult,200);
+      }
+    }
+    setTimeout(spin,50*i+50);
+  });
+
+  function showResult(){
+    resultEl.textContent=resultMsg;
+    if(multiplier>1){
+      const color=multiplier>=50?'#ff4':'#7f7';
+      resultEl.style.color=color;coinsEl.style.color=color;
+      coinsEl.textContent='+'+(payout-bet)+' 🪙 (won '+payout+')';
+      addCoins(username,payout);
+      reelEls.forEach(el=>{el.style.background='rgba(255,215,0,0.12)';el.style.borderColor='#ffd700';});
+      if(multiplier>=50){box.style.boxShadow='0 0 90px rgba(255,215,0,0.9),inset 0 0 30px rgba(255,215,0,0.15)';box.style.borderColor='#ffff00';}
+      setTimeout(()=>getCoins(username,c=>{
+        const msg=multiplier>=50
+          ?'🎰 JACKPOT! @'+username+' hit '+rolls.map(r=>r.sym).join('')+' and won '+payout+' 🪙! ('+c+' total)'
+          :'🎰 @'+username+' spun '+rolls.map(r=>r.sym).join('')+' and won '+payout+' 🪙! ('+c+' total)';
+        sendBotMsg(msg);
+      }),800);
+      if(petObj)petObj.say(multiplier>=50?'🎉 JACKPOT!':'🎊 I WON!');
+    } else if(multiplier===1){
+      resultEl.style.color='#aaa';coinsEl.style.color='#aaa';
+      coinsEl.textContent='Bet returned';
+      addCoins(username,bet);
+      if(petObj)petObj.say('Could be worse...');
+    } else {
+      resultEl.style.color='#f77';coinsEl.style.color='#f77';
+      coinsEl.textContent='-'+bet+' 🪙 lost';
+      if(petObj)petObj.say('😢 Lost it all...');
+    }
+    const dismissDelay=multiplier>=50?6000:4000;
+    setTimeout(()=>{box.style.transition='opacity 0.6s';box.style.opacity='0';setTimeout(()=>box.remove(),700);},dismissDelay);
+  }
+}
+
+// ── STEAL / STOCKADE ──────────────────────────────────────
+function stealPin(p){
+  p.x=(window.innerWidth-p.w)/2;
+  p.y=window.innerHeight*0.38;
+  p.vx=0;p.vy=0;p.airborne=false;
+  p.pinned=true;
+  p._stonesNeeded=1;
+  p.nameEl.textContent='🪢 '+p.username;
+}
+
+function stealUnpin(p){
+  clearTimeout(p._stealPinTimer);
+  p._stealPinTimer=null;
+  p.pinned=false;
+  p._stonesNeeded=0;
+  p.nameEl.textContent=p.username;
+  p.vy=-4;p.airborne=true;
+  p.say('Finally free!');
+}
+
+function throwStone(thrower,target,onLand){
+  let sx,sy;
+  if(thrower&&thrower.el){
+    const sr=thrower.el.getBoundingClientRect();
+    sx=sr.left+sr.width/2;sy=sr.top+sr.height/2;
+  } else {
+    // no pet on screen — throw from a random edge
+    const edge=Math.floor(Math.random()*4);
+    if(edge===0){sx=Math.random()*window.innerWidth;sy=0;}
+    else if(edge===1){sx=window.innerWidth;sy=Math.random()*window.innerHeight;}
+    else if(edge===2){sx=Math.random()*window.innerWidth;sy=window.innerHeight;}
+    else{sx=0;sy=Math.random()*window.innerHeight;}
+  }
+  const tr=target.el.getBoundingClientRect();
+  const tx=tr.left+tr.width/2,ty=tr.top+tr.height/2;
+  const stone=document.createElement('div');
+  stone.style.cssText='position:fixed;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#bbb,#555);box-shadow:2px 2px 4px rgba(0,0,0,0.6);pointer-events:none;z-index:9999;';
+  document.body.appendChild(stone);
+  const start=performance.now();
+  const dist=Math.hypot(tx-sx,ty-sy);
+  const duration=Math.max(300,dist*0.6);
+  (function tick(ts){
+    const t=Math.min(1,(ts-start)/duration);
+    const ease=t<0.5?2*t*t:(4-2*t)*t-1;
+    const x=sx+(tx-sx)*ease;
+    const y=sy+(ty-sy)*ease-Math.sin(ease*Math.PI)*80;
+    stone.style.left=(x-7)+'px';stone.style.top=(y-7)+'px';
+    stone.style.transform='rotate('+Math.round(t*720)+'deg)';
+    if(t<1){requestAnimationFrame(tick);}
+    else{stone.remove();ensureAudio();playEventSound(hitBuffer,'hit');if(onLand)onLand();}
+  })(performance.now());
 }
 
 // ── BLOOD SPLATTER ────────────────────────────────────────
@@ -4211,8 +4800,15 @@ const CMD_DEFS=[
   {id:'eat',          label:'Eat a viewer',        def:'!eat',          owner:false},
   {id:'coins',        label:'Check coin balance',  def:'!coins',        owner:false},
   {id:'inventory',    label:'Check inventory',     def:'!inventory',    owner:false},
+  {id:'shop',         label:'View shop',           def:'!shop',         owner:false},
   {id:'buy',          label:'Buy item from shop',  def:'!buy',          owner:false},
   {id:'bomb',         label:'Use a Bomb item',     def:'!bomb',         owner:false},
+  {id:'flashbang',    label:'Use a Flashbang item',def:'!flashbang',    owner:false},
+  {id:'nuke',         label:'Use a Nuke item',     def:'!nuke',         owner:false},
+  {id:'steal',        label:'Steal coins from viewer',def:'!steal',     owner:false},
+  {id:'gift',         label:'Gift coins to another viewer',def:'!gift', owner:false},
+  {id:'stone',        label:'Stone a pinned viewer',def:'!stone',       owner:false},
+  {id:'bet',          label:'Gamble coins (!gamble also works)',def:'!bet',owner:false},
 ];
 
 // Live command map: id → current trigger string (lowercase, with !)
@@ -4262,6 +4858,7 @@ document.querySelectorAll('.stab[data-tab="commands"]').forEach(btn=>{
 // ── New viewer command implementations ────────────────────
 // active duels: map of pet username → {target, hp, maxHp, oppHp, oppMaxHp, interval}
 const activeDuels=new Map();
+const pendingDuels=new Map(); // target username → {challenger:pet, timer}
 // Queue for duel / punch / hug when one is already in progress for a participant
 const interactionQueue=[];
 let interactionBusy=false;
@@ -4342,7 +4939,6 @@ function startDuel(pet,target){
         const loser=duelState.hpA>0?target:pet;
         winner.say('\uD83C\uDFC6 I WIN!');
         loser.vx=(Math.random()<0.5?-1:1)*8;loser.vy=-6;loser.airborne=true;
-        ensureAudio();playEventSound(winBuffer,'win');
         addCoins(winner.username, COIN_DUEL_WIN);
         addCoins(loser.username, -COIN_DUEL_LOSE);
         setTimeout(() => getCoins(winner.username, c => winner.say('\uD83E\uDE99 +' + COIN_DUEL_WIN + ' (' + c + ' total)')), 1500);
@@ -4390,22 +4986,49 @@ function startPunch(pet,target,done){
   activePunches.set(pet.username,walkInterval);
 }
 
+function botReply(username,text){if(botConnected)sendBotMsg('@'+username+' '+text);}
+
 function execViewerCmd(cmdId,username,args){
   if(cmdId==='coins'){
     const p=petMap[username.toLowerCase()];
     if(!p||!p.alive)return;
-    getCoins(username, c => p.say('🪙 ' + c + ' coins'));
+    getCoins(username, c => {
+      p.say('🪙 ' + c + ' coins');
+      botReply(username, 'you have 🪙 ' + c + ' coins!');
+    });
     return;
   }
   if(cmdId==='inventory'){
     const p=petMap[username.toLowerCase()];
     if(!p||!p.alive)return;
     getInventory(username, items => {
-      if(!items.length){p.say('Inventory: Empty');return;}
+      if(!items.length){
+        p.say('Inventory: Empty');
+        botReply(username,'your inventory is empty!');
+        return;
+      }
       const counts={};
       items.forEach(i=>{const k=i.trim();counts[k]=(counts[k]||0)+1;});
       const lines=Object.entries(counts).map(([k,v])=>v>1?k+' x'+v:k);
       p.say('Inventory:\n'+lines.join('\n'));
+      botReply(username,'Inventory: '+lines.join(', '));
+    });
+    return;
+  }
+  if(cmdId==='shop'){
+    getShop(items=>{
+      if(!items.length){sendBotMsg('The shop is empty!');return;}
+      const list=items.map(i=>i.item+' - '+i.price+' 🪙').join(' | ');
+      sendBotMsg('🛒 Shop: '+list+' — use !buy [item name] to purchase');
+    });
+    return;
+  }
+  if(cmdId==='leaderboard'){
+    getLeaderboard(entries=>{
+      if(!entries.length){sendBotMsg('No leaderboard data yet!');return;}
+      const medals=['🥇','🥈','🥉'];
+      const list=entries.slice(0,10).map((e,i)=>(medals[i]||'#'+(i+1))+' '+e.user+': '+e.coins+' 🪙').join(' | ');
+      sendBotMsg('💰 Leaderboard: '+list);
     });
     return;
   }
@@ -4413,12 +5036,12 @@ function execViewerCmd(cmdId,username,args){
     const p=petMap[username.toLowerCase()];
     if(!p||!p.alive)return;
     const item=(args&&args.join(' '))||'';
-    if(!item){p.say('Use !buy [item name]');return;}
+    if(!item){p.say('Use !buy [item name]');botReply(username,'use !buy [item name]');return;}
     buyItem(username, item, result => {
-      if(result.error==='not enough coins') p.say('Not enough coins! Need 🪙 ' + result.price + ', have ' + result.coins);
-      else if(result.error==='item not found') p.say('"' + item + '" is not in the shop!');
+      if(result.error==='not enough coins'){p.say('Not enough coins! Need 🪙 ' + result.price + ', have ' + result.coins);botReply(username,'not enough coins! Need 🪙 '+result.price+', you have '+result.coins+'.');}
+      else if(result.error==='item not found'){p.say('"' + item + '" is not in the shop!');botReply(username,'"'+item+'" is not in the shop!');}
       else if(result.error) p.say('Could not buy item.');
-      else p.say('Bought ' + result.item + '! 🪙 ' + result.coins + ' left');
+      else{p.say('Bought ' + result.item + '! 🪙 ' + result.coins + ' left');botReply(username,'you bought '+result.item+'! 🪙 '+result.coins+' coins left.');}
     });
     return;
   }
@@ -4453,6 +5076,140 @@ function execViewerCmd(cmdId,username,args){
     });
     return;
   }
+  if(cmdId==='flashbang'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    getInventory(username, items => {
+      const idx=items.findIndex(i=>i.toLowerCase()==='flashbang');
+      if(idx===-1){p.say("I don't have a flashbang!");return;}
+      removeItem(username,'Flashbang', result => {
+        if(result && result.error){ p.say("Dud..."); return; }
+        p.say('🌟 FLASH OUT!');
+        setTimeout(()=>triggerFlashbang(), 600);
+      });
+    });
+    return;
+  }
+  if(cmdId==='nuke'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    getInventory(username, items => {
+      const idx=items.findIndex(i=>i.toLowerCase()==='nuke');
+      if(idx===-1){p.say("I don't have a nuke!");return;}
+      removeItem(username,'Nuke', result => {
+        if(result && result.error){ p.say("Launch failed..."); return; }
+        p.say('☢️');
+        let blinkOn=false, delay=200, charging=true;
+        function chargeBlink(){
+          if(!charging)return;
+          blinkOn=!blinkOn;
+          p.el.style.filter=blinkOn
+            ?'drop-shadow(0 0 20px rgba(100,255,80,1)) drop-shadow(0 0 10px rgba(0,200,0,0.9))'
+            :'drop-shadow(0 0 4px rgba(0,180,0,0.3))';
+          delay=Math.max(25,delay-14);
+          setTimeout(chargeBlink,delay);
+        }
+        chargeBlink();
+        setTimeout(()=>{
+          charging=false;
+          p.el.style.filter='';
+          p.say('☢️ NUCLEAR LAUNCH DETECTED!');
+          triggerNuke(p);
+        },2400);
+      });
+    });
+    return;
+  }
+  if(cmdId==='steal'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    if(p.pinned){botReply(username,"you're pinned and can't steal right now!");return;}
+    const targetName=(args[0]||'').replace(/^@/,'').toLowerCase();
+    if(!targetName){botReply(username,'use !steal @username');return;}
+    if(targetName===username.toLowerCase()){botReply(username,"you can't steal from yourself!");return;}
+    const target=petMap[targetName];
+    if(!target||!target.alive){botReply(username,"that viewer isn't here!");return;}
+    p.say('👀');
+    const stealWalk=setInterval(()=>{
+      if(!p.alive||!target.alive||p.pinned){clearInterval(stealWalk);return;}
+      const dx=(target.x+target.w/2)-(p.x+p.w/2);
+      if(Math.abs(dx)>p.w*1.2){
+        p.vx=Math.sign(dx)*petSpeed*2.5;
+      } else {
+        clearInterval(stealWalk);
+        p.vx=0;
+        const caught=Math.random()<0.8;
+        if(caught){
+          p.say('YOU GOT CAUGHT!');
+          p.vx=-Math.sign(dx)*8;p.vy=-5;p.airborne=true;
+          setTimeout(()=>stealPin(p),400);
+          sendBotMsg('@'+username+' was caught trying to steal from @'+target.username+'! They\'re pinned in the center! Type !stone to throw rocks at them! 🪢');
+        } else {
+          p.say('💰 Got it!');
+          target.say('HEY!');
+          p.vx=-Math.sign(dx)*6;p.vy=-4;p.airborne=true;
+          getCoins(targetName,targetCoins=>{
+            const pct=(1+Math.floor(Math.random()*20))/100;
+            const amount=Math.max(1,Math.floor(Math.abs(targetCoins)*pct));
+            addCoins(username,amount);
+            addCoins(targetName,-amount);
+            setTimeout(()=>getCoins(username,c=>{
+              sendBotMsg('@'+username+' sneakily stole '+amount+' 🪙 from @'+target.username+'! 💰 ('+c+' total)');
+            }),1200);
+          });
+        }
+      }
+    },50);
+    return;
+  }
+  if(cmdId==='gift'){
+    const targetName=(args[0]||'').replace(/^@/,'').toLowerCase();
+    const amount=parseInt(args[1])||0;
+    if(!targetName||amount<=0){botReply(username,'use !gift @username [amount]');return;}
+    if(targetName===username.toLowerCase()){botReply(username,"you can't gift yourself!");return;}
+    getCoins(username,senderCoins=>{
+      if(senderCoins<amount){botReply(username,"not enough coins! You have "+senderCoins+' 🪙');return;}
+      addCoins(username,-amount);
+      addCoins(targetName,amount);
+      setTimeout(()=>getCoins(targetName,tc=>{
+        sendBotMsg('@'+username+' gifted '+amount+' 🪙 to @'+targetName+'! 🎁 (they now have '+tc+')');
+        const giver=petMap[username.toLowerCase()];
+        const receiver=petMap[targetName];
+        if(giver)giver.say('🎁');
+        if(receiver)receiver.say('Thanks! 🪙');
+      }),1200);
+    });
+    return;
+  }
+  if(cmdId==='stone'){
+    const p=petMap[username.toLowerCase()]||null;
+    const pinned=pets.filter(t=>t.pinned&&t.alive);
+    if(!pinned.length)return;
+    const px=p?(p.x+p.w/2):window.innerWidth/2;
+    const py=p?(p.y+p.h/2):window.innerHeight/2;
+    pinned.sort((a,b)=>Math.hypot(a.x+a.w/2-px,a.y+a.h/2-py)-Math.hypot(b.x+b.w/2-px,b.y+b.h/2-py));
+    const stoneTarget=pinned[0];
+    throwStone(p,stoneTarget,()=>{
+      spawnBloodSplatter(stoneTarget);
+      stoneTarget.say('OW!');
+      if(Math.random()<0.1){
+        stealUnpin(stoneTarget);
+        sendBotMsg('@'+stoneTarget.username+' has been freed from jail!');
+      }
+    });
+    return;
+  }
+  if(cmdId==='bet'){
+    const p=petMap[username.toLowerCase()]||null;
+    const bet=parseInt(args[0])||0;
+    if(bet<=0){botReply(username,'use !bet [amount]');return;}
+    getCoins(username,coins=>{
+      if(coins<bet){botReply(username,"not enough coins! You have "+coins+' 🪙');return;}
+      addCoins(username,-bet);
+      triggerSlotMachine(username,bet,p);
+    });
+    return;
+  }
   if((battleRoyaleActive||warActive)&&cmdId!=='jump')return;
   // strip @ prefix from target usernames
   if(args&&args[0]&&args[0].startsWith('@'))args[0]=args[0].slice(1);
@@ -4466,15 +5223,56 @@ function execViewerCmd(cmdId,username,args){
       kaijuTakeDamage(10,username);
       break;
     case 'duel':{
-      const targetName=args&&args[0];
-      const target=targetName
-        ?pets.find(p=>p.username.toLowerCase()===targetName.toLowerCase()&&p!==pet)
-        :pets.find(p=>p!==pet&&!activeDuels.has(p.username));
-      if(pet&&target)queueInteraction(pet,target,(p,t,done)=>{startDuel(p,t);
-        // mark done when duel ends (watch activeDuels)
+      if(battleRoyaleActive||warActive||kaijuActive){
+        if(pet)pet.say('No duels during events!');
+        botReply(username,'duels are disabled while an event is active!');
+        break;
+      }
+      if(!pet)break;
+      if(activeDuels.has(pet.username)){botReply(username,'you are already in a duel!');break;}
+      const rawTarget=(args&&args[0]||'').replace(/^@/,'').toLowerCase();
+      const target=rawTarget
+        ?pets.find(p=>p.username.toLowerCase()===rawTarget&&p!==pet)
+        :null;
+      if(!target){pet.say('Who should I duel? Use !duel @username');break;}
+      if(activeDuels.has(target.username)){botReply(username,target.username+' is already in a duel!');break;}
+      if(pendingDuels.has(target.username.toLowerCase())){botReply(username,target.username+' already has a pending duel request!');break;}
+      const expiryTimer=setTimeout(()=>{
+        if(pendingDuels.has(target.username.toLowerCase())){
+          pendingDuels.delete(target.username.toLowerCase());
+          sendBotMsg('@'+target.username+' the duel request from @'+username+' expired. ⏱');
+        }
+      },30000);
+      pendingDuels.set(target.username.toLowerCase(),{challenger:pet,timer:expiryTimer});
+      sendBotMsg('@'+target.username+' @'+username+' has challenged you to a duel! Type !accept or !decline within 30 seconds ⚔️');
+      pet.say('Waiting for '+target.username+' to accept...');
+      break;
+    }
+    case 'accept':{
+      const pending=pendingDuels.get(username.toLowerCase());
+      if(!pending){botReply(username,'you have no pending duel requests.');break;}
+      clearTimeout(pending.timer);
+      pendingDuels.delete(username.toLowerCase());
+      if(battleRoyaleActive||warActive||kaijuActive){
+        botReply(username,'cannot start duel — an event is active!');
+        break;
+      }
+      const challenger=pending.challenger;
+      const accepter=petMap[username.toLowerCase()];
+      if(!challenger||!accepter){sendBotMsg('Duel cancelled — a participant is no longer present.');break;}
+      sendBotMsg('⚔️ @'+challenger.username+' vs @'+username+' — DUEL ACCEPTED! FIGHT!');
+      queueInteraction(challenger,accepter,(p,t,done)=>{
+        startDuel(p,t);
         const watcher=setInterval(()=>{if(!activeDuels.has(p.username)){clearInterval(watcher);done();}},500);
       });
-      else if(pet)pet.say('Who should I duel?');
+      break;
+    }
+    case 'decline':{
+      const pending=pendingDuels.get(username.toLowerCase());
+      if(!pending)break;
+      clearTimeout(pending.timer);
+      pendingDuels.delete(username.toLowerCase());
+      sendBotMsg('@'+pending.challenger.username+' @'+username+' declined your duel request. 🚫');
       break;
     }
     case 'spawn':{
@@ -4620,10 +5418,10 @@ function playEventSound(buf,key){if(buf&&audioCtx)playSound(buf,pv(key||'collisi
 // named wrappers used throughout
 function playBattleStart(){ensureAudio();playEventSound(battleStartBuffer,'battleStart');}
 function playHit(){ensureAudio();playEventSound(hitBuffer,'hit');}
-function playKO(){ensureAudio();playEventSound(koBuffer,'ko');}
-function playWin(){ensureAudio();playEventSound(winBuffer,'win');}
 function playStomp(){ensureAudio();playEventSound(stompBuffer,'stomp');}
-function playDVDBounce(){ensureAudio();playEventSound(dvdBounceBuffer,'dvd');}
+function playBomb(){ensureAudio();playEventSound(bombBuffer,'bomb');}
+function playNuke(){ensureAudio();playEventSound(nukeBuffer,'nuke');}
+function playFlashbang(){ensureAudio();playEventSound(flashbangBuffer,'flashbang');}
 
 // Hook battle start sound — called when any event starts
 const _origStartBR=startBattleRoyale,_origStartWar=startWar,_origStartKaiju=startKaiju;
@@ -4640,7 +5438,7 @@ updateDvd=function(){
     _origUpdateDvd();
     const nowLeft=dvdSpire.x-r<=1,nowRight=dvdSpire.x+r>=W-1,nowTop=dvdSpire.y-r<=1,nowBot=dvdSpire.y+r>=H-1;
     if((nowLeft&&!wasLeft)||(nowRight&&!wasRight)||(nowTop&&!wasTop)||(nowBot&&!wasBot)){
-      ensureAudio();playEventSound(dvdBounceBuffer,'dvd');
+      ensureAudio();playEventSound(collisionBuffer,'collision');
     }
   } else {_origUpdateDvd();}
 };
@@ -4670,7 +5468,7 @@ document.getElementById('bubbleFontSize').addEventListener('input',function(){bu
 
 
 // directional viewer frame wiring
-const LS_PFL='lpp_pfl5',LS_PFR='lpp_pfr5',LS_PFI='lpp_pfi5';
+const LS_PFR='lpp_pfr5';
 function savePetFramesDir(){
   idbSet(LS_PFR,JSON.stringify(petFramesRight.map(i=>i._dataUrl||i.src))).catch(()=>{});
 }
