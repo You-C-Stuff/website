@@ -254,6 +254,16 @@ const YAPPERS_GENS = [
         ]
     },
     {
+        label: 'GEN 14',
+        yappers: [
+            { name: 'Lazyscots', talk: 'Images/Yappers/Scotnewtalk.gif',  mute: 'Images/Yappers/Scotnewmuted.gif' },
+            { name: 'Vinnuf',     talk: 'Images/Yappers/vinnuftalk.gif',    mute: 'Images/Yappers/vinnufmute.gif' },
+            { name: 'RairiiArts',  talk: 'Images/Yappers/rariitalk.gif',    mute: 'Images/Yappers/rariimuted.gif' },
+            { name: 'Heathenisdrunk',  talk: 'Images/Yappers/heathentalk.gif',    mute: 'Images/Yappers/heathenmuted.gif' },
+            { name: 'Piggyxixi',  talk: 'Images/Yappers/piggytalk.gif',   mute: 'Images/Yappers/piggymute.gif' },
+        ]
+    },
+    {
         label: 'SPECIAL',
         yappers: [
             { name: 'AerooctoInkstics',  talk: 'Images/Yappers/AerooctoTalk.gif', mute: 'Images/Yappers/Aerooctomuted.gif' },
