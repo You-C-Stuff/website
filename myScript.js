@@ -310,24 +310,22 @@ function postToGoogleform() {
   
         // ScrollSpy
         window.addEventListener('scroll', () => {
-          const scrollPos = window.scrollY + window.innerHeight / 2;
-  
+          const midViewport = window.innerHeight / 2;
+
           navLinks.forEach(link => {
             const targetId = link.getAttribute('href');
             const target = document.querySelector(targetId);
-  
+
             if (target) {
-              const sectionTop = target.offsetTop;
-              const sectionHeight = target.offsetHeight;
-  
-              if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+              const rect = target.getBoundingClientRect();
+              if (rect.top <= midViewport && rect.bottom > midViewport) {
                 link.classList.add('active');
               } else {
                 link.classList.remove('active');
               }
             }
           });
- });
+        });
  });
 
 /*-------------------------------GALLERY--------------------------------*/
