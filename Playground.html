@@ -104,11 +104,15 @@ body.mode-hallway #hallwayContainer{display:block;}
 .sclose:hover{background:rgba(127,119,221,0.3);}
 .hoop-section{background:rgba(239,159,39,0.06);border:0.5px solid rgba(239,159,39,0.2);border-radius:10px;padding:12px;}
 .hoop-section h3{font-size:12px;font-weight:500;color:rgba(239,159,39,0.8);margin-bottom:10px;}
+#brKillFeed{display:none;position:fixed;top:90px;right:4px;z-index:15;pointer-events:none;width:160px;flex-direction:column;gap:2px;}
+.brKE{font-size:10px;color:rgba(255,255,255,0.85);background:rgba(0,0,0,0.6);border-radius:4px;padding:3px 5px;border-left:2px solid rgba(220,80,80,0.7);animation:brKEin 0.25s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@keyframes brKEin{from{opacity:0;transform:translateX(14px);}to{opacity:1;transform:none;}}
 </style>
 </head>
 <body>
 <div id="canvasWrap"><canvas id="canvas"></canvas></div>
 <div id="hallwayContainer"><canvas id="hallwayCanvas"></canvas></div>
+<div id="brKillFeed"></div>
 
 <div id="topbar">
   <!-- Row 1: physics sliders + core buttons -->
@@ -693,6 +697,7 @@ function applyViewMode(mode){
   document.body.classList.add('mode-'+mode);
   document.getElementById('viewModeBtn').textContent=VIEW_LABELS[mode];
   resize();
+  if(typeof _brKillFeedVis==='function')_brKillFeedVis();
 }
 
 function resize(){
@@ -719,6 +724,10 @@ function resize(){
 
   const scale=vpW/window.innerWidth;
   const leftX=Math.round((availW-vpW)/2);
+
+  // fit kill feed into the right dark border
+  const _kf=document.getElementById('brKillFeed');
+  if(_kf){const kfW=Math.max(60,leftX-8);_kf.style.width=kfW+'px';_kf.style.right='4px';}
 
   canvasWrap.style.transformOrigin='top left';
   canvasWrap.style.transform=`translate(${leftX}px,${topH}px) scale(${scale})`;
@@ -2646,6 +2655,16 @@ let battleRoyaleActive=false;
 let brInterval=null;
 let _simBrCleanup=false;
 
+const brKillFeedEl=document.getElementById('brKillFeed');
+function _brKillFeedVis(){brKillFeedEl.style.display=(battleRoyaleActive&&currentViewMode!=='fullscreen')?'flex':'none';}
+function addKillFeedEntry(killer,victim){
+  const el=document.createElement('div');
+  el.className='brKE';
+  el.textContent='⚔️ '+killer+' → '+victim;
+  brKillFeedEl.prepend(el);
+  while(brKillFeedEl.children.length>5)brKillFeedEl.lastChild.remove();
+}
+
 function startBattleRoyale(){
   if(pets.length<2){return;}
   battleRoyaleActive=true;
@@ -2667,6 +2686,8 @@ function startBattleRoyale(){
   });
   clearInterval(brInterval);
   brInterval=setInterval(_brTick,brCheckInterval);
+  brKillFeedEl.innerHTML='';
+  _brKillFeedVis();
 }
 
 function _brTick(){
@@ -2711,6 +2732,7 @@ function _brTick(){
         spawnBloodSplatter(nearest);
         if(nearest.hp<=0){
           nearest.alive=false;
+          addKillFeedEntry(p.username,nearest.username);
           if(nearest.bubble){nearest.bubble.remove();nearest.bubble=null;}
           nearest.healthBarWrap.style.display='none';
           nearest.brAngleTarget=Math.PI*4*(Math.random()<0.5?1:-1);
@@ -2728,6 +2750,7 @@ function _brTick(){
 function endBattleRoyale(){
   battleRoyaleActive=false;
   clearInterval(brInterval);brInterval=null;
+  brKillFeedEl.innerHTML='';_brKillFeedVis();
   const doClean=_simBrCleanup;
   _simBrCleanup=false;
   if(doClean){
@@ -3218,20 +3241,12 @@ function _doConnect(){
         const raiderCount=parseInt(tags['msg-param-viewerCount']||'1',10)||1;
         setTimeout(()=>startRaidKaiju(raiderName,raiderCount),1000);
       }
-      // sub/resub/giftsub celebration
-      const subMsgIds=['sub','resub','subgift','submysterygift','giftpaidupgrade','primepaidupgrade'];
-      if(un&&subMsgIds.includes(tags['msg-id'])){
-        const subberName=tags['display-name']||tags['login']||'';
-        celebratePets(subberName,'sub');
-      }
       if(pm){
         const username=tags['display-name']||pm[1];
         const text=pm[2].trim();
         const color=tags['color']||null;
         const pet=getOrCreatePet(username,color||undefined);
         if(pet&&!text.startsWith('!'))pet.say(text,tags['emotes']||'');
-        // bits (cheer) celebration
-        if(tags['bits']&&parseInt(tags['bits'])>0)celebratePets(username,'bits');
         const cmdText=text.trim().toLowerCase();
         const cmdParts=cmdText.split(/\s+/);
         const cmdTrigger=cmdParts[0];
@@ -3422,21 +3437,40 @@ function _connectEventSub(url){
     const type=msg.metadata?.message_type;
     if(type==='session_welcome'){
       const sid=msg.payload.session.id;
+      const bc={broadcaster_user_id:_broadcasterId};
+      const transport={method:'websocket',session_id:sid};
+      const esub=async(evtType,version)=>{
+        try{await fetch('https://api.twitch.tv/helix/eventsub/subscriptions',{
+          method:'POST',
+          headers:{'Client-Id':_botClientId,'Authorization':'Bearer '+_broadcasterToken,'Content-Type':'application/json'},
+          body:JSON.stringify({type:evtType,version,condition:bc,transport})
+        }).then(r=>r.json());}catch(e){}
+      };
       try{
         const r=await fetch('https://api.twitch.tv/helix/eventsub/subscriptions',{
           method:'POST',
           headers:{'Client-Id':_botClientId,'Authorization':'Bearer '+_broadcasterToken,'Content-Type':'application/json'},
-          body:JSON.stringify({type:'channel.channel_points_custom_reward_redemption.add',version:'1',
-            condition:{broadcaster_user_id:_broadcasterId},transport:{method:'websocket',session_id:sid}})
+          body:JSON.stringify({type:'channel.channel_points_custom_reward_redemption.add',version:'1',condition:bc,transport})
         }).then(r=>r.json());
         if(r.data){_startTokenExpiryWatch(_broadcasterToken);}
         else{setBroadcasterStatus('Sub failed: '+(r.message||'unknown'),'rgba(220,80,80,0.8)');}
       }catch(e){setBroadcasterStatus('Sub error: '+e.message,'rgba(220,80,80,0.8)');}
+      esub('channel.subscribe','1');
+      esub('channel.subscription.gift','1');
+      esub('channel.subscription.message','1');
+      esub('channel.cheer','1');
     }
     if(type==='session_reconnect'){_connectEventSub(msg.payload.session.reconnect_url);}
     if(type==='notification'&&msg.payload?.event){
       const evt=msg.payload.event;
-      handleRedemption(evt.reward.title,evt.user_name||evt.user_login,evt.user_input||'');
+      const subtype=msg.payload.subscription?.type||'';
+      if(subtype==='channel.channel_points_custom_reward_redemption.add'){
+        handleRedemption(evt.reward.title,evt.user_name||evt.user_login,evt.user_input||'');
+      }else if(subtype==='channel.subscribe'||subtype==='channel.subscription.gift'||subtype==='channel.subscription.message'){
+        celebratePets(evt.user_name||evt.user_login||'','sub');
+      }else if(subtype==='channel.cheer'){
+        celebratePets(evt.user_name||evt.user_login||'','bits');
+      }
     }
   };
   ws.onclose=()=>{
@@ -4365,12 +4399,6 @@ function triggerBomb(thrower) {
 // ── FLASHBANG ─────────────────────────────────────────────
 function triggerFlashbang() {
   ensureAudio();playFlashbang();
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:#fff;opacity:1;pointer-events:none;z-index:99999;transition:opacity 2s ease-out;';
-  document.body.appendChild(overlay);
-  overlay.getBoundingClientRect();
-  overlay.style.opacity = '0';
-  setTimeout(() => overlay.remove(), 2200);
 }
 
 // ── NUKE ──────────────────────────────────────────────────
@@ -4411,14 +4439,15 @@ function triggerNuke(thrower) {
   border.style.opacity = '0';
   setTimeout(() => border.remove(), 900);
 
-  // Screen shake
+  // Screen shake — prepend shake offset so small-screen scale/translate is preserved
   const canvasEl = document.getElementById('canvasWrap') || document.body;
+  const baseTransform = canvasEl.style.transform || '';
   let shakeFrame = 0;
   const shakeInterval = setInterval(() => {
     shakeFrame++;
     const mag = Math.max(0, 14 - shakeFrame * 0.7);
-    canvasEl.style.transform = `translate(${(Math.random()-0.5)*mag*2}px,${(Math.random()-0.5)*mag*2}px)`;
-    if (shakeFrame >= 20) { clearInterval(shakeInterval); canvasEl.style.transform = ''; }
+    if (shakeFrame >= 20) { clearInterval(shakeInterval); canvasEl.style.transform = baseTransform; }
+    else { canvasEl.style.transform = `translate(${(Math.random()-0.5)*mag*2}px,${(Math.random()-0.5)*mag*2}px) ${baseTransform}`; }
   }, 30);
 
   // Push and damage EVERYONE except thrower — massive force and damage
@@ -4546,7 +4575,12 @@ function triggerSlotMachine(username, bet, petObj){
 
 // ── STEAL / STOCKADE ──────────────────────────────────────
 function stealPin(p){
-  p.x=(window.innerWidth-p.w)/2;
+  const slotIndex=pets.filter(t=>t.pinned&&t.alive).length;
+  const dir=slotIndex===0?0:(slotIndex%2===1?-1:1);
+  const mag=Math.ceil(slotIndex/2);
+  const spacing=(p.w||60)+10;
+  const centerX=(window.innerWidth-p.w)/2;
+  p.x=Math.max(0,Math.min(window.innerWidth-p.w,centerX+dir*mag*spacing));
   p.y=window.innerHeight*0.38;
   p.vx=0;p.vy=0;p.airborne=false;
   p.pinned=true;
@@ -5085,6 +5119,7 @@ function execViewerCmd(cmdId,username,args){
       removeItem(username,'Flashbang', result => {
         if(result && result.error){ p.say("Dud..."); return; }
         p.say('🌟 FLASH OUT!');
+        sendBotMsg('@'+username+' used !flashbang');
         setTimeout(()=>triggerFlashbang(), 600);
       });
     });
@@ -5138,26 +5173,39 @@ function execViewerCmd(cmdId,username,args){
       } else {
         clearInterval(stealWalk);
         p.vx=0;
-        const caught=Math.random()<0.8;
-        if(caught){
-          p.say('YOU GOT CAUGHT!');
-          p.vx=-Math.sign(dx)*8;p.vy=-5;p.airborne=true;
-          setTimeout(()=>stealPin(p),400);
-          sendBotMsg('@'+username+' was caught trying to steal from @'+target.username+'! They\'re pinned in the center! Type !stone to throw rocks at them! 🪢');
-        } else {
-          p.say('💰 Got it!');
-          target.say('HEY!');
-          p.vx=-Math.sign(dx)*6;p.vy=-4;p.airborne=true;
-          getCoins(targetName,targetCoins=>{
+        getCoins(targetName,targetCoins=>{
+          if(targetCoins<=0){
+            p.say('💸 Nothing!');
+            botReply(username,'@'+target.username+' has no coins to steal!');
+            return;
+          }
+          const requestedAmount=parseInt(args[1])||0;
+          let amount;
+          if(requestedAmount>0){
+            amount=Math.min(requestedAmount,targetCoins);
+          } else {
             const pct=(1+Math.floor(Math.random()*20))/100;
-            const amount=Math.max(1,Math.floor(Math.abs(targetCoins)*pct));
+            amount=Math.max(1,Math.floor(targetCoins*pct));
+          }
+          const stealPct=amount/targetCoins;
+          const caughtChance=Math.min(0.95,0.10+stealPct*0.85);
+          const caught=Math.random()<caughtChance;
+          if(caught){
+            p.say('YOU GOT CAUGHT!');
+            p.vx=-Math.sign(dx)*8;p.vy=-5;p.airborne=true;
+            setTimeout(()=>stealPin(p),400);
+            sendBotMsg('@'+username+' was caught trying to steal from @'+target.username+'! They\'re pinned in the center! Type !stone to throw rocks at them! 🪢');
+          } else {
+            p.say('💰 Got it!');
+            target.say('HEY!');
+            p.vx=-Math.sign(dx)*6;p.vy=-4;p.airborne=true;
             addCoins(username,amount);
             addCoins(targetName,-amount);
             setTimeout(()=>getCoins(username,c=>{
               sendBotMsg('@'+username+' sneakily stole '+amount+' 🪙 from @'+target.username+'! 💰 ('+c+' total)');
             }),1200);
-          });
-        }
+          }
+        });
       }
     },50);
     return;
