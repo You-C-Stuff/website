@@ -680,6 +680,7 @@ let pets=[], petMap={}, viewersVisible=true;
 const VIEW_MODES=['fullscreen','small','hallway'];
 const VIEW_LABELS={fullscreen:'⛶ Fullscreen',small:'▣ Small',hallway:'▤ Hallway'};
 let currentViewMode='fullscreen';
+let currentCanvasScale=1;
 
 const hallwayContainer=document.getElementById('hallwayContainer');
 const hallwayCanvas=document.getElementById('hallwayCanvas');
@@ -705,6 +706,7 @@ function resize(){
   canvas.width=window.innerWidth; canvas.height=window.innerHeight;
 
   if(currentViewMode==='fullscreen'){
+    currentCanvasScale=1;
     canvasWrap.style.transform='';
     canvasWrap.style.width='';canvasWrap.style.height='';
     canvasWrap.style.top='';canvasWrap.style.left='';
@@ -723,6 +725,7 @@ function resize(){
   if(vpW>availW){vpW=availW; vpH=Math.round(vpW*9/16);}
 
   const scale=vpW/window.innerWidth;
+  currentCanvasScale=scale;
   const leftX=Math.round((availW-vpW)/2);
 
   // fit kill feed into the right dark border
@@ -2213,16 +2216,17 @@ class ChatPet{
       if(onSurface){
         // walking state — ensure viewer is always moving
         this.airborne=false;
-        if(Math.abs(this.vx)<0.3)this.vx=(Math.random()<0.5?-1:1)*(0.4+Math.random()*petSpeed);
+        const _spd=petSpeed*(this._speedMult||1);
+        if(Math.abs(this.vx)<0.3)this.vx=(Math.random()<0.5?-1:1)*(0.4+Math.random()*_spd);
         // gradually restore walking speed if too slow (e.g. after landing on a block)
-        const targetSpeed=(this.vx>=0?1:-1)*Math.max(0.5,Math.abs(this.vx)||petSpeed*0.6);
-        if(Math.abs(this.vx)<petSpeed*0.4)this.vx+=(targetSpeed-this.vx)*0.15;
+        const targetSpeed=(this.vx>=0?1:-1)*Math.max(0.5,Math.abs(this.vx)||_spd*0.6);
+        if(Math.abs(this.vx)<_spd*0.4)this.vx+=(targetSpeed-this.vx)*0.15;
         // random direction change — skip during block bounce cooldown
         if(Math.random()<0.005&&!this._blockBounce)this.vx*=-1;
-        const maxV=petSpeed*1.8;
+        const maxV=_spd*1.8;
         this.vx=Math.max(-maxV,Math.min(maxV,this.vx));
-        if(this.x<=0){this.x=0;this.vx=Math.abs(this.vx)||petSpeed*0.5;}
-        if(this.x+this.w>=W){this.x=W-this.w;this.vx=-(Math.abs(this.vx)||petSpeed*0.5);}
+        if(this.x<=0){this.x=0;this.vx=Math.abs(this.vx)||_spd*0.5;}
+        if(this.x+this.w>=W){this.x=W-this.w;this.vx=-(Math.abs(this.vx)||_spd*0.5);}
         for(const b of blocks){
           const margin=this.w*0.00005; // small buffer — close to visual edge
           const bx=b.x-margin, bx2=b.x+b.w+margin;
@@ -2483,7 +2487,7 @@ ChatPet.prototype.update=function(now){
       }
     }
 
-    const H=window.innerHeight;
+    if(this.bubbleTimer>0){this.bubbleTimer--;if(this.bubbleTimer<=0&&this.bubble){this.bubble.remove();this.bubble=null;this._talking=false;}}
     placePetEl(this);
     this.el.style.transform='rotate('+this._swingAngle+'rad)';
     this.el.style.transformOrigin='top center';
@@ -3021,11 +3025,13 @@ function startWar(){
     if(teamsAlive.length<=1){
       if(teamsAlive.length===1){
         const wt=teamsAlive[0];
-        const survivors=pets.filter(p=>p.alive&&p.team===wt.id);
-        survivors.forEach(p=>{
-          p.say(wt.emoji+' VICTORY!');
+        // reward every member of the winning team, alive or not
+        pets.filter(p=>p.team===wt.id).forEach(p=>{
           addCoins(p.username, COIN_WAR_WIN);
-          setTimeout(() => getCoins(p.username, c => p.say('🪙 +' + COIN_WAR_WIN + ' (' + c + ' total)')), 1500);
+          if(p.alive){
+            p.say(wt.emoji+' VICTORY!');
+            setTimeout(() => getCoins(p.username, c => p.say('🪙 +' + COIN_WAR_WIN + ' (' + c + ' total)')), 1500);
+          }
         });
       }
       endWar();return;
@@ -3257,6 +3263,8 @@ function _doConnect(){
           if(cmdTrigger===cmd('battleroyale'))setTimeout(startBattleRoyale,500);
           if(cmdTrigger===cmd('war'))setTimeout(startWar,500);
           if(cmdTrigger===cmd('kaiju'))setTimeout(startKaiju,500);
+          if(cmdTrigger===cmd('spawn'))execViewerCmd('spawn',username,cmdArgs);
+          if(cmdTrigger===cmd('despawn'))execViewerCmd('despawn',username,cmdArgs);
           if(cmdTrigger==='!addcoin'||cmdTrigger==='!addcoins'||cmdTrigger==='!removecoin'||cmdTrigger==='!removecoins'){
             const target=(cmdArgs[0]||'').replace(/^@/,'').toLowerCase();
             const amount=parseInt(cmdArgs[1])||0;
@@ -3272,39 +3280,42 @@ function _doConnect(){
             }
           }
         }
-        // viewer commands
-        if(cmdTrigger===cmd('attack'))execViewerCmd('attack',username,cmdArgs);
+        // viewer commands — during active fights only !jump is allowed
+        const inFight=battleRoyaleActive||warActive||kaijuActive;
         if(cmdTrigger===cmd('jump'))execViewerCmd('jump',username,cmdArgs);
-        if(cmdTrigger===cmd('duel'))execViewerCmd('duel',username,cmdArgs);
-        if(cmdTrigger===cmd('fight'))execViewerCmd('duel',username,cmdArgs);
-        if(cmdTrigger==='!accept')execViewerCmd('accept',username,cmdArgs);
-        if(cmdTrigger==='!decline')execViewerCmd('decline',username,cmdArgs);
-        if(cmdTrigger===cmd('punch'))execViewerCmd('punch',username,cmdArgs);
-        if(cmdTrigger===cmd('pledge'))execViewerCmd('pledge',username,cmdArgs);
-        if(cmdTrigger===cmd('spawn'))execViewerCmd('spawn',username,cmdArgs);
-        if(cmdTrigger===cmd('ballin'))execViewerCmd('ballin',username,cmdArgs);
-        if(cmdTrigger===cmd('bounce'))execViewerCmd('bounce',username,cmdArgs);
-        if(cmdTrigger===cmd('float'))execViewerCmd('float',username,cmdArgs);
-        if(cmdTrigger===cmd('shrink'))execViewerCmd('shrink',username,cmdArgs);
-        if(cmdTrigger===cmd('grow'))execViewerCmd('grow',username,cmdArgs);
-        if(cmdTrigger===cmd('despawn'))execViewerCmd('despawn',username,cmdArgs);
-        if(cmdTrigger===cmd('lurk'))execViewerCmd('lurk',username,cmdArgs);
-        if(cmdTrigger===cmd('vanish'))execViewerCmd('lurk',username,cmdArgs);
-        if(cmdTrigger===cmd('v'))execViewerCmd('lurk',username,cmdArgs);
-        if(cmdTrigger===cmd('hug'))execViewerCmd('hug',username,cmdArgs);
-        if(cmdTrigger===cmd('eat'))execViewerCmd('eat',username,cmdArgs);
-        if(cmdTrigger===cmd('coins')||cmdTrigger===cmd('coins').replace(/s$/,'')||cmdTrigger===cmd('coins')+'s')execViewerCmd('coins',username,cmdArgs);
-        if(cmdTrigger===cmd('inventory'))execViewerCmd('inventory',username,cmdArgs);
-        if(cmdTrigger===cmd('shop'))execViewerCmd('shop',username,cmdArgs);
-        if(cmdTrigger===cmd('buy'))execViewerCmd('buy',username,cmdArgs);
-        if(cmdTrigger==='!leaderboard'||cmdTrigger==='!lb')execViewerCmd('leaderboard',username,cmdArgs);
-        if(cmdTrigger===cmd('bomb'))execViewerCmd('bomb',username,cmdArgs);
-        if(cmdTrigger===cmd('flashbang'))execViewerCmd('flashbang',username,cmdArgs);
-        if(cmdTrigger===cmd('nuke'))execViewerCmd('nuke',username,cmdArgs);
-        if(cmdTrigger===cmd('steal'))execViewerCmd('steal',username,cmdArgs);
-        if(cmdTrigger===cmd('stone'))execViewerCmd('stone',username,cmdArgs);
-        if(cmdTrigger===cmd('gift'))execViewerCmd('gift',username,cmdArgs);
-        if(cmdTrigger===cmd('bet')||cmdTrigger==='!gamble')execViewerCmd('bet',username,cmdArgs);
+        if(cmdTrigger===cmd('attack'))execViewerCmd('attack',username,cmdArgs); // always on — needed to damage kaiju
+        if(cmdTrigger===cmd('speed'))execViewerCmd('speed',username,cmdArgs);
+        if(cmdTrigger===cmd('growth'))execViewerCmd('growth',username,cmdArgs);
+        if(!inFight){
+          if(cmdTrigger===cmd('duel'))execViewerCmd('duel',username,cmdArgs);
+          if(cmdTrigger===cmd('fight'))execViewerCmd('duel',username,cmdArgs);
+          if(cmdTrigger==='!accept')execViewerCmd('accept',username,cmdArgs);
+          if(cmdTrigger==='!decline')execViewerCmd('decline',username,cmdArgs);
+          if(cmdTrigger===cmd('punch'))execViewerCmd('punch',username,cmdArgs);
+          if(cmdTrigger===cmd('pledge'))execViewerCmd('pledge',username,cmdArgs);
+          if(cmdTrigger===cmd('ballin'))execViewerCmd('ballin',username,cmdArgs);
+          if(cmdTrigger===cmd('bounce'))execViewerCmd('bounce',username,cmdArgs);
+          if(cmdTrigger===cmd('float'))execViewerCmd('float',username,cmdArgs);
+          if(cmdTrigger===cmd('shrink'))execViewerCmd('shrink',username,cmdArgs);
+          if(cmdTrigger===cmd('grow'))execViewerCmd('grow',username,cmdArgs);
+          if(cmdTrigger===cmd('lurk'))execViewerCmd('lurk',username,cmdArgs);
+          if(cmdTrigger===cmd('vanish'))execViewerCmd('lurk',username,cmdArgs);
+          if(cmdTrigger===cmd('v'))execViewerCmd('lurk',username,cmdArgs);
+          if(cmdTrigger===cmd('hug'))execViewerCmd('hug',username,cmdArgs);
+          if(cmdTrigger===cmd('eat'))execViewerCmd('eat',username,cmdArgs);
+          if(cmdTrigger===cmd('coins')||cmdTrigger===cmd('coins').replace(/s$/,'')||cmdTrigger===cmd('coins')+'s')execViewerCmd('coins',username,cmdArgs);
+          if(cmdTrigger===cmd('inventory'))execViewerCmd('inventory',username,cmdArgs);
+          if(cmdTrigger===cmd('shop'))execViewerCmd('shop',username,cmdArgs);
+          if(cmdTrigger===cmd('buy'))execViewerCmd('buy',username,cmdArgs);
+          if(cmdTrigger==='!leaderboard'||cmdTrigger==='!lb')execViewerCmd('leaderboard',username,cmdArgs);
+          if(cmdTrigger===cmd('bomb'))execViewerCmd('bomb',username,cmdArgs);
+          if(cmdTrigger===cmd('flashbang'))execViewerCmd('flashbang',username,cmdArgs);
+          if(cmdTrigger===cmd('nuke'))execViewerCmd('nuke',username,cmdArgs);
+          if(cmdTrigger===cmd('steal'))execViewerCmd('steal',username,cmdArgs);
+          if(cmdTrigger===cmd('stone'))execViewerCmd('stone',username,cmdArgs);
+          if(cmdTrigger===cmd('gift'))execViewerCmd('gift',username,cmdArgs);
+          if(cmdTrigger===cmd('bet')||cmdTrigger==='!gamble')execViewerCmd('bet',username,cmdArgs);
+        }
       }
     }
   };
@@ -3374,7 +3385,10 @@ function sendBotMsg(text){
 }
 
 function handleRedemption(rewardTitle,username,userInput){
-  if(rewardTitle==='FIRST!'){
+  if(rewardTitle==='Pet'){
+    const pet=getOrCreatePet(username);
+    if(pet)pet.say('🐾 Thanks for the redeem!');
+  } else if(rewardTitle==='FIRST!'){
     addCoins(username,250);
     setTimeout(()=>getCoins(username,c=>{
       sendBotMsg('@'+username+' scored FIRST! 🥇 +250 🪙 ('+c+' total)');
@@ -4030,6 +4044,7 @@ function saveViewerCostumes(){try{localStorage.setItem(LS_VIEWER_COSTUMES,JSON.s
 let kaijuActive=false, kaijuStompTimer=null;
 let kaijuSize=400, kaijuStompInterval=3000, kaijuFlingForce=18, kaijuHitsToDie=4;
 let kaijuPet=null, kaijuHp=0, kaijuMaxHp=0, kaijuBarEl=null;
+let raidParticipants=[]; // usernames of viewers present when raid started
 const KAIJU_BAR_CSS='position:fixed;top:88px;left:50%;transform:translateX(-50%);width:500px;z-index:50;pointer-events:none;text-align:center;';
 
 // kaijuSpire: the canvas ball that becomes the Kaiju
@@ -4153,11 +4168,15 @@ function kaijuTakeDamage(dmg,username){
     setTimeout(()=>{if(kaijuPet)kaijuPet.el.style.filter='drop-shadow(0 0 16px rgba(255,80,80,0.9))';},200);
   }
   if(kaijuHp<=0){
-    const survivors=pets.filter(p=>p.alive&&p!==kaijuPet);
-    survivors.forEach(p=>{
-      p.say('WE WIN!');
-      addCoins(p.username, 50);
-      setTimeout(()=>getCoins(p.username, c=>p.say('🪙 +50 ('+c+' total)')), 1500);
+    // for raids: reward everyone who was present at raid start; for regular kaiju: survivors only
+    const winnerNames=kaijuPet ? raidParticipants : pets.filter(p=>p.alive&&p!==kaijuPet).map(p=>p.username);
+    winnerNames.forEach(uname=>{
+      addCoins(uname, 50);
+      const lp=petMap[uname.toLowerCase()];
+      if(lp&&lp.alive){
+        lp.say('WE WIN!');
+        setTimeout(()=>getCoins(uname, c=>lp.say('🪙 +50 ('+c+' total)')), 1500);
+      }
     });
     if(kaijuSpire){kaijuSpire.vx=(Math.random()-.5)*20;kaijuSpire.vy=-15;}
     if(kaijuPet){kaijuPet.vx=(Math.random()-.5)*10;kaijuPet.vy=-8;kaijuPet.airborne=true;}
@@ -4274,6 +4293,7 @@ function startRaidKaiju(raiderName, raidViewers){
   kaijuPet.hp=kaijuMaxHp; kaijuPet.maxHp=kaijuMaxHp; kaijuPet.alive=true;
   kaijuPet._isRaidBoss=true; // prevents normal BR/war death logic
   kaijuPet.healthBarWrap.style.display='none'; // no health bar on raider
+  raidParticipants=pets.filter(p=>p!==kaijuPet).map(p=>p.username);
 
   const hitHP=kaijuHitsToDie*25;
   pets.forEach(p=>{
@@ -4314,7 +4334,12 @@ function startRaidKaiju(raiderName, raidViewers){
           p.el.style.transition='opacity 0.8s'; p.el.style.opacity='0';
           setTimeout(()=>{if(!p.alive)p.el.style.display='none';},900);
         }
-        if(!pets.some(q=>q!==_raidPetRef&&q.alive)){_raidPetRef.say('RAID WINS!');endKaiju();}
+        if(!pets.some(q=>q!==_raidPetRef&&q.alive)){
+          _raidPetRef.say('RAID WINS!');
+          addCoins(_raidPetRef.username, 50);
+          setTimeout(()=>getCoins(_raidPetRef.username, c=>_raidPetRef.say('🪙 +50 ('+c+' total)')), 1500);
+          endKaiju();
+        }
       });
     },700);
   }
@@ -4489,7 +4514,7 @@ function triggerSlotMachine(username, bet, petObj){
   const payout=Math.floor(bet*multiplier);
 
   const box=document.createElement('div');
-  box.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(160deg,#1a0a5e,#2d1b8e);border:4px solid #ffd700;border-radius:28px;padding:44px 56px;text-align:center;z-index:9995;box-shadow:0 0 80px rgba(255,215,0,0.35),inset 0 0 40px rgba(0,0,0,0.5);min-width:520px;font-family:inherit;pointer-events:none;';
+  box.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale('+currentCanvasScale+');transform-origin:50% 50%;background:linear-gradient(160deg,#1a0a5e,#2d1b8e);border:4px solid #ffd700;border-radius:28px;padding:44px 56px;text-align:center;z-index:9995;box-shadow:0 0 80px rgba(255,215,0,0.35),inset 0 0 40px rgba(0,0,0,0.5);min-width:520px;font-family:inherit;pointer-events:none;';
 
   const titleEl=document.createElement('div');
   titleEl.textContent='🎰 SLOT MACHINE';
@@ -4820,13 +4845,13 @@ const CMD_DEFS=[
   {id:'fight',        label:'Fight (alias duel)', def:'!fight',       owner:false},
   {id:'punch',        label:'Punch someone',    def:'!punch',        owner:false},
   {id:'pledge',       label:'Pledge allegiance',def:'!pledge',       owner:false},
-  {id:'spawn',        label:'Spawn a pet ball', def:'!spawn',        owner:false},
+  {id:'spawn',        label:'Spawn a pet ball', def:'!spawn',        owner:true},
   {id:'ballin',       label:'Shoot a hoop',     def:'!ballin',       owner:false},
   {id:'bounce',       label:'Bounce pet ball',  def:'!bounce',       owner:false},
   {id:'float',        label:'Everyone floats',  def:'!float',        owner:false},
   {id:'shrink',       label:'Shrink pet ball',  def:'!shrink',       owner:false},
   {id:'grow',         label:'Grow pet ball',    def:'!grow',         owner:false},
-  {id:'despawn',      label:'Despawn a pet ball',def:'!despawn',     owner:false},
+  {id:'despawn',      label:'Despawn a pet ball',def:'!despawn',     owner:true},
   {id:'lurk',         label:'Viewer lurks',       def:'!lurk',         owner:false},
   {id:'vanish',       label:'Vanish (alias lurk)', def:'!vanish',      owner:false},
   {id:'v',            label:'!v (alias lurk)',      def:'!v',           owner:false},
@@ -4839,6 +4864,8 @@ const CMD_DEFS=[
   {id:'bomb',         label:'Use a Bomb item',     def:'!bomb',         owner:false},
   {id:'flashbang',    label:'Use a Flashbang item',def:'!flashbang',    owner:false},
   {id:'nuke',         label:'Use a Nuke item',     def:'!nuke',         owner:false},
+  {id:'speed',        label:'Use a Speed Potion',  def:'!speed',        owner:false},
+  {id:'growth',       label:'Use a Growth Potion', def:'!growth',       owner:false},
   {id:'steal',        label:'Steal coins from viewer',def:'!steal',     owner:false},
   {id:'gift',         label:'Gift coins to another viewer',def:'!gift', owner:false},
   {id:'stone',        label:'Stone a pinned viewer',def:'!stone',       owner:false},
@@ -5009,12 +5036,24 @@ function startPunch(pet,target,done){
       clearInterval(walkInterval);
       pet.vx=0;
       const nx=Math.sign(dx)||1;
-      target.vx=nx*14;target.vy=-7;target.airborne=true;
-      target.say('OW!');
-      ensureAudio();playEventSound(hitBuffer,'hit');spawnBloodSplatter(target);
-      pet.vx=-nx*3;pet.vy=-2;pet.airborne=true;
-      pet._inPunch=false;target._inPunch=false;
-      setTimeout(()=>{if(done)done();},500);
+      // bigger pets hit harder but are less accurate — scales off pet.w/petSize regardless of source (eat or growth potion)
+      const sizeMult=pet.w/petSize;
+      const missChance=Math.min(0.65,0.10+(sizeMult-1)/3.0*0.55); // 10% at default, caps at 65% around 4x size
+      if(Math.random()<missChance){
+        pet.say('💨 WHIFF!');
+        target.say('Too slow!');
+        pet.vx=-nx*2;pet.vy=-1;pet.airborne=true;
+        pet._inPunch=false;target._inPunch=false;
+        setTimeout(()=>{if(done)done();},500);
+      } else {
+        const force=Math.min(2.5,sizeMult); // knockback caps at 2.5x
+        target.vx=nx*14*force;target.vy=-7*Math.min(1.5,force);target.airborne=true;
+        target.say('OW!');
+        ensureAudio();playEventSound(hitBuffer,'hit');spawnBloodSplatter(target);
+        pet.vx=-nx*3;pet.vy=-2;pet.airborne=true;
+        pet._inPunch=false;target._inPunch=false;
+        setTimeout(()=>{if(done)done();},500);
+      }
     }
   },50);
   activePunches.set(pet.username,walkInterval);
@@ -5155,6 +5194,45 @@ function execViewerCmd(cmdId,username,args){
     });
     return;
   }
+  if(cmdId==='speed'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    getInventory(username, items => {
+      const idx=items.findIndex(i=>i.toLowerCase()==='speed potion');
+      if(idx===-1){p.say("No speed potion!");return;}
+      removeItem(username,'Speed Potion', result => {
+        if(result&&result.error){p.say("Potion fizzled...");return;}
+        p._speedMult=4;
+        p.vx=Math.sign(p.vx||1)*petSpeed*4;
+        p.say('⚡ SPEED BOOST!');
+        sendBotMsg('@'+username+' chugged a Speed Potion! ⚡ Turbo mode for 3 minutes!');
+        setTimeout(()=>{
+          p._speedMult=1;
+          if(p.alive)p.say('Speed wore off...');
+        },3*60*1000);
+      });
+    });
+    return;
+  }
+  if(cmdId==='growth'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    getInventory(username, items => {
+      const idx=items.findIndex(i=>i.toLowerCase()==='growth potion');
+      if(idx===-1){p.say("No growth potion!");return;}
+      removeItem(username,'Growth Potion', result => {
+        if(result&&result.error){p.say("Potion fizzled...");return;}
+        const newSize=Math.min(p.w+40,300);
+        p.w=newSize;p.h=newSize;
+        p.spriteEl.width=newSize;p.spriteEl.height=newSize;
+        p.el.style.width=newSize+'px';
+        p.y=Math.min(p.y,canvas.height-p.h);
+        p.say('🌱 GROWING!');
+        sendBotMsg('@'+username+' used a Growth Potion! 🌱 They\'re getting bigger permanently!');
+      });
+    });
+    return;
+  }
   if(cmdId==='steal'){
     const p=petMap[username.toLowerCase()];
     if(!p||!p.alive)return;
@@ -5181,14 +5259,24 @@ function execViewerCmd(cmdId,username,args){
           }
           const requestedAmount=parseInt(args[1])||0;
           let amount;
+          let caughtChance;
           if(requestedAmount>0){
             amount=Math.min(requestedAmount,targetCoins);
+            const stealPct=amount/targetCoins;
+            if(stealPct<=0.20){
+              // scales from ~10% at tiny amounts to 85% at 20% of target's coins
+              caughtChance=0.10+(stealPct/0.20)*0.75;
+            } else {
+              // exponentially harder beyond 20%
+              const excess=stealPct-0.20;
+              caughtChance=Math.min(0.99,0.85+0.14*(1-Math.exp(-15*excess)));
+            }
           } else {
+            // random steal: flat 85% catch chance
             const pct=(1+Math.floor(Math.random()*20))/100;
             amount=Math.max(1,Math.floor(targetCoins*pct));
+            caughtChance=0.85;
           }
-          const stealPct=amount/targetCoins;
-          const caughtChance=Math.min(0.95,0.10+stealPct*0.85);
           const caught=Math.random()<caughtChance;
           if(caught){
             p.say('YOU GOT CAUGHT!');
@@ -5379,6 +5467,7 @@ function execViewerCmd(cmdId,username,args){
     }
     case 'lurk':{
       if(pet){
+        if(pet.pinned){pet.say("Can't lurk while pinned! 🪢");break;}
         pet.say('Going lurk...');
         const _lu=pet.username;
         setTimeout(()=>{
