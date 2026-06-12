@@ -1353,8 +1353,8 @@ function bounceAll(){
   }
 }
 
-function adjustSize(delta){
-  config.size=Math.max(10,Math.min(120,config.size+delta));
+function adjustSize(delta, uncapped){
+  config.size=uncapped?Math.max(10,config.size+delta):Math.max(10,Math.min(120,config.size+delta));
   document.getElementById('size').value=config.size;
   document.getElementById('sv').textContent=config.size;
   for(let s of spires){s.r=config.size;s.mass=config.size/24;}
@@ -2493,6 +2493,31 @@ ChatPet.prototype.update=function(now){
     this.el.style.transformOrigin='top center';
     this.drawSprite(now);return;
   }
+  if(this._dancing&&!this.grabbed){
+    if(this._hidden)return;
+    const g=config.gravity*0.4, gravDown=g>=0, H=window.innerHeight;
+    this.vy+=g; this.y+=this.vy;
+    if(gravDown){
+      if(this.y>=H-this.h){this.y=H-this.h;this.vy=0;this.airborne=false;}
+      if(this.y<0){this.y=0;this.vy=Math.abs(this.vy)*0.4;}
+    }else{
+      if(this.y<=0){this.y=0;this.vy=0;this.airborne=false;}
+      if(this.y+this.h>H){this.y=H-this.h;this.vy=-Math.abs(this.vy)*0.4;}
+    }
+    if(this.bubbleTimer>0){this.bubbleTimer--;if(!this.bubbleTimer&&this.bubble){this.bubble.remove();this.bubble=null;this._talking=false;}}
+    placePetEl(this);
+    this.drawSprite(now);
+    if(this._spinAngle!==undefined){
+      this.spriteEl.style.transformOrigin='center center';
+      this.spriteEl.style.transform='rotate('+this._spinAngle+'deg)';
+      this.el.style.transform='none';this.el.style.transformOrigin='';
+    }else{
+      this.spriteEl.style.transform='none';this.spriteEl.style.transformOrigin='';
+      this.el.style.transformOrigin='bottom center';
+      this.el.style.transform=this._danceTilt?'rotate('+this._danceTilt+'deg)':'none';
+    }
+    return;
+  }
   if(!this.pinned&&this._swingAngle!==undefined){
     this._swingAngle=undefined;this._swingVel=undefined;this._pivotX=undefined;this._pivotY=undefined;
     this.el.style.transform='none';this.el.style.transformOrigin='';
@@ -2701,6 +2726,7 @@ function _brTick(){
     if(alive.length===1){
       alive[0].say('👑 I WIN!');alive[0].brAngleTarget=0;
       addCoins(alive[0].username, COIN_BR_WIN);
+      sendBotMsg('@' + alive[0].username + ' wins the Battle Royale! 🏆 +' + COIN_BR_WIN + ' coins!');
       setTimeout(() => getCoins(alive[0].username, c => alive[0].say('🪙 +' + COIN_BR_WIN + ' (' + c + ' total)')), 1500);
     }
     endBattleRoyale();return;
@@ -2969,6 +2995,22 @@ function removeItem(username, item, cb) {
   }).then(r => r.json()).then(d => cb && cb(d)).catch(() => cb && cb({ error: 'network' }));
 }
 
+function get4DInfo(cb) {
+  if(!COINS_API){cb&&cb(null);return;}
+  fetch(COINS_API+'?action=4d_info&_='+Date.now())
+    .then(r=>r.json()).then(d=>cb&&cb(d)).catch(()=>cb&&cb(null));
+}
+
+function play4D(username, guess, cb) {
+  if(!COINS_API){cb&&cb(null);return;}
+  fetch(COINS_API, {
+    method: 'POST',
+    body: JSON.stringify({ user: username.toLowerCase(), action: '4d', guess }),
+    headers: { 'Content-Type': 'text/plain' }
+  }).then(r=>r.json()).then(d=>cb&&cb(d)).catch(()=>cb&&cb(null));
+}
+
+
 // ══════════════════════════════════════════════════════════
 // WAR MODE
 // ══════════════════════════════════════════════════════════
@@ -3025,8 +3067,10 @@ function startWar(){
     if(teamsAlive.length<=1){
       if(teamsAlive.length===1){
         const wt=teamsAlive[0];
+        const _warWinners=pets.filter(p=>p.team===wt.id);
+        sendBotMsg(wt.emoji+' '+_warWinners.map(p=>'@'+p.username).join(', ')+' win the Battle! Each gets '+COIN_WAR_WIN+' coins! 🎖️');
         // reward every member of the winning team, alive or not
-        pets.filter(p=>p.team===wt.id).forEach(p=>{
+        _warWinners.forEach(p=>{
           addCoins(p.username, COIN_WAR_WIN);
           if(p.alive){
             p.say(wt.emoji+' VICTORY!');
@@ -3240,12 +3284,25 @@ function _doConnect(){
       }
       // chat message
       const pm=msg.match(/^:(\w+)!\w+@\S+ PRIVMSG #\S+ :(.+)$/);
-      // raid detection — Twitch sends USERNOTICE with msg-id=raid
+      // USERNOTICE: raid + watch streak share
       const un=msg.match(/^:tmi\.twitch\.tv USERNOTICE #\S+/)||msg.match(/USERNOTICE #\S+/);
       if(un&&tags['msg-id']==='raid'){
         const raiderName=tags['display-name']||tags['login']||'Raider';
         const raiderCount=parseInt(tags['msg-param-viewerCount']||'1',10)||1;
         setTimeout(()=>startRaidKaiju(raiderName,raiderCount),1000);
+      }
+      if(un&&tags['msg-id']==='viewermilestone'&&tags['msg-param-category']==='watch-streak'){
+        const username=tags['display-name']||tags['login']||'';
+        const streak=parseInt(tags['msg-param-value']||'0',10);
+        if(username&&streak>0){
+          const bonus=streak*5;
+          addCoins(username,bonus);
+          setTimeout(()=>{
+            const p=petMap[username.toLowerCase()];
+            if(p&&p.alive)p.say('🔥 '+streak+' stream streak! +'+bonus+' 🪙');
+            getCoins(username,c=>sendBotMsg('@'+username+' 🔥 '+streak+'-stream watch streak! +'+bonus+' coins ('+c+' total)'));
+          },800);
+        }
       }
       if(pm){
         const username=tags['display-name']||pm[1];
@@ -3265,6 +3322,7 @@ function _doConnect(){
           if(cmdTrigger===cmd('kaiju'))setTimeout(startKaiju,500);
           if(cmdTrigger===cmd('spawn'))execViewerCmd('spawn',username,cmdArgs);
           if(cmdTrigger===cmd('despawn'))execViewerCmd('despawn',username,cmdArgs);
+          if(cmdTrigger===cmd('tuck'))execViewerCmd('tuck',username,cmdArgs);
           if(cmdTrigger==='!addcoin'||cmdTrigger==='!addcoins'||cmdTrigger==='!removecoin'||cmdTrigger==='!removecoins'){
             const target=(cmdArgs[0]||'').replace(/^@/,'').toLowerCase();
             const amount=parseInt(cmdArgs[1])||0;
@@ -3283,6 +3341,8 @@ function _doConnect(){
         // viewer commands — during active fights only !jump is allowed
         const inFight=battleRoyaleActive||warActive||kaijuActive;
         if(cmdTrigger===cmd('jump'))execViewerCmd('jump',username,cmdArgs);
+        if(cmdTrigger===cmd('dance'))execViewerCmd('dance',username,cmdArgs);
+        if(cmdTrigger===cmd('spin'))execViewerCmd('spin',username,cmdArgs);
         if(cmdTrigger===cmd('attack'))execViewerCmd('attack',username,cmdArgs); // always on — needed to damage kaiju
         if(cmdTrigger===cmd('speed'))execViewerCmd('speed',username,cmdArgs);
         if(cmdTrigger===cmd('growth'))execViewerCmd('growth',username,cmdArgs);
@@ -3296,12 +3356,14 @@ function _doConnect(){
           if(cmdTrigger===cmd('ballin'))execViewerCmd('ballin',username,cmdArgs);
           if(cmdTrigger===cmd('bounce'))execViewerCmd('bounce',username,cmdArgs);
           if(cmdTrigger===cmd('float'))execViewerCmd('float',username,cmdArgs);
+          if(cmdTrigger===cmd('unfloat'))execViewerCmd('unfloat',username,cmdArgs);
           if(cmdTrigger===cmd('shrink'))execViewerCmd('shrink',username,cmdArgs);
           if(cmdTrigger===cmd('grow'))execViewerCmd('grow',username,cmdArgs);
           if(cmdTrigger===cmd('lurk'))execViewerCmd('lurk',username,cmdArgs);
           if(cmdTrigger===cmd('vanish'))execViewerCmd('lurk',username,cmdArgs);
           if(cmdTrigger===cmd('v'))execViewerCmd('lurk',username,cmdArgs);
           if(cmdTrigger===cmd('hug'))execViewerCmd('hug',username,cmdArgs);
+          if(cmdTrigger===cmd('kiss'))execViewerCmd('kiss',username,cmdArgs);
           if(cmdTrigger===cmd('eat'))execViewerCmd('eat',username,cmdArgs);
           if(cmdTrigger===cmd('coins')||cmdTrigger===cmd('coins').replace(/s$/,'')||cmdTrigger===cmd('coins')+'s')execViewerCmd('coins',username,cmdArgs);
           if(cmdTrigger===cmd('inventory'))execViewerCmd('inventory',username,cmdArgs);
@@ -3315,6 +3377,7 @@ function _doConnect(){
           if(cmdTrigger===cmd('stone'))execViewerCmd('stone',username,cmdArgs);
           if(cmdTrigger===cmd('gift'))execViewerCmd('gift',username,cmdArgs);
           if(cmdTrigger===cmd('bet')||cmdTrigger==='!gamble')execViewerCmd('bet',username,cmdArgs);
+          if(cmdTrigger===cmd('4d')||cmdTrigger==='!toto')execViewerCmd('4d',username,cmdArgs);
         }
       }
     }
@@ -4169,7 +4232,8 @@ function kaijuTakeDamage(dmg,username){
   }
   if(kaijuHp<=0){
     // for raids: reward everyone who was present at raid start; for regular kaiju: survivors only
-    const winnerNames=kaijuPet ? raidParticipants : pets.filter(p=>p.alive&&p!==kaijuPet).map(p=>p.username);
+    const _isRaidWin=!!kaijuPet;
+    const winnerNames=_isRaidWin ? raidParticipants : pets.filter(p=>p.alive&&p!==kaijuPet).map(p=>p.username);
     winnerNames.forEach(uname=>{
       addCoins(uname, 50);
       const lp=petMap[uname.toLowerCase()];
@@ -4178,6 +4242,11 @@ function kaijuTakeDamage(dmg,username){
         setTimeout(()=>getCoins(uname, c=>lp.say('🪙 +50 ('+c+' total)')), 1500);
       }
     });
+    if(winnerNames.length>0){
+      sendBotMsg(_isRaidWin
+        ? 'The viewers defeated the raid boss! '+winnerNames.length+' viewer'+(winnerNames.length===1?'':'s')+' each get 50 coins! 🎉'
+        : 'The viewers defeated the Kaiju! '+winnerNames.length+' survivor'+(winnerNames.length===1?'':'s')+' each get 50 coins! 🎉');
+    }
     if(kaijuSpire){kaijuSpire.vx=(Math.random()-.5)*20;kaijuSpire.vy=-15;}
     if(kaijuPet){kaijuPet.vx=(Math.random()-.5)*10;kaijuPet.vy=-8;kaijuPet.airborne=true;}
     endKaiju();
@@ -4337,6 +4406,7 @@ function startRaidKaiju(raiderName, raidViewers){
         if(!pets.some(q=>q!==_raidPetRef&&q.alive)){
           _raidPetRef.say('RAID WINS!');
           addCoins(_raidPetRef.username, 50);
+          sendBotMsg('@'+_raidPetRef.username+' and the raiders won! 🏴‍☠️ +50 coins!');
           setTimeout(()=>getCoins(_raidPetRef.username, c=>_raidPetRef.say('🪙 +50 ('+c+' total)')), 1500);
           endKaiju();
         }
@@ -4841,14 +4911,18 @@ const CMD_DEFS=[
   // viewer commands
   {id:'attack',       label:'Attack Kaiju',     def:'!attack',       owner:false},
   {id:'jump',         label:'Jump',             def:'!jump',         owner:false},
+  {id:'dance',        label:'Dance',            def:'!dance',        owner:false},
+  {id:'spin',         label:'Spin in place',    def:'!spin',         owner:false},
   {id:'duel',         label:'Duel someone',     def:'!duel',         owner:false},
   {id:'fight',        label:'Fight (alias duel)', def:'!fight',       owner:false},
   {id:'punch',        label:'Punch someone',    def:'!punch',        owner:false},
   {id:'pledge',       label:'Pledge allegiance',def:'!pledge',       owner:false},
   {id:'spawn',        label:'Spawn a pet ball', def:'!spawn',        owner:true},
+  {id:'tuck',         label:'Tuck a viewer to sleep (owner)', def:'!tuck', owner:true},
   {id:'ballin',       label:'Shoot a hoop',     def:'!ballin',       owner:false},
   {id:'bounce',       label:'Bounce pet ball',  def:'!bounce',       owner:false},
   {id:'float',        label:'Everyone floats',  def:'!float',        owner:false},
+  {id:'unfloat',      label:'Stop floating',    def:'!unfloat',      owner:false},
   {id:'shrink',       label:'Shrink pet ball',  def:'!shrink',       owner:false},
   {id:'grow',         label:'Grow pet ball',    def:'!grow',         owner:false},
   {id:'despawn',      label:'Despawn a pet ball',def:'!despawn',     owner:true},
@@ -4856,6 +4930,7 @@ const CMD_DEFS=[
   {id:'vanish',       label:'Vanish (alias lurk)', def:'!vanish',      owner:false},
   {id:'v',            label:'!v (alias lurk)',      def:'!v',           owner:false},
   {id:'hug',          label:'Hug a viewer',       def:'!hug',          owner:false},
+  {id:'kiss',         label:'Kiss a viewer',      def:'!kiss',         owner:false},
   {id:'eat',          label:'Eat a viewer',        def:'!eat',          owner:false},
   {id:'coins',        label:'Check coin balance',  def:'!coins',        owner:false},
   {id:'inventory',    label:'Check inventory',     def:'!inventory',    owner:false},
@@ -4870,6 +4945,7 @@ const CMD_DEFS=[
   {id:'gift',         label:'Gift coins to another viewer',def:'!gift', owner:false},
   {id:'stone',        label:'Stone a pinned viewer',def:'!stone',       owner:false},
   {id:'bet',          label:'Gamble coins (!gamble also works)',def:'!bet',owner:false},
+  {id:'4d',           label:'4D/Toto lottery (!toto also works)',def:'!4d',owner:false},
 ];
 
 // Live command map: id → current trigger string (lowercase, with !)
@@ -5105,6 +5181,37 @@ function execViewerCmd(cmdId,username,args){
     });
     return;
   }
+  if(cmdId==='4d'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    const guess=(args&&args.join('')||'').replace(/\D/g,'').slice(0,4);
+    if(!guess){
+      get4DInfo(info=>{
+        if(!info){p.say('4D offline!');return;}
+        sendBotMsg('🎰 4D Jackpot: '+info.prize+' 🪙 | Entry cost: '+info.entry_cost+' 🪙 | Guess with: !4d [XXXX]');
+      });
+      return;
+    }
+    if(guess.length!==4){p.say('Need exactly 4 digits! e.g. !4d 1234');return;}
+    p.say('🎰 '+guess+'...');
+    play4D(username,guess,result=>{
+      if(!result){p.say('Error, try again!');return;}
+      if(result.error==='not_enough_coins'){
+        p.say('Need '+result.entry_cost+' 🪙 to enter!');
+        botReply(username,'need '+result.entry_cost+' coins to enter the 4D!');
+        return;
+      }
+      if(result.error==='invalid_guess'){p.say('4 digits only!');return;}
+      if(result.result==='win'){
+        p.say('🎉 JACKPOT! +'+result.prize+' 🪙!');
+        setTimeout(()=>sendBotMsg('🎉🎰 @'+username+' STRUCK THE 4D JACKPOT of '+result.prize+' coins! New draw begins now! 🎰🎉'),600);
+      }else{
+        p.say('❌ No match! Jackpot: '+result.prize+' 🪙');
+        botReply(username,'no match! Jackpot is now '+result.prize+' coins. Try again with !4d XXXX');
+      }
+    });
+    return;
+  }
   if(cmdId==='buy'){
     const p=petMap[username.toLowerCase()];
     if(!p||!p.alive)return;
@@ -5202,14 +5309,10 @@ function execViewerCmd(cmdId,username,args){
       if(idx===-1){p.say("No speed potion!");return;}
       removeItem(username,'Speed Potion', result => {
         if(result&&result.error){p.say("Potion fizzled...");return;}
-        p._speedMult=4;
-        p.vx=Math.sign(p.vx||1)*petSpeed*4;
-        p.say('⚡ SPEED BOOST!');
-        sendBotMsg('@'+username+' chugged a Speed Potion! ⚡ Turbo mode for 3 minutes!');
-        setTimeout(()=>{
-          p._speedMult=1;
-          if(p.alive)p.say('Speed wore off...');
-        },3*60*1000);
+        p._speedMult=30;
+        p.vx=Math.sign(p.vx||1)*petSpeed*30;
+        p.say('⚡ 3000% SPEED!');
+        sendBotMsg('@'+username+' chugged a Speed Potion! ⚡ 3000% speed — permanently!');
       });
     });
     return;
@@ -5228,7 +5331,7 @@ function execViewerCmd(cmdId,username,args){
         p.el.style.width=newSize+'px';
         p.y=Math.min(p.y,canvas.height-p.h);
         p.say('🌱 GROWING!');
-        sendBotMsg('@'+username+' used a Growth Potion! 🌱 They\'re getting bigger permanently!');
+        sendBotMsg('@'+username+' used a Growth Potion! ');
       });
     });
     return;
@@ -5354,6 +5457,65 @@ function execViewerCmd(cmdId,username,args){
     case 'jump':
       if(pet){pet.vy=-(8+Math.random()*4);pet.airborne=true;}
       break;
+    case 'dance':{
+      if(!pet||pet.pinned||pet._dancing)break;
+      pet._dancing=true; pet._danceTilt=0; pet.vx=0;
+      pet.say('💃');
+      const TILT=22, TILT3=15, STEP=210;
+      const _du=pet.username;
+      const go=(delay,fn)=>setTimeout(()=>{const p=petMap[_du];if(p&&p._dancing)fn(p);},delay);
+      let t=150;
+      // phase 1 — look left, 3 wiggles
+      go(t,p=>{p.facingLeft=true;});
+      for(let i=0;i<3;i++){
+        t+=STEP; go(t,p=>{p._danceTilt=-TILT; p.facingLeft=true;});
+        t+=STEP; go(t,p=>{p._danceTilt=0;     p.facingLeft=true;});
+      }
+      t+=160;
+      // phase 2 — look right, 3 wiggles
+      go(t,p=>{p.facingLeft=false;});
+      for(let i=0;i<3;i++){
+        t+=STEP; go(t,p=>{p._danceTilt=TILT;  p.facingLeft=false;});
+        t+=STEP; go(t,p=>{p._danceTilt=0;     p.facingLeft=false;});
+      }
+      t+=160;
+      // phase 3 — 3 in-place left-right rocks
+      for(let i=0;i<3;i++){
+        t+=STEP; go(t,p=>{p._danceTilt=-TILT3; p.facingLeft=true;});
+        t+=STEP; go(t,p=>{p._danceTilt=TILT3;  p.facingLeft=false;});
+      }
+      t+=STEP; go(t,p=>{p._danceTilt=0;});
+      t+=120;
+      // phase 4 — jump
+      go(t,p=>{p.vy=-(9+Math.random()*3); p.airborne=true; p.say('🎉');});
+      // phase 5 — end dance, resume walking
+      t+=650;
+      go(t,p=>{
+        p._dancing=false; p._danceTilt=null;
+        p.el.style.transform='none'; p.el.style.transformOrigin='';
+        p.vx=(Math.random()<0.5?-1:1)*(petSpeed*(p._speedMult||1));
+      });
+      break;
+    }
+    case 'spin':{
+      if(!pet||pet.pinned||pet._dancing)break;
+      pet._dancing=true; pet._spinAngle=0; pet.vx=0;
+      pet.say('🌀');
+      const _su=pet.username;
+      const iv=setInterval(()=>{
+        const p=petMap[_su];
+        if(!p||!p._dancing){clearInterval(iv);return;}
+        p._spinAngle=(p._spinAngle||0)+14; // ~26 steps per rotation at 16ms ≈ 420ms/rotation
+        if(p._spinAngle>=720){ // 2 full rotations then stop
+          clearInterval(iv);
+          p._dancing=false; p._spinAngle=undefined;
+          p.spriteEl.style.transform='none'; p.spriteEl.style.transformOrigin='';
+          p.el.style.transform='none'; p.el.style.transformOrigin='';
+          p.vx=(Math.random()<0.5?-1:1)*(petSpeed*(p._speedMult||1));
+        }
+      },16);
+      break;
+    }
     case 'attack':
       if(pet&&pet.alive===false)break; // dead viewers can't attack
       kaijuTakeDamage(10,username);
@@ -5438,17 +5600,17 @@ function execViewerCmd(cmdId,username,args){
       break;
     }
     case 'float':{
-      // toggle zero gravity — permanent until triggered again
-      if(config.gravity===0){
-        setGravity(1);
-        if(pet)pet.say('Back to earth!');
-      } else {
-        setGravity(0);
-        // push all viewers and balls off the ground
-        pets.forEach(p=>{if(!p.pinned){p.vy=-(4+Math.random()*4);p.airborne=true;}});
-        spires.forEach(s=>{s.vy=-(4+Math.random()*4);});
-        if(pet)pet.say('I believe I can fly!');
-      }
+      if(config.gravity===0)break; // already floating
+      setGravity(0);
+      pets.forEach(p=>{if(!p.pinned){p.vy=-(4+Math.random()*4);p.airborne=true;}});
+      spires.forEach(s=>{s.vy=-(4+Math.random()*4);});
+      if(pet)pet.say('I believe I can fly!');
+      break;
+    }
+    case 'unfloat':{
+      if(config.gravity!==0)break; // already grounded
+      setGravity(1);
+      if(pet)pet.say('Back to earth!');
       break;
     }
     case 'shrink':{
@@ -5457,7 +5619,7 @@ function execViewerCmd(cmdId,username,args){
       break;
     }
     case 'grow':{
-      adjustSize(10);
+      adjustSize(10, true);
       if(pet)pet.say('Getting bigger!');
       break;
     }
@@ -5481,7 +5643,7 @@ function execViewerCmd(cmdId,username,args){
     case 'hug':{
       const hugTgt=args&&args[0]
         ?pets.find(p=>p.username.toLowerCase()===(args[0]||'').toLowerCase()&&p!==pet)
-        :pets.find(p=>p!==pet);
+        :pets.filter(p=>p!==pet)[Math.floor(Math.random()*pets.filter(p=>p!==pet).length)];
       if(pet&&hugTgt){
         queueInteraction(pet,hugTgt,(p,t,done)=>{
           p._inHug=true;t._inHug=true;
@@ -5490,7 +5652,29 @@ function execViewerCmd(cmdId,username,args){
             const dx=(t.x+t.w/2)-(p.x+p.w/2);
             if(Math.abs(dx)<p.w*1.2){
               clearInterval(hugIv);p.vx=0;
-              p.say('\u2764');t.say('\u2764');
+              sendBotMsg('@'+p.username+' hugged @'+t.username+'! \ud83e\udec2');
+              t.vx=(Math.random()<0.5?-1:1)*3;t.vy=-4;t.airborne=true;
+              p._inHug=false;t._inHug=false;
+              setTimeout(done,500);
+            }else{p.vx=Math.sign(dx)*petSpeed*1.5;}
+          },100);
+        });
+      }
+      break;
+    }
+    case 'kiss':{
+      const kissTgt=args&&args[0]
+        ?pets.find(p=>p.username.toLowerCase()===(args[0]||'').toLowerCase()&&p!==pet)
+        :pets.filter(p=>p!==pet)[Math.floor(Math.random()*pets.filter(p=>p!==pet).length)];
+      if(pet&&kissTgt){
+        queueInteraction(pet,kissTgt,(p,t,done)=>{
+          p._inHug=true;t._inHug=true;
+          const kissIv=setInterval(()=>{
+            if(!pets.includes(p)||!pets.includes(t)){clearInterval(kissIv);p._inHug=false;t._inHug=false;done();return;}
+            const dx=(t.x+t.w/2)-(p.x+p.w/2);
+            if(Math.abs(dx)<p.w*1.2){
+              clearInterval(kissIv);p.vx=0;
+              sendBotMsg('@'+p.username+' gave @'+t.username+' a kiss! <3 \ud83d\udc8b');
               t.vx=(Math.random()<0.5?-1:1)*3;t.vy=-4;t.airborne=true;
               p._inHug=false;t._inHug=false;
               setTimeout(done,500);
@@ -5504,6 +5688,7 @@ function execViewerCmd(cmdId,username,args){
       if(battleRoyaleActive||warActive||kaijuActive||activeDuels.size>0){
         if(pet)pet.say('No eating during events!');break;
       }
+      if(pet&&pet.w>=400){pet.say("I'm full...");break;}
       const eatTgt=args&&args[0]
         ?pets.find(p=>p.username.toLowerCase()===(args[0]||'').toLowerCase()&&p!==pet)
         :null;
@@ -5546,6 +5731,46 @@ function execViewerCmd(cmdId,username,args){
         ?pets.find(p=>p.username.toLowerCase()===targetName2.toLowerCase()&&p!==pet)
         :pets.find(p=>p!==pet);
       if(pet&&target2)queueInteraction(pet,target2,(p,t,done)=>{startPunch(p,t,done);});
+      break;
+    }
+    case 'tuck':{
+      const tuckTargetName=args&&args[0];
+      if(!tuckTargetName){if(pet)pet.say('Who?');break;}
+      const tuckTarget=pets.find(p=>p.username.toLowerCase()===tuckTargetName.toLowerCase()&&p!==pet);
+      if(!pet||!tuckTarget){if(pet)pet.say('They are not here!');break;}
+      queueInteraction(pet,tuckTarget,(p,t,done)=>{
+        p._inPunch=true;t._inPunch=true;
+        const tuckIv=setInterval(()=>{
+          if(!pets.includes(p)||!pets.includes(t)){clearInterval(tuckIv);p._inPunch=false;t._inPunch=false;done();return;}
+          const dx=(t.x+t.w/2)-(p.x+p.w/2);
+          if(Math.abs(dx)>p.w*1.2){
+            p.vx=Math.sign(dx)*petSpeed*2;
+          } else {
+            clearInterval(tuckIv);p.vx=0;
+            const nx=Math.sign(dx)||1;
+            // land the punch
+            t.vx=nx*8;t.vy=-5;t.airborne=true;
+            t.say('😴 zzzz...');
+            ensureAudio();playEventSound(hitBuffer,'hit');spawnBloodSplatter(t);
+            p.vx=-nx*3;p.vy=-2;p.airborne=true;
+            p._inPunch=false;t._inPunch=false;
+            sendBotMsg('@'+p.username+' has tucked @'+t.username+' to sleep PERMANENTLY 😴💤');
+            // fade the target out and remove them
+            setTimeout(()=>{
+              if(!pets.includes(t)){done();return;}
+              t.el.style.transition='opacity 2s';
+              t.el.style.opacity='0';
+              setTimeout(()=>{
+                const tu=t.username;
+                if(petMap[tu])delete petMap[tu];
+                pets=pets.filter(p=>p.username!==tu);
+                t.destroy();
+                done();
+              },2000);
+            },800);
+          }
+        },50);
+      });
       break;
     }
   }
