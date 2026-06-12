@@ -910,6 +910,9 @@ let mouseX=0,mouseY=0,prevMouseX=0,prevMouseY=0,mouseVX=0,mouseVY=0;
 let hoveredSpire=null,uiVisible=true;
 
 let costumes=[],activeCostumeId=null;
+let costumeMap=new Map();
+let _lastSpireCount=-1,_lastPetCount=-1;
+function rebuildCostumeMap(){costumeMap=new Map(costumes.map(c=>[c.id,c]));}
 let fps=12,frameTime=1000/12;
 let viewerFps=12,viewerFrameTime=1000/12;
 
@@ -1055,6 +1058,7 @@ function saveCostumes(){
     }))));
     localStorage.setItem(LS_A,activeCostumeId||'');
   }catch(e){}
+  rebuildCostumeMap();
 }
 function saveHoop(){try{localStorage.setItem(LS_H,JSON.stringify(hoopFrames.map(f=>({id:f.id,src:f.img.src}))));}catch(e){}}
 function loadAll(){
@@ -1084,7 +1088,7 @@ function loadAll(){
     if(raw){
       const data=JSON.parse(raw);
       let pending=data.reduce((s,c)=>s+c.frames.length,0);
-      const finish=()=>{activeCostumeId=localStorage.getItem(LS_A)||null;renderCostumeGrid();updateCostumeSelect();};
+      const finish=()=>{activeCostumeId=localStorage.getItem(LS_A)||null;rebuildCostumeMap();renderCostumeGrid();updateCostumeSelect();};
       if(!pending){costumes=data.map(d=>({...d,frames:[]}));finish();return;}
       data.forEach(cd=>{
         const c={id:cd.id,name:cd.name,frames:[],framesLeft:[],framesRight:[]};costumes.push(c);
@@ -1329,7 +1333,7 @@ function playResize(){
 }
 
 function getCostumeFrames(costumeId,facingLeft,isMoving,isTalking){
-  const c=costumes.find(c=>c.id===costumeId);
+  const c=costumeMap.get(costumeId);
   if(!c)return[];
   const hasDir=(c.framesLeft&&c.framesLeft.length)||(c.framesRight&&c.framesRight.length);
   if(isTalking){
@@ -1438,7 +1442,7 @@ function draw(now){
 
     const framesD=getCostumeFrames(s.costumeId,s.facingLeft,Math.abs(s.vx)>0.3,false);
     const frame=framesD.length>0?framesD[s.frame%framesD.length]:null;
-    const c2=costumes.find(c=>c.id===s.costumeId);
+    const c2=costumeMap.get(s.costumeId);
     const hasDirFrames=c2&&((c2.framesLeft&&c2.framesLeft.length)||(c2.framesRight&&c2.framesRight.length));
 
     ctx.save();
@@ -1455,8 +1459,8 @@ function draw(now){
     ctx.restore();
   }
 
-  document.getElementById('count').textContent=spires.length;
-  document.getElementById('vcount').textContent=pets.length;
+  if(spires.length!==_lastSpireCount){document.getElementById('count').textContent=spires.length;_lastSpireCount=spires.length;}
+  if(pets.length!==_lastPetCount){document.getElementById('vcount').textContent=pets.length;_lastPetCount=pets.length;}
 }
 
 function loop(now){update(now);draw(now);requestAnimationFrame(loop);}
@@ -2066,11 +2070,14 @@ class ChatPet{
     canvasWrap.appendChild(this.el);
     this.el.style.pointerEvents='auto';
 
-    this.el.addEventListener('mousedown',e=>{e.preventDefault();startGrabPet(this,e.clientX,e.clientY);});
-    this.el.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();releasePet();});
-    this.el.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];startGrabPet(this,t.clientX,t.clientY);},{passive:false});
-    // right-click → assign custom image
-    this.el.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();openPetImagePicker(this,e.clientX,e.clientY);});
+    this._onMousedown=e=>{e.preventDefault();startGrabPet(this,e.clientX,e.clientY);};
+    this._onDblclick=e=>{e.preventDefault();e.stopPropagation();releasePet();};
+    this._onTouchstart=e=>{e.preventDefault();const t=e.touches[0];startGrabPet(this,t.clientX,t.clientY);};
+    this._onContextmenu=e=>{e.preventDefault();e.stopPropagation();openPetImagePicker(this,e.clientX,e.clientY);};
+    this.el.addEventListener('mousedown',this._onMousedown);
+    this.el.addEventListener('dblclick',this._onDblclick);
+    this.el.addEventListener('touchstart',this._onTouchstart,{passive:false});
+    this.el.addEventListener('contextmenu',this._onContextmenu);
   }
   say(msg,emoteTag){
     this._inactiveFrames=0;
@@ -2326,7 +2333,13 @@ class ChatPet{
     placePetEl(this);
     this.drawSprite(now);
   }
-  destroy(){this.el.remove();}
+  destroy(){
+    this.el.removeEventListener('mousedown',this._onMousedown);
+    this.el.removeEventListener('dblclick',this._onDblclick);
+    this.el.removeEventListener('touchstart',this._onTouchstart);
+    this.el.removeEventListener('contextmenu',this._onContextmenu);
+    this.el.remove();
+  }
 }
 
 // ── grab logic ────────────────────────────────────────────
@@ -2404,7 +2417,7 @@ function getOrCreatePet(username,color){
   if(petMap[username])return petMap[username];
   // block new viewers from joining mid-event
   if(battleRoyaleActive||warActive||kaijuActive)return null;
-  if(Object.keys(petMap).length>=maxPets)return null;
+  if(pets.length>=maxPets)return null;
   const pet=new ChatPet(username,color);
   petMap[username]=pet;
   pets.push(pet);
