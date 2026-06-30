@@ -10,6 +10,8 @@ const COMMISSION_PRICES = {
     Toontuber: {
         types:  { 'Simple': 30, 'Half Body': 80, 'Full Body': 100 },
         addOns: { 'Set': 20, 'Mute/Deafen': 20 },
+        // Toontuber Emotes: multiplier applied to base type price (1.0 = +100%)
+        toontuberEmotes: { '1': 0, '2': 1.0, '3': 2.0, '4 or more': 3.0 },
     },
     Animation: {
         types:  { 'Sketch': 60, 'Flat Colours': 100, 'Shaded': 200 },
@@ -123,6 +125,16 @@ function updatePriceEstimate() {
         basePrice = config.types[typeVal];
     }
     total = basePrice;
+
+    // Toontuber Emotes multiplier
+    if (commissionType === 'Toontuber' && config.toontuberEmotes) {
+        var toonEmoteEl = document.getElementById('toontuberEmotes');
+        var toonEmoteQty = toonEmoteEl ? toonEmoteEl.value : '';
+        if (toonEmoteQty && config.toontuberEmotes[toonEmoteQty] !== undefined) {
+            total += basePrice * config.toontuberEmotes[toonEmoteQty];
+            if (toonEmoteQty === '4 or more') isPlusPrice = true;
+        }
+    }
 
     // Add-ons
     if (config.addOns) {
@@ -241,6 +253,7 @@ function updateFormVisibility() {
     if (commissionType === 'Toontuber') {
         document.getElementById('packageplanfields').classList.remove('hidden');
         document.getElementById('toontuberAddOns').classList.remove('hidden');
+        document.getElementById('toontuberFields').classList.remove('hidden');
 
     } else if (commissionType === 'Animation' || commissionType === 'Illustration') {
         setLevelOfDetailOptions(commissionType);
