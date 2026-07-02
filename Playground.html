@@ -68,7 +68,7 @@ body.mode-hallway #hallwayContainer{display:block;}
 .srow{margin-bottom:16px;}
 .srow>label{display:block;font-size:12px;color:rgba(255,255,255,0.45);margin-bottom:6px;}
 .srow input[type=color]{width:100%;height:36px;border-radius:8px;border:0.5px solid rgba(255,255,255,0.2);cursor:pointer;background:none;padding:2px;}
-.srow input[type=number],.srow input[type=text]{width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px;font-family:inherit;}
+.srow input[type=number],.srow input[type=text],.srow input[type=password]{width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:7px 10px;color:#fff;font-size:13px;font-family:inherit;}
 .srow input:focus{outline:none;border-color:#7F77DD;}
 .srow input[type=range]{flex:1;accent-color:#7F77DD;}
 .sdivider{border:none;border-top:0.5px solid rgba(255,255,255,0.08);margin:16px 0;}
@@ -92,7 +92,7 @@ body.mode-hallway #hallwayContainer{display:block;}
 .soundUpBtn{width:100%;padding:8px;border-radius:8px;border:1px dashed rgba(255,255,255,0.2);background:transparent;color:rgba(255,255,255,0.5);font-size:12px;cursor:pointer;font-family:inherit;}
 .soundUpBtn:hover{border-color:#7F77DD;}
 .snd-label{font-size:11px;color:rgba(255,255,255,0.4);min-height:16px;flex:1;margin:0;}
-#fileInputHidden,#hoopFileInput,#soundInput,#victorySoundInput,#resizeSoundInput,#battleStartSoundInput,#hitSoundInput,#koSoundInput,#winSoundInput,#stompSoundInput,#dvdBounceSoundInput,#whipSoundInput{display:none;}
+#fileInputHidden,#hoopFileInput,#soundInput,#victorySoundInput,#resizeSoundInput,#battleStartSoundInput,#hitSoundInput,#stompSoundInput,#whipSoundInput,#bombSoundInput,#nukeSoundInput,#flashbangSoundInput{display:none;}
 #hotkeyList{width:100%;border-collapse:collapse;font-size:12px;}
 #hotkeyList th{text-align:left;color:rgba(255,255,255,0.4);font-weight:400;padding:4px 6px;border-bottom:0.5px solid rgba(255,255,255,0.08);}
 #hotkeyList td{padding:6px 6px;vertical-align:middle;}
@@ -104,11 +104,15 @@ body.mode-hallway #hallwayContainer{display:block;}
 .sclose:hover{background:rgba(127,119,221,0.3);}
 .hoop-section{background:rgba(239,159,39,0.06);border:0.5px solid rgba(239,159,39,0.2);border-radius:10px;padding:12px;}
 .hoop-section h3{font-size:12px;font-weight:500;color:rgba(239,159,39,0.8);margin-bottom:10px;}
+#brKillFeed{display:none;position:fixed;top:90px;right:4px;z-index:15;pointer-events:none;width:160px;flex-direction:column;gap:2px;}
+.brKE{font-size:10px;color:rgba(255,255,255,0.85);background:rgba(0,0,0,0.6);border-radius:4px;padding:3px 5px;border-left:2px solid rgba(220,80,80,0.7);animation:brKEin 0.25s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@keyframes brKEin{from{opacity:0;transform:translateX(14px);}to{opacity:1;transform:none;}}
 </style>
 </head>
 <body>
 <div id="canvasWrap"><canvas id="canvas"></canvas></div>
 <div id="hallwayContainer"><canvas id="hallwayCanvas"></canvas></div>
+<div id="brKillFeed"></div>
 
 <div id="topbar">
   <!-- Row 1: physics sliders + core buttons -->
@@ -256,6 +260,32 @@ body.mode-hallway #hallwayContainer{display:block;}
         <div style="display:flex;align-items:center;gap:8px;"><input type="range" id="bubbleFontSize" min="6" max="48" step="1" value="11"><span id="bubbleFontSizeVal" style="font-size:12px;color:#fff;min-width:36px;">11px</span></div>
       </div>
 
+      <hr class="sdivider">
+      <div style="font-size:12px;font-weight:500;color:rgba(127,119,221,0.9);margin-bottom:8px;">📡 Broadcaster (Redemptions)</div>
+      <div class="srow"><label>Broadcaster OAuth token — channel:read:redemptions (hidden)</label><input type="password" id="broadcasterToken" placeholder="oauth:xxxxxxxxxxxxxx or raw token"></div>
+      <div class="srow"><label>Client ID (hidden)</label><input type="password" id="botClientId" placeholder="your Twitch app client ID"></div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button id="broadcasterConnectBtn" style="flex:1;background:transparent;border:0.5px solid rgba(127,119,221,0.5);border-radius:8px;color:#b8b2ff;font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Connect</button>
+        <button id="broadcasterDisconnectBtn" style="flex:1;background:transparent;border:0.5px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(255,255,255,0.6);font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Disconnect</button>
+      </div>
+      <div id="broadcasterStatus" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:-10px;margin-bottom:12px;min-height:16px;">Not connected</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-bottom:4px;">Redemption log</div>
+      <div id="redemptionLog" style="background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 8px;font-size:11px;font-family:monospace;color:rgba(255,255,255,0.55);min-height:48px;max-height:140px;overflow-y:auto;margin-bottom:16px;display:flex;flex-direction:column;gap:3px;"><span data-empty style="color:rgba(255,255,255,0.2);">No redemptions yet</span></div>
+
+      <hr class="sdivider">
+      <div style="font-size:12px;font-weight:500;color:rgba(127,119,221,0.9);margin-bottom:8px;">🤖 Bot (Chat — optional)</div>
+      <div class="srow"><label>Bot username</label><input type="text" id="botUsername" placeholder="your bot account name"></div>
+      <div class="srow"><label>Bot OAuth token — chat:edit (hidden)</label><input type="password" id="botToken" placeholder="oauth:xxxxxxxxxxxxxx or raw token"></div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button id="botConnectBtn" style="flex:1;background:transparent;border:0.5px solid rgba(127,119,221,0.5);border-radius:8px;color:#b8b2ff;font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Connect</button>
+        <button id="botDisconnectBtn" style="flex:1;background:transparent;border:0.5px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(255,255,255,0.6);font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Disconnect</button>
+      </div>
+      <div id="botStatus" style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:-10px;margin-bottom:12px;min-height:16px;">Not connected</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <input type="text" id="botTestMsg" placeholder="Send a test message…" style="flex:1;">
+        <button id="botTestSendBtn" style="padding:7px 14px;border-radius:8px;border:0.5px solid rgba(127,119,221,0.5);background:transparent;color:#b8b2ff;font-size:13px;font-family:inherit;cursor:pointer;white-space:nowrap;">Send</button>
+      </div>
+
     </div>
     <div class="stabpanel active" id="tab-costumes">
       <!-- ── Background ── -->
@@ -398,32 +428,7 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button id="hitSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
-      <div class="srow">
-        <label>&#x1F480; Viewer KO'd</label>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volKO" min="0" max="2" step="0.01" value="1">
-          <span id="volKOVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
-        </div>
-        <button class="soundUpBtn" id="koSoundUpBtn">Upload (MP3, WAV, OGG)</button>
-        <input type="file" id="koSoundInput" accept="audio/*">
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="koSoundName">No sound loaded</div>
-          <button id="koSoundClearBtn" class="snd-clear-btn">Clear</button>
-        </div>
-      </div>
-      <div class="srow">
-        <label>&#x1F3C6; Winner declared</label>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volWin" min="0" max="2" step="0.01" value="1">
-          <span id="volWinVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
-        </div>
-        <button class="soundUpBtn" id="winSoundUpBtn">Upload (MP3, WAV, OGG)</button>
-        <input type="file" id="winSoundInput" accept="audio/*">
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="winSoundName">No sound loaded</div>
-          <button id="winSoundClearBtn" class="snd-clear-btn">Clear</button>
-        </div>
-      </div>
+
       <div class="srow">
         <label>&#x1F996; Kaiju stomp</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -437,19 +442,7 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button id="stompSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
-      <div class="srow">
-        <label>&#x1F4BF; DVD wall bounce</label>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-          <input type="range" id="volDVD" min="0" max="2" step="0.01" value="1">
-          <span id="volDVDVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
-        </div>
-        <button class="soundUpBtn" id="dvdBounceSoundUpBtn">Upload (MP3, WAV, OGG)</button>
-        <input type="file" id="dvdBounceSoundInput" accept="audio/*">
-        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
-          <div class="snd-label" id="dvdBounceSoundName">No sound loaded</div>
-          <button id="dvdBounceSoundClearBtn" class="snd-clear-btn">Clear</button>
-        </div>
-      </div>
+
       <div class="srow">
         <label>🦯 Whip hit</label>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
@@ -463,21 +456,53 @@ body.mode-hallway #hallwayContainer{display:block;}
           <button id="whipSoundClearBtn" class="snd-clear-btn">Clear</button>
         </div>
       </div>
+      <div class="srow">
+        <label>💣 Bomb</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volBomb" min="0" max="2" step="0.01" value="1">
+          <span id="volBombVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
+        <button class="soundUpBtn" id="bombSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="bombSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="bombSoundName">No sound loaded</div>
+          <button id="bombSoundClearBtn" class="snd-clear-btn">Clear</button>
+        </div>
+      </div>
+      <div class="srow">
+        <label>☢️ Nuke</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volNuke" min="0" max="2" step="0.01" value="1">
+          <span id="volNukeVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
+        <button class="soundUpBtn" id="nukeSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="nukeSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="nukeSoundName">No sound loaded</div>
+          <button id="nukeSoundClearBtn" class="snd-clear-btn">Clear</button>
+        </div>
+      </div>
+      <div class="srow">
+        <label>🌟 Flashbang</label>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+          <input type="range" id="volFlashbang" min="0" max="2" step="0.01" value="1">
+          <span id="volFlashbangVal" style="font-size:11px;color:rgba(255,255,255,0.5);min-width:34px;">100%</span>
+        </div>
+        <button class="soundUpBtn" id="flashbangSoundUpBtn">Upload (MP3, WAV, OGG)</button>
+        <input type="file" id="flashbangSoundInput" accept="audio/*">
+        <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+          <div class="snd-label" id="flashbangSoundName">No sound loaded</div>
+          <button id="flashbangSoundClearBtn" class="snd-clear-btn">Clear</button>
+        </div>
+      </div>
     </div>
     <div class="stabpanel" id="tab-hotkeys">
       <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Click a field then press any key to rebind.</p>
-      <div class="srow" style="margin-bottom:14px;">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:rgba(255,255,255,0.7);">
-          <input type="checkbox" id="keepFocusToggle" style="accent-color:#7F77DD;">
-          Keep focus for hotkeys (recommended for OBS / overlay use)
-        </label>
-        <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:4px;padding-left:20px;">When enabled, the page automatically recaptures keyboard focus so hotkeys work outside the browser.</div>
-      </div>
       <table id="hotkeyList"><tr><th>Action</th><th>Key</th></tr></table>
     </div>
 
     <div class="stabpanel" id="tab-fights">
-      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Configure War teams (2–4). Viewers type <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge Red</code> / <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge Blue</code> etc. to join. Owner triggers <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!war</code> to start.</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Configure War teams (2–4). Viewers type <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge A</code> / <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!pledge B</code> etc. to join. Owner triggers <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!war</code> to start.</p>
       <div class="sdivider"></div>
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
         <span style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);">⚔️ War teams</span>
@@ -511,6 +536,12 @@ body.mode-hallway #hallwayContainer{display:block;}
       <div class="srow"><label>Segment length (px) — shorter = tighter, longer = longer reach</label><input type="number" id="whipSegLenInput" value="1" min="1" max="60" step="1"></div>
       <div class="sdivider"></div>
       <div style="font-size:12px;font-weight:500;color:rgba(255,198,3,0.9);margin-bottom:10px;">🪙 Coins</div>
+      <div class="srow"><label>API URL (hidden for stream safety)</label><input type="password" id="coinsApiInput" placeholder="Paste Google Apps Script URL"></div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button id="coinsApiSaveBtn" style="flex:1;background:transparent;border:0.5px solid rgba(255,198,3,0.4);border-radius:8px;color:rgba(255,198,3,0.9);font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Save URL</button>
+        <button id="coinsApiClearBtn" style="flex:1;background:transparent;border:0.5px solid rgba(255,255,255,0.2);border-radius:8px;color:rgba(255,255,255,0.6);font-size:13px;font-family:inherit;padding:7px 0;cursor:pointer;">Clear</button>
+      </div>
+      <div id="coinsApiMsg" style="font-size:12px;color:rgba(255,198,3,0.8);margin-top:-10px;margin-bottom:16px;min-height:16px;"></div>
       <div class="srow"><label>Username</label><input type="text" id="coinUser" placeholder="viewer name"></div>
       <div class="srow"><label>Amount (negative to subtract)</label><input type="number" id="coinAmount" value="100"></div>
       <div style="display:flex;gap:8px;margin-bottom:16px;">
@@ -649,6 +680,7 @@ let pets=[], petMap={}, viewersVisible=true;
 const VIEW_MODES=['fullscreen','small','hallway'];
 const VIEW_LABELS={fullscreen:'⛶ Fullscreen',small:'▣ Small',hallway:'▤ Hallway'};
 let currentViewMode='fullscreen';
+let currentCanvasScale=1;
 
 const hallwayContainer=document.getElementById('hallwayContainer');
 const hallwayCanvas=document.getElementById('hallwayCanvas');
@@ -666,6 +698,7 @@ function applyViewMode(mode){
   document.body.classList.add('mode-'+mode);
   document.getElementById('viewModeBtn').textContent=VIEW_LABELS[mode];
   resize();
+  if(typeof _brKillFeedVis==='function')_brKillFeedVis();
 }
 
 function resize(){
@@ -673,6 +706,7 @@ function resize(){
   canvas.width=window.innerWidth; canvas.height=window.innerHeight;
 
   if(currentViewMode==='fullscreen'){
+    currentCanvasScale=1;
     canvasWrap.style.transform='';
     canvasWrap.style.width='';canvasWrap.style.height='';
     canvasWrap.style.top='';canvasWrap.style.left='';
@@ -691,7 +725,12 @@ function resize(){
   if(vpW>availW){vpW=availW; vpH=Math.round(vpW*9/16);}
 
   const scale=vpW/window.innerWidth;
+  currentCanvasScale=scale;
   const leftX=Math.round((availW-vpW)/2);
+
+  // fit kill feed into the right dark border
+  const _kf=document.getElementById('brKillFeed');
+  if(_kf){const kfW=Math.max(60,leftX-8);_kf.style.width=kfW+'px';_kf.style.right='4px';}
 
   canvasWrap.style.transformOrigin='top left';
   canvasWrap.style.transform=`translate(${leftX}px,${topH}px) scale(${scale})`;
@@ -871,6 +910,9 @@ let mouseX=0,mouseY=0,prevMouseX=0,prevMouseY=0,mouseVX=0,mouseVY=0;
 let hoveredSpire=null,uiVisible=true;
 
 let costumes=[],activeCostumeId=null;
+let costumeMap=new Map();
+let _lastSpireCount=-1,_lastPetCount=-1;
+function rebuildCostumeMap(){costumeMap=new Map(costumes.map(c=>[c.id,c]));}
 let fps=12,frameTime=1000/12;
 let viewerFps=12,viewerFrameTime=1000/12;
 
@@ -887,10 +929,10 @@ let hoopSliding=false;
 let hoopSlideDir=0;    // +1 = sliding out, -1 = sliding in
 
 let collisionBuffer=null,victoryBuffer=null,resizeBuffer=null;
-let battleStartBuffer=null,hitBuffer=null,koBuffer=null,winBuffer=null,stompBuffer=null,dvdBounceBuffer=null,whipBuffer=null;
+let battleStartBuffer=null,hitBuffer=null,stompBuffer=null,whipBuffer=null,bombBuffer=null,nukeBuffer=null,flashbangBuffer=null;
 let audioCtx=null,soundVol=0.02,soundThresh=3,lastSoundTime=0,lastResizeSound=0,lastVictoryTime=0;
 // per-sound volume multipliers (0–2, default 1)
-const perSoundVol={collision:1,hoop:1,resize:1,battleStart:1,hit:1,ko:1,win:1,stomp:1,dvd:1,whip:1};
+const perSoundVol={collision:1,hoop:1,resize:1,battleStart:1,hit:1,stomp:1,whip:1,bomb:1,nuke:1,flashbang:1};
 const LS_PERVOL='lpp_pervol5';
 (function(){try{const r=localStorage.getItem(LS_PERVOL);if(r)Object.assign(perSoundVol,JSON.parse(r));}catch(e){}})();
 function savePerVol(){try{localStorage.setItem(LS_PERVOL,JSON.stringify(perSoundVol));}catch(e){}}
@@ -931,7 +973,9 @@ ACTIONS.forEach(a=>hotkeys[a.id]=a.default?[a.default]:[]);
 
 const LS_C='lpp_c5',LS_A='lpp_a5',LS_H='lpp_h5',LS_HK='lpp_hk5',LS_PREFS='lpp_prefs5';
 const LS_SND='lpp_snd5',LS_VSND='lpp_vsnd5',LS_RSND='lpp_rsnd5';
-const LS_BSND='lpp_bsnd5',LS_HSND='lpp_hsnd5',LS_KOSND='lpp_kosnd5',LS_WINSND='lpp_winsnd5',LS_STOMPSND='lpp_stompsnd5',LS_DVDSND='lpp_dvdsnd5',LS_WHIPSND='lpp_whipsnd5';
+const LS_BSND='lpp_bsnd5',LS_HSND='lpp_hsnd5',LS_STOMPSND='lpp_stompsnd5',LS_WHIPSND='lpp_whipsnd5',LS_BOMBSND='lpp_bombsnd5',LS_NUKESND='lpp_nukesnd5',LS_FLASHBANGSND='lpp_flashbangsnd5';
+const LS_COINS_API='lpp_coinsapi5';
+const LS_BOT_USER='lpp_botuser5',LS_BOT_TOKEN='lpp_bottoken5',LS_BOT_CLIENTID='lpp_botclientid5',LS_BROADCASTER_TOKEN='lpp_bcasttoken5';
 
 // ── IndexedDB image store (replaces localStorage for large image blobs) ──
 let _idb=null;
@@ -946,6 +990,7 @@ function _openIDB(){
 }
 function idbSet(key,val){return _openIDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('imgs','readwrite');tx.objectStore('imgs').put(val,key);tx.oncomplete=res;tx.onerror=rej;}));}
 function idbGet(key){return _openIDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('imgs','readonly');const r=tx.objectStore('imgs').get(key);r.onsuccess=()=>res(r.result);r.onerror=rej;}));}
+function idbDel(key){return _openIDB().then(db=>new Promise((res,rej)=>{const tx=db.transaction('imgs','readwrite');tx.objectStore('imgs').delete(key);tx.oncomplete=res;tx.onerror=rej;}));}
 // ── End IndexedDB ──
 
 // Volume uses a square curve: slider value s ∈ [0,1] → actual vol = s² * 0.04
@@ -956,32 +1001,31 @@ function volToSlider(v){ return Math.sqrt(Math.max(0,v)/0.04); }
 function saveHotkeys(){
   try{localStorage.setItem(LS_HK,JSON.stringify(hotkeys));}catch(e){}
 }
-let keepFocusForHotkeys=false;
-window.addEventListener('blur',()=>{if(keepFocusForHotkeys)setTimeout(()=>window.focus(),80);});
 
 function savePrefs(){
-  try{localStorage.setItem(LS_PREFS,JSON.stringify({bgColor,fps,hoopHeightPct,soundVol,soundThresh,keepFocusForHotkeys,hallwayViewerSize}));}catch(e){}
+  try{localStorage.setItem(LS_PREFS,JSON.stringify({bgColor,fps,hoopHeightPct,soundVol,soundThresh,hallwayViewerSize}));}catch(e){}
 }
 function saveAudioBytes(key,arrayBuffer){
-  if(!arrayBuffer){localStorage.removeItem(key);return;}
-  try{
-    const bytes=new Uint8Array(arrayBuffer);
-    let b64='';const chunk=8192;
-    for(let i=0;i<bytes.length;i+=chunk){b64+=String.fromCharCode(...bytes.subarray(i,i+chunk));}
-    localStorage.setItem(key,JSON.stringify({raw:btoa(b64)}));
-  }catch(e){console.warn('Could not save audio to localStorage (may be too large):',e);}
+  if(!arrayBuffer){idbDel(key).catch(()=>{});localStorage.removeItem(key);return;}
+  idbSet(key,arrayBuffer).catch(()=>{
+    // fallback: localStorage (may fail for large files)
+    try{
+      const bytes=new Uint8Array(arrayBuffer);
+      let b64='';const chunk=8192;
+      for(let i=0;i<bytes.length;i+=chunk){b64+=String.fromCharCode(...bytes.subarray(i,i+chunk));}
+      localStorage.setItem(key,JSON.stringify({raw:btoa(b64)}));
+    }catch(e){console.warn('Could not save audio:',e);}
+  });
 }
-function loadAudioBuffer(key,cb){
+function _loadAudioFromLS(key,cb){
   try{
     const stored=localStorage.getItem(key);if(!stored)return;
     const parsed=JSON.parse(stored);
     ensureAudio();
     if(parsed.raw){
-      // new format: original file bytes — decode directly
       const bytes=Uint8Array.from(atob(parsed.raw),c=>c.charCodeAt(0));
       audioCtx.decodeAudioData(bytes.buffer.slice(0),buf=>cb(buf),()=>{});
     }else if(parsed.b64){
-      // old format: decoded PCM floats — reconstruct AudioBuffer
       const bytes=Uint8Array.from(atob(parsed.b64),c=>c.charCodeAt(0));
       const floats=new Float32Array(bytes.buffer);
       const buf=audioCtx.createBuffer(parsed.ch,parsed.len,parsed.sr);
@@ -989,6 +1033,16 @@ function loadAudioBuffer(key,cb){
       cb(buf);
     }
   }catch(e){}
+}
+function loadAudioBuffer(key,cb){
+  idbGet(key).then(val=>{
+    if(val instanceof ArrayBuffer){
+      ensureAudio();
+      audioCtx.decodeAudioData(val.slice(0),buf=>cb(buf),()=>{});
+    }else{
+      _loadAudioFromLS(key,cb);
+    }
+  }).catch(()=>_loadAudioFromLS(key,cb));
 }
 function genId(){return'id_'+Date.now()+'_'+Math.random().toString(36).slice(2);}
 function saveCostumes(){
@@ -1004,6 +1058,7 @@ function saveCostumes(){
     }))));
     localStorage.setItem(LS_A,activeCostumeId||'');
   }catch(e){}
+  rebuildCostumeMap();
 }
 function saveHoop(){try{localStorage.setItem(LS_H,JSON.stringify(hoopFrames.map(f=>({id:f.id,src:f.img.src}))));}catch(e){}}
 function loadAll(){
@@ -1025,7 +1080,6 @@ function loadAll(){
       if(p.hoopHeightPct!=null){hoopHeightPct=p.hoopHeightPct;document.getElementById('hoopHeightSlider').value=hoopHeightPct;document.getElementById('hoopHeightVal').textContent=hoopHeightPct+'%';}
       if(p.soundVol!=null){soundVol=p.soundVol;document.getElementById('soundVol').value=volToSlider(soundVol);}
       if(p.soundThresh!=null){soundThresh=p.soundThresh;document.getElementById('soundThresh').value=soundThresh;}
-      if(p.keepFocusForHotkeys!=null){keepFocusForHotkeys=p.keepFocusForHotkeys;document.getElementById('keepFocusToggle').checked=keepFocusForHotkeys;}
       if(p.hallwayViewerSize!=null){hallwayViewerSize=p.hallwayViewerSize;document.getElementById('hallwayViewerSize').value=hallwayViewerSize;}
     }
   }catch(e){}
@@ -1034,7 +1088,7 @@ function loadAll(){
     if(raw){
       const data=JSON.parse(raw);
       let pending=data.reduce((s,c)=>s+c.frames.length,0);
-      const finish=()=>{activeCostumeId=localStorage.getItem(LS_A)||null;renderCostumeGrid();updateCostumeSelect();};
+      const finish=()=>{activeCostumeId=localStorage.getItem(LS_A)||null;rebuildCostumeMap();renderCostumeGrid();updateCostumeSelect();};
       if(!pending){costumes=data.map(d=>({...d,frames:[]}));finish();return;}
       data.forEach(cd=>{
         const c={id:cd.id,name:cd.name,frames:[],framesLeft:[],framesRight:[]};costumes.push(c);
@@ -1070,11 +1124,11 @@ function loadSoundsFromLS(){
   loadAudioBuffer(LS_RSND,buf=>{resizeBuffer=buf;document.getElementById('resizeSoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_BSND,buf=>{battleStartBuffer=buf;document.getElementById('battleStartSoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_HSND,buf=>{hitBuffer=buf;document.getElementById('hitSoundName').textContent='✓ (saved)';});
-  loadAudioBuffer(LS_KOSND,buf=>{koBuffer=buf;document.getElementById('koSoundName').textContent='✓ (saved)';});
-  loadAudioBuffer(LS_WINSND,buf=>{winBuffer=buf;document.getElementById('winSoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_STOMPSND,buf=>{stompBuffer=buf;document.getElementById('stompSoundName').textContent='✓ (saved)';});
-  loadAudioBuffer(LS_DVDSND,buf=>{dvdBounceBuffer=buf;document.getElementById('dvdBounceSoundName').textContent='✓ (saved)';});
   loadAudioBuffer(LS_WHIPSND,buf=>{whipBuffer=buf;document.getElementById('whipSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_BOMBSND,buf=>{bombBuffer=buf;document.getElementById('bombSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_NUKESND,buf=>{nukeBuffer=buf;document.getElementById('nukeSoundName').textContent='✓ (saved)';});
+  loadAudioBuffer(LS_FLASHBANGSND,buf=>{flashbangBuffer=buf;document.getElementById('flashbangSoundName').textContent='✓ (saved)';});
 }
 
 class Spire{
@@ -1279,7 +1333,7 @@ function playResize(){
 }
 
 function getCostumeFrames(costumeId,facingLeft,isMoving,isTalking){
-  const c=costumes.find(c=>c.id===costumeId);
+  const c=costumeMap.get(costumeId);
   if(!c)return[];
   const hasDir=(c.framesLeft&&c.framesLeft.length)||(c.framesRight&&c.framesRight.length);
   if(isTalking){
@@ -1303,8 +1357,8 @@ function bounceAll(){
   }
 }
 
-function adjustSize(delta){
-  config.size=Math.max(10,Math.min(120,config.size+delta));
+function adjustSize(delta, uncapped){
+  config.size=uncapped?Math.max(10,config.size+delta):Math.max(10,Math.min(120,config.size+delta));
   document.getElementById('size').value=config.size;
   document.getElementById('sv').textContent=config.size;
   for(let s of spires){s.r=config.size;s.mass=config.size/24;}
@@ -1388,7 +1442,7 @@ function draw(now){
 
     const framesD=getCostumeFrames(s.costumeId,s.facingLeft,Math.abs(s.vx)>0.3,false);
     const frame=framesD.length>0?framesD[s.frame%framesD.length]:null;
-    const c2=costumes.find(c=>c.id===s.costumeId);
+    const c2=costumeMap.get(s.costumeId);
     const hasDirFrames=c2&&((c2.framesLeft&&c2.framesLeft.length)||(c2.framesRight&&c2.framesRight.length));
 
     ctx.save();
@@ -1405,8 +1459,8 @@ function draw(now){
     ctx.restore();
   }
 
-  document.getElementById('count').textContent=spires.length;
-  document.getElementById('vcount').textContent=pets.length;
+  if(spires.length!==_lastSpireCount){document.getElementById('count').textContent=spires.length;_lastSpireCount=spires.length;}
+  if(pets.length!==_lastPetCount){document.getElementById('vcount').textContent=pets.length;_lastPetCount=pets.length;}
 }
 
 function loop(now){update(now);draw(now);requestAnimationFrame(loop);}
@@ -1675,7 +1729,6 @@ document.querySelectorAll('.stab').forEach(btn=>{
   });
 });
 document.getElementById('bgColor').addEventListener('input',function(){bgColor=this.value;savePrefs();});
-document.getElementById('keepFocusToggle').addEventListener('change',function(){keepFocusForHotkeys=this.checked;savePrefs();});
 document.getElementById('fps').addEventListener('input',function(){fps=Math.max(1,parseInt(this.value)||12);frameTime=1000/fps;savePrefs();});
 document.getElementById('viewerFpsInput').addEventListener('input',function(){viewerFps=Math.max(1,parseInt(this.value)||12);viewerFrameTime=1000/viewerFps;});
 document.getElementById('defaultPetSize').addEventListener('input',function(){
@@ -1827,22 +1880,22 @@ wireAudio('victorySoundUpBtn','victorySoundInput','victorySoundName',(buf,raw)=>
 wireAudio('resizeSoundUpBtn','resizeSoundInput','resizeSoundName',(buf,raw)=>{resizeBuffer=buf;saveAudioBytes(LS_RSND,raw);});
 wireAudio('battleStartSoundUpBtn','battleStartSoundInput','battleStartSoundName',(buf,raw)=>{battleStartBuffer=buf;saveAudioBytes(LS_BSND,raw);});
 wireAudio('hitSoundUpBtn','hitSoundInput','hitSoundName',(buf,raw)=>{hitBuffer=buf;saveAudioBytes(LS_HSND,raw);});
-wireAudio('koSoundUpBtn','koSoundInput','koSoundName',(buf,raw)=>{koBuffer=buf;saveAudioBytes(LS_KOSND,raw);});
-wireAudio('winSoundUpBtn','winSoundInput','winSoundName',(buf,raw)=>{winBuffer=buf;saveAudioBytes(LS_WINSND,raw);});
 wireAudio('stompSoundUpBtn','stompSoundInput','stompSoundName',(buf,raw)=>{stompBuffer=buf;saveAudioBytes(LS_STOMPSND,raw);});
-wireAudio('dvdBounceSoundUpBtn','dvdBounceSoundInput','dvdBounceSoundName',(buf,raw)=>{dvdBounceBuffer=buf;saveAudioBytes(LS_DVDSND,raw);});
 wireAudio('whipSoundUpBtn','whipSoundInput','whipSoundName',(buf,raw)=>{whipBuffer=buf;saveAudioBytes(LS_WHIPSND,raw);});
+wireAudio('bombSoundUpBtn','bombSoundInput','bombSoundName',(buf,raw)=>{bombBuffer=buf;saveAudioBytes(LS_BOMBSND,raw);});
+wireAudio('nukeSoundUpBtn','nukeSoundInput','nukeSoundName',(buf,raw)=>{nukeBuffer=buf;saveAudioBytes(LS_NUKESND,raw);});
+wireAudio('flashbangSoundUpBtn','flashbangSoundInput','flashbangSoundName',(buf,raw)=>{flashbangBuffer=buf;saveAudioBytes(LS_FLASHBANGSND,raw);});
 
-document.getElementById('soundClearBtn').addEventListener('click',()=>{collisionBuffer=null;localStorage.removeItem(LS_SND);document.getElementById('soundName').textContent='No sound loaded';});
-document.getElementById('victorySoundClearBtn').addEventListener('click',()=>{victoryBuffer=null;localStorage.removeItem(LS_VSND);document.getElementById('victorySoundName').textContent='No sound loaded';});
-document.getElementById('resizeSoundClearBtn').addEventListener('click',()=>{resizeBuffer=null;localStorage.removeItem(LS_RSND);document.getElementById('resizeSoundName').textContent='No sound loaded';});
-document.getElementById('battleStartSoundClearBtn').addEventListener('click',()=>{battleStartBuffer=null;localStorage.removeItem(LS_BSND);document.getElementById('battleStartSoundName').textContent='No sound loaded';});
-document.getElementById('hitSoundClearBtn').addEventListener('click',()=>{hitBuffer=null;localStorage.removeItem(LS_HSND);document.getElementById('hitSoundName').textContent='No sound loaded';});
-document.getElementById('koSoundClearBtn').addEventListener('click',()=>{koBuffer=null;localStorage.removeItem(LS_KOSND);document.getElementById('koSoundName').textContent='No sound loaded';});
-document.getElementById('winSoundClearBtn').addEventListener('click',()=>{winBuffer=null;localStorage.removeItem(LS_WINSND);document.getElementById('winSoundName').textContent='No sound loaded';});
-document.getElementById('stompSoundClearBtn').addEventListener('click',()=>{stompBuffer=null;localStorage.removeItem(LS_STOMPSND);document.getElementById('stompSoundName').textContent='No sound loaded';});
-document.getElementById('dvdBounceSoundClearBtn').addEventListener('click',()=>{dvdBounceBuffer=null;localStorage.removeItem(LS_DVDSND);document.getElementById('dvdBounceSoundName').textContent='No sound loaded';});
-document.getElementById('whipSoundClearBtn').addEventListener('click',()=>{whipBuffer=null;localStorage.removeItem(LS_WHIPSND);document.getElementById('whipSoundName').textContent='No sound loaded';});
+document.getElementById('soundClearBtn').addEventListener('click',()=>{collisionBuffer=null;idbDel(LS_SND).catch(()=>{});localStorage.removeItem(LS_SND);document.getElementById('soundName').textContent='No sound loaded';});
+document.getElementById('victorySoundClearBtn').addEventListener('click',()=>{victoryBuffer=null;idbDel(LS_VSND).catch(()=>{});localStorage.removeItem(LS_VSND);document.getElementById('victorySoundName').textContent='No sound loaded';});
+document.getElementById('resizeSoundClearBtn').addEventListener('click',()=>{resizeBuffer=null;idbDel(LS_RSND).catch(()=>{});localStorage.removeItem(LS_RSND);document.getElementById('resizeSoundName').textContent='No sound loaded';});
+document.getElementById('battleStartSoundClearBtn').addEventListener('click',()=>{battleStartBuffer=null;idbDel(LS_BSND).catch(()=>{});localStorage.removeItem(LS_BSND);document.getElementById('battleStartSoundName').textContent='No sound loaded';});
+document.getElementById('hitSoundClearBtn').addEventListener('click',()=>{hitBuffer=null;idbDel(LS_HSND).catch(()=>{});localStorage.removeItem(LS_HSND);document.getElementById('hitSoundName').textContent='No sound loaded';});
+document.getElementById('stompSoundClearBtn').addEventListener('click',()=>{stompBuffer=null;idbDel(LS_STOMPSND).catch(()=>{});localStorage.removeItem(LS_STOMPSND);document.getElementById('stompSoundName').textContent='No sound loaded';});
+document.getElementById('whipSoundClearBtn').addEventListener('click',()=>{whipBuffer=null;idbDel(LS_WHIPSND).catch(()=>{});localStorage.removeItem(LS_WHIPSND);document.getElementById('whipSoundName').textContent='No sound loaded';});
+document.getElementById('bombSoundClearBtn').addEventListener('click',()=>{bombBuffer=null;idbDel(LS_BOMBSND).catch(()=>{});localStorage.removeItem(LS_BOMBSND);document.getElementById('bombSoundName').textContent='No sound loaded';});
+document.getElementById('nukeSoundClearBtn').addEventListener('click',()=>{nukeBuffer=null;idbDel(LS_NUKESND).catch(()=>{});localStorage.removeItem(LS_NUKESND);document.getElementById('nukeSoundName').textContent='No sound loaded';});
+document.getElementById('flashbangSoundClearBtn').addEventListener('click',()=>{flashbangBuffer=null;idbDel(LS_FLASHBANGSND).catch(()=>{});localStorage.removeItem(LS_FLASHBANGSND);document.getElementById('flashbangSoundName').textContent='No sound loaded';});
 
 
 document.getElementById('soundVol').addEventListener('input',function(){
@@ -1857,15 +1910,14 @@ wireVolSlider('volHoop','volHoopVal','hoop');
 wireVolSlider('volResize','volResizeVal','resize');
 wireVolSlider('volBattleStart','volBattleStartVal','battleStart');
 wireVolSlider('volHit','volHitVal','hit');
-wireVolSlider('volKO','volKOVal','ko');
-wireVolSlider('volWin','volWinVal','win');
 wireVolSlider('volStomp','volStompVal','stomp');
-wireVolSlider('volDVD','volDVDVal','dvd');
 wireVolSlider('volWhip','volWhipVal','whip');
+wireVolSlider('volBomb','volBombVal','bomb');
+wireVolSlider('volNuke','volNukeVal','nuke');
+wireVolSlider('volFlashbang','volFlashbangVal','flashbang');
 document.getElementById('soundThresh').addEventListener('input',function(){soundThresh=parseFloat(this.value)||3;savePrefs();});
 document.addEventListener('pointerdown',()=>ensureAudio());
 
-function codeToDisplay(code){if(code==='Space')return'Space';if(code==='Equal')return'=';if(code==='Minus')return'-';return code.replace(/^Key/,'').replace(/^Digit/,'').replace(/^Arrow/,'');}
 function renderHotkeyRow(action,tr){
   tr.innerHTML='';
   const td1=document.createElement('td');td1.textContent=action.label;tr.appendChild(td1);
@@ -1933,12 +1985,8 @@ buildHotkeyTable(); // rebuild after load so restored keys are shown
 
 // ── pet state ─────────────────────────────────────────────
 let petFrames=[];
-let petFramesLeft=[],petFramesRight=[],petFramesIdle=[];
-// petFramesTalk: viewer costume talk state frames
-let petFramesTalk=[];
-let petFramesLeftTalk=[], petFramesRightTalk=[];
+let petFramesRight=[];
 function getPetFramesForDir(fl,mov,talking){
-  if(talking&&petFramesRightTalk.length)return petFramesRightTalk;
   if(petFramesRight.length)return petFramesRight;if(petFrames.length)return petFrames;return[];
 } // loaded images for walking animation
 let petSize=84, petSpeed=6*(30/100), maxPets=30, bubbleDur=5;
@@ -1978,12 +2026,15 @@ class ChatPet{
     this.grabbed=false; this.grabVX=0; this.grabVY=0;
     this.airborne=false;
     this.pinned=false; // when true, locked in place
+    this._stonesNeeded=0;
+    this._stealPinTimer=null;
     this.customImg=null; // per-viewer directional image overrides
     this.customImgForward=null;
     this.customImgLeft=null;
     this.customImgRight=null;
     // Battle Royale state
     this.hp=100; this.maxHp=100; this.alive=true;
+    this._showHPUntil=0;
     this.brCooldown=0;
     this.brAngle=0; // current rotation angle for attack animation
     this.brAngleTarget=0; // target rotation
@@ -2019,11 +2070,14 @@ class ChatPet{
     canvasWrap.appendChild(this.el);
     this.el.style.pointerEvents='auto';
 
-    this.el.addEventListener('mousedown',e=>{e.preventDefault();startGrabPet(this,e.clientX,e.clientY);});
-    this.el.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();releasePet();});
-    this.el.addEventListener('touchstart',e=>{e.preventDefault();const t=e.touches[0];startGrabPet(this,t.clientX,t.clientY);},{passive:false});
-    // right-click → assign custom image
-    this.el.addEventListener('contextmenu',e=>{e.preventDefault();e.stopPropagation();openPetImagePicker(this,e.clientX,e.clientY);});
+    this._onMousedown=e=>{e.preventDefault();startGrabPet(this,e.clientX,e.clientY);};
+    this._onDblclick=e=>{e.preventDefault();e.stopPropagation();releasePet();};
+    this._onTouchstart=e=>{e.preventDefault();const t=e.touches[0];startGrabPet(this,t.clientX,t.clientY);};
+    this._onContextmenu=e=>{e.preventDefault();e.stopPropagation();openPetImagePicker(this,e.clientX,e.clientY);};
+    this.el.addEventListener('mousedown',this._onMousedown);
+    this.el.addEventListener('dblclick',this._onDblclick);
+    this.el.addEventListener('touchstart',this._onTouchstart,{passive:false});
+    this.el.addEventListener('contextmenu',this._onContextmenu);
   }
   say(msg,emoteTag){
     this._inactiveFrames=0;
@@ -2057,7 +2111,7 @@ class ChatPet{
     const isTalking=!!(this.bubble&&this.bubbleTimer>0);
     const dirFrames=customFrame?null:getPetFramesForDir(this.facingLeft,isMoving,isTalking);
     const frames=customFrame?[customFrame]:(dirFrames&&dirFrames.length>0?dirFrames:[]);
-    const hasDir=(petFramesLeft.length>0||petFramesRight.length>0||petFramesIdle.length>0);
+    const hasDir=(petFramesRight.length>0||petFrames.length>0);
 
     if(frames.length>0){
       // hold on talk frame while talking — only cycle when not talking
@@ -2109,7 +2163,7 @@ class ChatPet{
     }
 
     // update DOM health bar
-    if((battleRoyaleActive||warActive||(kaijuActive&&!this._isRaidBoss)||this._inDuel||caneActive)&&this.alive){
+    if((battleRoyaleActive||warActive||(kaijuActive&&!this._isRaidBoss)||this._inDuel||caneActive||Date.now()<this._showHPUntil)&&this.alive){
       this.healthBarWrap.style.display='block';
       const ratio=Math.max(0,this.hp/this.maxHp);
       this.healthBarFill.style.width=(ratio*100)+'%';
@@ -2128,6 +2182,7 @@ class ChatPet{
     // pinned or menu-frozen — stay put, just draw
     if(this.pinned||this._menuFrozen){
       this.vx=0;this.vy=0;
+      if(this.bubbleTimer>0){this.bubbleTimer--;if(this.bubbleTimer<=0&&this.bubble){this.bubble.remove();this.bubble=null;this._talking=false;}}
       placePetEl(this);
       this.drawSprite(now);
       return;
@@ -2168,16 +2223,17 @@ class ChatPet{
       if(onSurface){
         // walking state — ensure viewer is always moving
         this.airborne=false;
-        if(Math.abs(this.vx)<0.3)this.vx=(Math.random()<0.5?-1:1)*(0.4+Math.random()*petSpeed);
+        const _spd=petSpeed*(this._speedMult||1);
+        if(Math.abs(this.vx)<0.3)this.vx=(Math.random()<0.5?-1:1)*(0.4+Math.random()*_spd);
         // gradually restore walking speed if too slow (e.g. after landing on a block)
-        const targetSpeed=(this.vx>=0?1:-1)*Math.max(0.5,Math.abs(this.vx)||petSpeed*0.6);
-        if(Math.abs(this.vx)<petSpeed*0.4)this.vx+=(targetSpeed-this.vx)*0.15;
+        const targetSpeed=(this.vx>=0?1:-1)*Math.max(0.5,Math.abs(this.vx)||_spd*0.6);
+        if(Math.abs(this.vx)<_spd*0.4)this.vx+=(targetSpeed-this.vx)*0.15;
         // random direction change — skip during block bounce cooldown
         if(Math.random()<0.005&&!this._blockBounce)this.vx*=-1;
-        const maxV=petSpeed*1.8;
+        const maxV=_spd*1.8;
         this.vx=Math.max(-maxV,Math.min(maxV,this.vx));
-        if(this.x<=0){this.x=0;this.vx=Math.abs(this.vx)||petSpeed*0.5;}
-        if(this.x+this.w>=W){this.x=W-this.w;this.vx=-(Math.abs(this.vx)||petSpeed*0.5);}
+        if(this.x<=0){this.x=0;this.vx=Math.abs(this.vx)||_spd*0.5;}
+        if(this.x+this.w>=W){this.x=W-this.w;this.vx=-(Math.abs(this.vx)||_spd*0.5);}
         for(const b of blocks){
           const margin=this.w*0.00005; // small buffer — close to visual edge
           const bx=b.x-margin, bx2=b.x+b.w+margin;
@@ -2277,7 +2333,13 @@ class ChatPet{
     placePetEl(this);
     this.drawSprite(now);
   }
-  destroy(){this.el.remove();}
+  destroy(){
+    this.el.removeEventListener('mousedown',this._onMousedown);
+    this.el.removeEventListener('dblclick',this._onDblclick);
+    this.el.removeEventListener('touchstart',this._onTouchstart);
+    this.el.removeEventListener('contextmenu',this._onContextmenu);
+    this.el.remove();
+  }
 }
 
 // ── grab logic ────────────────────────────────────────────
@@ -2349,15 +2411,13 @@ const __drawOrig=draw;
 })();
 
 // ── pet management ────────────────────────────────────────
-// petMap declared early above
-const _petMapAlias=petMap; // keep ref
 function getOrCreatePet(username,color){
   username=username.toLowerCase();
   if(ignoreList.has(username))return null;
   if(petMap[username])return petMap[username];
   // block new viewers from joining mid-event
   if(battleRoyaleActive||warActive||kaijuActive)return null;
-  if(Object.keys(petMap).length>=maxPets)return null;
+  if(pets.length>=maxPets)return null;
   const pet=new ChatPet(username,color);
   petMap[username]=pet;
   pets.push(pet);
@@ -2440,11 +2500,36 @@ ChatPet.prototype.update=function(now){
       }
     }
 
-    const H=window.innerHeight;
+    if(this.bubbleTimer>0){this.bubbleTimer--;if(this.bubbleTimer<=0&&this.bubble){this.bubble.remove();this.bubble=null;this._talking=false;}}
     placePetEl(this);
     this.el.style.transform='rotate('+this._swingAngle+'rad)';
     this.el.style.transformOrigin='top center';
     this.drawSprite(now);return;
+  }
+  if(this._dancing&&!this.grabbed){
+    if(this._hidden)return;
+    const g=config.gravity*0.4, gravDown=g>=0, H=window.innerHeight;
+    this.vy+=g; this.y+=this.vy;
+    if(gravDown){
+      if(this.y>=H-this.h){this.y=H-this.h;this.vy=0;this.airborne=false;}
+      if(this.y<0){this.y=0;this.vy=Math.abs(this.vy)*0.4;}
+    }else{
+      if(this.y<=0){this.y=0;this.vy=0;this.airborne=false;}
+      if(this.y+this.h>H){this.y=H-this.h;this.vy=-Math.abs(this.vy)*0.4;}
+    }
+    if(this.bubbleTimer>0){this.bubbleTimer--;if(!this.bubbleTimer&&this.bubble){this.bubble.remove();this.bubble=null;this._talking=false;}}
+    placePetEl(this);
+    this.drawSprite(now);
+    if(this._spinAngle!==undefined){
+      this.spriteEl.style.transformOrigin='center center';
+      this.spriteEl.style.transform='rotate('+this._spinAngle+'deg)';
+      this.el.style.transform='none';this.el.style.transformOrigin='';
+    }else{
+      this.spriteEl.style.transform='none';this.spriteEl.style.transformOrigin='';
+      this.el.style.transformOrigin='bottom center';
+      this.el.style.transform=this._danceTilt?'rotate('+this._danceTilt+'deg)':'none';
+    }
+    return;
   }
   if(!this.pinned&&this._swingAngle!==undefined){
     this._swingAngle=undefined;this._swingVel=undefined;this._pivotX=undefined;this._pivotY=undefined;
@@ -2541,6 +2626,8 @@ document.getElementById('petPinBtn').addEventListener('click',()=>{
     petImgTarget.vx=0;petImgTarget.vy=0;petImgTarget.airborne=false;
     petImgTarget.nameEl.textContent='📌 '+petImgTarget.username;
   } else {
+    petImgTarget._stonesNeeded=0;
+    clearTimeout(petImgTarget._stealPinTimer);petImgTarget._stealPinTimer=null;
     petImgTarget.nameEl.textContent=petImgTarget.username;
   }
   closePetImagePicker();
@@ -2610,6 +2697,16 @@ let battleRoyaleActive=false;
 let brInterval=null;
 let _simBrCleanup=false;
 
+const brKillFeedEl=document.getElementById('brKillFeed');
+function _brKillFeedVis(){brKillFeedEl.style.display=(battleRoyaleActive&&currentViewMode!=='fullscreen')?'flex':'none';}
+function addKillFeedEntry(killer,victim){
+  const el=document.createElement('div');
+  el.className='brKE';
+  el.textContent='⚔️ '+killer+' → '+victim;
+  brKillFeedEl.prepend(el);
+  while(brKillFeedEl.children.length>5)brKillFeedEl.lastChild.remove();
+}
+
 function startBattleRoyale(){
   if(pets.length<2){return;}
   battleRoyaleActive=true;
@@ -2631,6 +2728,8 @@ function startBattleRoyale(){
   });
   clearInterval(brInterval);
   brInterval=setInterval(_brTick,brCheckInterval);
+  brKillFeedEl.innerHTML='';
+  _brKillFeedVis();
 }
 
 function _brTick(){
@@ -2638,8 +2737,9 @@ function _brTick(){
   const alive=pets.filter(p=>p.alive);
   if(alive.length<=1){
     if(alive.length===1){
-      alive[0].say('👑 I WIN!');ensureAudio();playEventSound(winBuffer,'win');alive[0].brAngleTarget=0;
+      alive[0].say('👑 I WIN!');alive[0].brAngleTarget=0;
       addCoins(alive[0].username, COIN_BR_WIN);
+      sendBotMsg('@' + alive[0].username + ' wins the Battle Royale! 🏆 +' + COIN_BR_WIN + ' coins!');
       setTimeout(() => getCoins(alive[0].username, c => alive[0].say('🪙 +' + COIN_BR_WIN + ' (' + c + ' total)')), 1500);
     }
     endBattleRoyale();return;
@@ -2675,13 +2775,14 @@ function _brTick(){
         spawnBloodSplatter(nearest);
         if(nearest.hp<=0){
           nearest.alive=false;
+          addKillFeedEntry(p.username,nearest.username);
           if(nearest.bubble){nearest.bubble.remove();nearest.bubble=null;}
           nearest.healthBarWrap.style.display='none';
           nearest.brAngleTarget=Math.PI*4*(Math.random()<0.5?1:-1);
           nearest.vx=(Math.random()<0.5?-1:1)*(10+Math.random()*8);
           nearest.vy=-(8+Math.random()*5);nearest.airborne=true;
           nearest.el.style.transition='opacity 0.8s';nearest.el.style.opacity='0';
-          playEventSound(koBuffer,'ko');
+
           setTimeout(()=>{if(!nearest.alive)nearest.el.style.display='none';},900);
         }
       } else {p.brCooldown=15;p.vx-=dx/dist*2;}
@@ -2692,6 +2793,7 @@ function _brTick(){
 function endBattleRoyale(){
   battleRoyaleActive=false;
   clearInterval(brInterval);brInterval=null;
+  brKillFeedEl.innerHTML='';_brKillFeedVis();
   const doClean=_simBrCleanup;
   _simBrCleanup=false;
   if(doClean){
@@ -2826,19 +2928,33 @@ function buildTeamConfigUI(){
   });
 }
 
-// legacy compat vars (kept in case other code refs them)
-let teamAEmoji='⚔️', teamBEmoji='🛡️', teamACry='For glory!', teamBCry='Hold the line!';
 let brCheckInterval=180, brAttackRange=2.8;
 let bloodEnabled=true, bloodScale=1;
 
 // ══════════════════════════════════════════════════════════
 // COIN SYSTEM
 // ══════════════════════════════════════════════════════════
-const COINS_API    = 'https://script.google.com/macros/s/AKfycbwCgSbszPkbVBh5FIySrfM5JrWcgtXRQH1piDYSJCLS0KMfWL9xsCnfsd6A5s1NwxF4/exec';
+let COINS_API = localStorage.getItem(LS_COINS_API) || '';
 const COIN_DUEL_WIN  = 100;
 const COIN_DUEL_LOSE = 50;
 const COIN_BR_WIN    = 300;
 const COIN_WAR_WIN   = 150;
+
+const SLOT_SYMBOLS=[
+  {sym:'🍒',weight:35,pay:3},
+  {sym:'🍋',weight:25,pay:5},
+  {sym:'🍊',weight:18,pay:8},
+  {sym:'🍇',weight:12,pay:15},
+  {sym:'🔔',weight:6, pay:25},
+  {sym:'⭐',weight:3, pay:50},
+  {sym:'💎',weight:1, pay:200},
+];
+function _slotRoll(){
+  const total=SLOT_SYMBOLS.reduce((s,x)=>s+x.weight,0);
+  let r=Math.random()*total;
+  for(const s of SLOT_SYMBOLS){r-=s.weight;if(r<=0)return s;}
+  return SLOT_SYMBOLS[SLOT_SYMBOLS.length-1];
+}
 
 function addCoins(username, delta) {
   fetch(COINS_API, {
@@ -2849,7 +2965,7 @@ function addCoins(username, delta) {
 }
 
 function getCoins(username, cb) {
-  fetch(COINS_API + '?user=' + encodeURIComponent(username.toLowerCase()))
+  fetch(COINS_API + '?user=' + encodeURIComponent(username.toLowerCase()) + '&_=' + Date.now())
     .then(r => r.json())
     .then(d => cb(d.coins ?? 0))
     .catch(() => cb(0));
@@ -2863,8 +2979,22 @@ function buyItem(username, item, cb) {
   }).then(r => r.json()).then(cb).catch(() => cb({ error: 'network' }));
 }
 
+function getShop(cb){
+  fetch(COINS_API+'?action=shop&_='+Date.now())
+    .then(r=>r.json())
+    .then(d=>cb(d.shop??[]))
+    .catch(()=>cb([]));
+}
+
+function getLeaderboard(cb){
+  fetch(COINS_API+'?action=leaderboard&_='+Date.now())
+    .then(r=>r.json())
+    .then(d=>cb(d.leaderboard??[]))
+    .catch(()=>cb([]));
+}
+
 function getInventory(username, cb) {
-  fetch(COINS_API + '?action=inventory&user=' + encodeURIComponent(username.toLowerCase()))
+  fetch(COINS_API + '?action=inventory&user=' + encodeURIComponent(username.toLowerCase()) + '&_=' + Date.now())
     .then(r => r.json())
     .then(d => cb(d.inventory ?? []))
     .catch(() => cb([]));
@@ -2877,6 +3007,22 @@ function removeItem(username, item, cb) {
     headers: { 'Content-Type': 'text/plain' }
   }).then(r => r.json()).then(d => cb && cb(d)).catch(() => cb && cb({ error: 'network' }));
 }
+
+function get4DInfo(cb) {
+  if(!COINS_API){cb&&cb(null);return;}
+  fetch(COINS_API+'?action=4d_info&_='+Date.now())
+    .then(r=>r.json()).then(d=>cb&&cb(d)).catch(()=>cb&&cb(null));
+}
+
+function play4D(username, guess, cb) {
+  if(!COINS_API){cb&&cb(null);return;}
+  fetch(COINS_API, {
+    method: 'POST',
+    body: JSON.stringify({ user: username.toLowerCase(), action: '4d', guess }),
+    headers: { 'Content-Type': 'text/plain' }
+  }).then(r=>r.json()).then(d=>cb&&cb(d)).catch(()=>cb&&cb(null));
+}
+
 
 // ══════════════════════════════════════════════════════════
 // WAR MODE
@@ -2934,13 +3080,16 @@ function startWar(){
     if(teamsAlive.length<=1){
       if(teamsAlive.length===1){
         const wt=teamsAlive[0];
-        const survivors=pets.filter(p=>p.alive&&p.team===wt.id);
-        survivors.forEach(p=>{
-          p.say(wt.emoji+' VICTORY!');
+        const _warWinners=pets.filter(p=>p.team===wt.id);
+        sendBotMsg(wt.emoji+' '+_warWinners.map(p=>'@'+p.username).join(', ')+' win the Battle! Each gets '+COIN_WAR_WIN+' coins! 🎖️');
+        // reward every member of the winning team, alive or not
+        _warWinners.forEach(p=>{
           addCoins(p.username, COIN_WAR_WIN);
-          setTimeout(() => getCoins(p.username, c => p.say('🪙 +' + COIN_WAR_WIN + ' (' + c + ' total)')), 1500);
+          if(p.alive){
+            p.say(wt.emoji+' VICTORY!');
+            setTimeout(() => getCoins(p.username, c => p.say('🪙 +' + COIN_WAR_WIN + ' (' + c + ' total)')), 1500);
+          }
         });
-        ensureAudio();playEventSound(winBuffer,'win');
       }
       endWar();return;
     }
@@ -3022,10 +3171,6 @@ function endWar(){
   },2500);
 }
 
-// also expose warActive to health bar drawing
-// (reuse battleRoyaleActive check — patch drawSprite to also show HP in war)
-const _origBattleCheck=()=>battleRoyaleActive||warActive;
-
 // ── fight settings wiring ─────────────────────────────────
 document.getElementById('numWarTeams').addEventListener('change',function(){
   numWarTeamsCount=parseInt(this.value)||2;
@@ -3050,6 +3195,25 @@ document.getElementById('coinCheckBtn').addEventListener('click',function(){
   const msg=document.getElementById('coinMsg');
   if(!user){msg.textContent='Enter a username.';return;}
   getCoins(user,c=>{msg.textContent=user+': 🪙 '+c+' coins';});
+});
+(function(){
+  const saved=localStorage.getItem(LS_COINS_API);
+  if(saved)document.getElementById('coinsApiMsg').textContent='✓ Custom URL saved';
+})();
+document.getElementById('coinsApiSaveBtn').addEventListener('click',function(){
+  const val=document.getElementById('coinsApiInput').value.trim();
+  const msg=document.getElementById('coinsApiMsg');
+  if(!val){msg.textContent='Paste a URL first.';return;}
+  COINS_API=val;
+  localStorage.setItem(LS_COINS_API,val);
+  document.getElementById('coinsApiInput').value='';
+  msg.textContent='✓ URL saved';
+});
+document.getElementById('coinsApiClearBtn').addEventListener('click',function(){
+  COINS_API='';
+  localStorage.removeItem(LS_COINS_API);
+  document.getElementById('coinsApiInput').value='';
+  document.getElementById('coinsApiMsg').textContent='URL cleared';
 });
 document.getElementById('bloodEnabledToggle').addEventListener('change',function(){bloodEnabled=this.checked;});
 document.getElementById('bloodScaleInput').addEventListener('input',function(){bloodScale=Math.max(0.1,parseFloat(this.value)||1);});
@@ -3133,12 +3297,25 @@ function _doConnect(){
       }
       // chat message
       const pm=msg.match(/^:(\w+)!\w+@\S+ PRIVMSG #\S+ :(.+)$/);
-      // raid detection — Twitch sends USERNOTICE with msg-id=raid
+      // USERNOTICE: raid + watch streak share
       const un=msg.match(/^:tmi\.twitch\.tv USERNOTICE #\S+/)||msg.match(/USERNOTICE #\S+/);
       if(un&&tags['msg-id']==='raid'){
         const raiderName=tags['display-name']||tags['login']||'Raider';
         const raiderCount=parseInt(tags['msg-param-viewerCount']||'1',10)||1;
         setTimeout(()=>startRaidKaiju(raiderName,raiderCount),1000);
+      }
+      if(un&&tags['msg-id']==='viewermilestone'&&tags['msg-param-category']==='watch-streak'){
+        const username=tags['display-name']||tags['login']||'';
+        const streak=parseInt(tags['msg-param-value']||'0',10);
+        if(username&&streak>0){
+          const bonus=streak*5;
+          addCoins(username,bonus);
+          setTimeout(()=>{
+            const p=petMap[username.toLowerCase()];
+            if(p&&p.alive)p.say('🔥 '+streak+' stream streak! +'+bonus+' 🪙');
+            getCoins(username,c=>sendBotMsg('@'+username+' 🔥 '+streak+'-stream watch streak! +'+bonus+' coins ('+c+' total)'));
+          },800);
+        }
       }
       if(pm){
         const username=tags['display-name']||pm[1];
@@ -3156,42 +3333,65 @@ function _doConnect(){
           if(cmdTrigger===cmd('battleroyale'))setTimeout(startBattleRoyale,500);
           if(cmdTrigger===cmd('war'))setTimeout(startWar,500);
           if(cmdTrigger===cmd('kaiju'))setTimeout(startKaiju,500);
-          if(cmdTrigger==='!addcoin'||cmdTrigger==='!removecoin'){
+          if(cmdTrigger===cmd('spawn'))execViewerCmd('spawn',username,cmdArgs);
+          if(cmdTrigger===cmd('despawn'))execViewerCmd('despawn',username,cmdArgs);
+          if(cmdTrigger===cmd('tuck'))execViewerCmd('tuck',username,cmdArgs);
+          if(cmdTrigger==='!addcoin'||cmdTrigger==='!addcoins'||cmdTrigger==='!removecoin'||cmdTrigger==='!removecoins'){
             const target=(cmdArgs[0]||'').replace(/^@/,'').toLowerCase();
             const amount=parseInt(cmdArgs[1])||0;
             if(target&&amount>0){
-              const delta=cmdTrigger==='!addcoin'?amount:-amount;
+              const delta=(cmdTrigger==='!addcoin'||cmdTrigger==='!addcoins')?amount:-amount;
               addCoins(target,delta);
               setTimeout(()=>getCoins(target,c=>{
                 const p=petMap[username.toLowerCase()];
                 if(p)p.say((delta>0?'+ ':'- ')+Math.abs(delta)+' 🪙 → '+target+': '+c);
+                const sign=delta>0?'+':'-';
+                sendBotMsg('@'+target+' '+sign+Math.abs(delta)+' 🪙 ('+c+' total)');
               }),1200);
             }
           }
         }
-        // viewer commands
-        if(cmdTrigger===cmd('attack'))execViewerCmd('attack',username,cmdArgs);
+        // viewer commands — during active fights only !jump is allowed
+        const inFight=battleRoyaleActive||warActive||kaijuActive;
         if(cmdTrigger===cmd('jump'))execViewerCmd('jump',username,cmdArgs);
-        if(cmdTrigger===cmd('duel'))execViewerCmd('duel',username,cmdArgs);
-        if(cmdTrigger===cmd('fight'))execViewerCmd('duel',username,cmdArgs);
-        if(cmdTrigger===cmd('punch'))execViewerCmd('punch',username,cmdArgs);
-        if(cmdTrigger===cmd('pledge'))execViewerCmd('pledge',username,cmdArgs);
-        if(cmdTrigger===cmd('spawn'))execViewerCmd('spawn',username,cmdArgs);
-        if(cmdTrigger===cmd('ballin'))execViewerCmd('ballin',username,cmdArgs);
-        if(cmdTrigger===cmd('bounce'))execViewerCmd('bounce',username,cmdArgs);
-        if(cmdTrigger===cmd('float'))execViewerCmd('float',username,cmdArgs);
-        if(cmdTrigger===cmd('shrink'))execViewerCmd('shrink',username,cmdArgs);
-        if(cmdTrigger===cmd('grow'))execViewerCmd('grow',username,cmdArgs);
-        if(cmdTrigger===cmd('despawn'))execViewerCmd('despawn',username,cmdArgs);
-        if(cmdTrigger===cmd('lurk'))execViewerCmd('lurk',username,cmdArgs);
-        if(cmdTrigger===cmd('vanish'))execViewerCmd('lurk',username,cmdArgs);
-        if(cmdTrigger===cmd('v'))execViewerCmd('lurk',username,cmdArgs);
-        if(cmdTrigger===cmd('hug'))execViewerCmd('hug',username,cmdArgs);
-        if(cmdTrigger===cmd('eat'))execViewerCmd('eat',username,cmdArgs);
-        if(cmdTrigger===cmd('coins'))execViewerCmd('coins',username,cmdArgs);
-        if(cmdTrigger===cmd('inventory'))execViewerCmd('inventory',username,cmdArgs);
-        if(cmdTrigger===cmd('buy'))execViewerCmd('buy',username,cmdArgs);
-        if(cmdTrigger===cmd('bomb'))execViewerCmd('bomb',username,cmdArgs);
+        if(cmdTrigger===cmd('dance'))execViewerCmd('dance',username,cmdArgs);
+        if(cmdTrigger===cmd('spin'))execViewerCmd('spin',username,cmdArgs);
+        if(cmdTrigger===cmd('attack'))execViewerCmd('attack',username,cmdArgs); // always on — needed to damage kaiju
+        if(cmdTrigger===cmd('speed'))execViewerCmd('speed',username,cmdArgs);
+        if(cmdTrigger===cmd('growth'))execViewerCmd('growth',username,cmdArgs);
+        if(!inFight){
+          if(cmdTrigger===cmd('duel'))execViewerCmd('duel',username,cmdArgs);
+          if(cmdTrigger===cmd('fight'))execViewerCmd('duel',username,cmdArgs);
+          if(cmdTrigger==='!accept')execViewerCmd('accept',username,cmdArgs);
+          if(cmdTrigger==='!decline')execViewerCmd('decline',username,cmdArgs);
+          if(cmdTrigger===cmd('punch'))execViewerCmd('punch',username,cmdArgs);
+          if(cmdTrigger===cmd('pledge'))execViewerCmd('pledge',username,cmdArgs);
+          if(cmdTrigger===cmd('ballin'))execViewerCmd('ballin',username,cmdArgs);
+          if(cmdTrigger===cmd('bounce'))execViewerCmd('bounce',username,cmdArgs);
+          if(cmdTrigger===cmd('float'))execViewerCmd('float',username,cmdArgs);
+          if(cmdTrigger===cmd('unfloat'))execViewerCmd('unfloat',username,cmdArgs);
+          if(cmdTrigger===cmd('shrink'))execViewerCmd('shrink',username,cmdArgs);
+          if(cmdTrigger===cmd('grow'))execViewerCmd('grow',username,cmdArgs);
+          if(cmdTrigger===cmd('lurk'))execViewerCmd('lurk',username,cmdArgs);
+          if(cmdTrigger===cmd('vanish'))execViewerCmd('lurk',username,cmdArgs);
+          if(cmdTrigger===cmd('v'))execViewerCmd('lurk',username,cmdArgs);
+          if(cmdTrigger===cmd('hug'))execViewerCmd('hug',username,cmdArgs);
+          if(cmdTrigger===cmd('kiss'))execViewerCmd('kiss',username,cmdArgs);
+          if(cmdTrigger===cmd('eat'))execViewerCmd('eat',username,cmdArgs);
+          if(cmdTrigger===cmd('coins')||cmdTrigger===cmd('coins').replace(/s$/,'')||cmdTrigger===cmd('coins')+'s')execViewerCmd('coins',username,cmdArgs);
+          if(cmdTrigger===cmd('inventory'))execViewerCmd('inventory',username,cmdArgs);
+          if(cmdTrigger===cmd('shop'))execViewerCmd('shop',username,cmdArgs);
+          if(cmdTrigger===cmd('buy'))execViewerCmd('buy',username,cmdArgs);
+          if(cmdTrigger==='!leaderboard'||cmdTrigger==='!lb')execViewerCmd('leaderboard',username,cmdArgs);
+          if(cmdTrigger===cmd('bomb'))execViewerCmd('bomb',username,cmdArgs);
+          if(cmdTrigger===cmd('flashbang'))execViewerCmd('flashbang',username,cmdArgs);
+          if(cmdTrigger===cmd('nuke'))execViewerCmd('nuke',username,cmdArgs);
+          if(cmdTrigger===cmd('steal'))execViewerCmd('steal',username,cmdArgs);
+          if(cmdTrigger===cmd('stone'))execViewerCmd('stone',username,cmdArgs);
+          if(cmdTrigger===cmd('gift'))execViewerCmd('gift',username,cmdArgs);
+          if(cmdTrigger===cmd('bet')||cmdTrigger==='!gamble')execViewerCmd('bet',username,cmdArgs);
+          if(cmdTrigger===cmd('4d')||cmdTrigger==='!toto')execViewerCmd('4d',username,cmdArgs);
+        }
       }
     }
   };
@@ -3214,6 +3414,189 @@ function setTwitchStatus(msg,color){
   if(el){el.textContent=msg;el.style.color=color||'rgba(255,255,255,0.35)';}
 }
 
+// ── Bot IRC + EventSub ────────────────────────────────────
+let botWS=null,botConnected=false;
+let _botUser='',_botToken='',_broadcasterToken='',_botClientId='',_broadcasterId='';
+let _eventSubWS=null,_botIRCReconnectTimer=null,_eventSubReconnectTimer=null;
+let _tokenExpiryAt=0,_tokenExpiryInterval=null;
+
+function _fmtExpiry(secsRemaining){
+  if(secsRemaining<=0)return'expired';
+  const h=Math.floor(secsRemaining/3600);
+  const m=Math.floor((secsRemaining%3600)/60);
+  return h>0?h+'h '+m+'m':m+'m';
+}
+
+async function _startTokenExpiryWatch(token){
+  clearInterval(_tokenExpiryInterval);
+  try{
+    const v=await fetch('https://id.twitch.tv/oauth2/validate',{
+      headers:{'Authorization':'OAuth '+token}
+    }).then(r=>r.json());
+    if(v.status===401){setBroadcasterStatus('Redemptions active ✓ — ⚠️ token invalid!','rgba(220,150,50,0.9)');return;}
+    _tokenExpiryAt=Date.now()+(v.expires_in*1000);
+    const update=()=>{
+      const secs=Math.max(0,Math.floor((_tokenExpiryAt-Date.now())/1000));
+      const color=secs<3600?'rgba(220,150,50,0.9)':'rgba(30,200,100,0.8)';
+      setBroadcasterStatus('Redemptions active ✓ — token expires in '+_fmtExpiry(secs),color);
+      if(secs===0){clearInterval(_tokenExpiryInterval);setBroadcasterStatus('Redemptions active ✓ — ⚠️ token expired — reconnect may fail','rgba(220,80,80,0.9)');}
+    };
+    update();
+    _tokenExpiryInterval=setInterval(update,60000);
+  }catch(e){setBroadcasterStatus('Redemptions active ✓ — could not check token expiry','rgba(30,200,100,0.8)');}
+}
+
+function setBotStatus(msg,color){
+  const el=document.getElementById('botStatus');
+  if(el){el.textContent=msg;el.style.color=color||'rgba(255,255,255,0.35)';}
+}
+function setBroadcasterStatus(msg,color){
+  const el=document.getElementById('broadcasterStatus');
+  if(el){el.textContent=msg;el.style.color=color||'rgba(255,255,255,0.35)';}
+}
+
+function sendBotMsg(text){
+  if(!botWS||!botConnected||!twitchChannel)return;
+  botWS.send('PRIVMSG #'+twitchChannel+' :'+text);
+}
+
+function handleRedemption(rewardTitle,username,userInput){
+  if(rewardTitle==='Pet'){
+    const pet=getOrCreatePet(username);
+    if(pet)pet.say('🐾 Thanks for the redeem!');
+  } else if(rewardTitle==='FIRST!'){
+    addCoins(username,250);
+    setTimeout(()=>getCoins(username,c=>{
+      sendBotMsg('@'+username+' scored FIRST! 🥇 +250 🪙 ('+c+' total)');
+    }),1200);
+  } else if(rewardTitle==='CHECK IN'){
+    addCoins(username,50);
+    setTimeout(()=>getCoins(username,c=>{
+      sendBotMsg('@'+username+' checked in! ✅ +50 🪙 ('+c+' total)');
+    }),1200);
+  }
+  const log=document.getElementById('redemptionLog');
+  if(log){
+    if(log.querySelector('span[data-empty]'))log.innerHTML='';
+    const now=new Date();
+    const ts=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0')+':'+now.getSeconds().toString().padStart(2,'0');
+    const row=document.createElement('div');
+    row.style.cssText='border-bottom:0.5px solid rgba(255,255,255,0.06);padding-bottom:3px;';
+    row.innerHTML='<span style="color:rgba(255,255,255,0.3);">['+ts+']</span> <span style="color:#b8b2ff;">'+username+'</span> → <span style="color:rgba(255,198,3,0.9);">'+rewardTitle+'</span>'+(userInput?'<span style="color:rgba(255,255,255,0.4);"> — '+userInput+'</span>':'');
+    log.appendChild(row);
+    while(log.children.length>20)log.removeChild(log.firstChild);
+    log.scrollTop=log.scrollHeight;
+  }
+}
+
+function _connectBotIRC(){
+  if(botWS){try{botWS.onclose=null;botWS.close();}catch(e){}botWS=null;}
+  clearTimeout(_botIRCReconnectTimer);
+  if(!_botToken||!twitchChannel)return;
+  const ws=new WebSocket('wss://irc-ws.chat.twitch.tv:443');
+  botWS=ws;
+  ws.onopen=()=>{
+    ws.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
+    ws.send('PASS oauth:'+_botToken);
+    ws.send('NICK '+_botUser);
+    ws.send('JOIN #'+twitchChannel);
+  };
+  ws.onmessage=ev=>{
+    for(const line of ev.data.split('\r\n')){
+      if(!line)continue;
+      if(line.startsWith('PING')){ws.send('PONG :tmi.twitch.tv');continue;}
+      if(/\s376\s|\s001\s/.test(line)){botConnected=true;setBotStatus('Bot connected as '+_botUser+' ✓','rgba(30,200,100,0.8)');}
+      if(line.includes('Login authentication failed')){setBotStatus('Bot auth failed — check token','rgba(220,80,80,0.8)');}
+    }
+  };
+  ws.onerror=()=>setBotStatus('Bot IRC error','rgba(220,80,80,0.8)');
+  ws.onclose=()=>{
+    botConnected=false;
+    if(_botToken&&twitchChannel)_botIRCReconnectTimer=setTimeout(_connectBotIRC,10000);
+  };
+}
+
+function _connectEventSub(url){
+  if(_eventSubWS){try{_eventSubWS.onclose=null;_eventSubWS.close();}catch(e){}}_eventSubWS=null;
+  clearTimeout(_eventSubReconnectTimer);
+  if(!_broadcasterToken||!_broadcasterId)return;
+  const ws=new WebSocket(url||'wss://eventsub.wss.twitch.tv/ws');
+  _eventSubWS=ws;
+  ws.onmessage=async ev=>{
+    let msg;try{msg=JSON.parse(ev.data);}catch(e){return;}
+    const type=msg.metadata?.message_type;
+    if(type==='session_welcome'){
+      const sid=msg.payload.session.id;
+      const bc={broadcaster_user_id:_broadcasterId};
+      const transport={method:'websocket',session_id:sid};
+      const esub=async(evtType,version)=>{
+        try{await fetch('https://api.twitch.tv/helix/eventsub/subscriptions',{
+          method:'POST',
+          headers:{'Client-Id':_botClientId,'Authorization':'Bearer '+_broadcasterToken,'Content-Type':'application/json'},
+          body:JSON.stringify({type:evtType,version,condition:bc,transport})
+        }).then(r=>r.json());}catch(e){}
+      };
+      try{
+        const r=await fetch('https://api.twitch.tv/helix/eventsub/subscriptions',{
+          method:'POST',
+          headers:{'Client-Id':_botClientId,'Authorization':'Bearer '+_broadcasterToken,'Content-Type':'application/json'},
+          body:JSON.stringify({type:'channel.channel_points_custom_reward_redemption.add',version:'1',condition:bc,transport})
+        }).then(r=>r.json());
+        if(r.data){_startTokenExpiryWatch(_broadcasterToken);}
+        else{setBroadcasterStatus('Sub failed: '+(r.message||'unknown'),'rgba(220,80,80,0.8)');}
+      }catch(e){setBroadcasterStatus('Sub error: '+e.message,'rgba(220,80,80,0.8)');}
+      esub('channel.subscribe','1');
+      esub('channel.subscription.gift','1');
+      esub('channel.subscription.message','1');
+      esub('channel.cheer','1');
+    }
+    if(type==='session_reconnect'){_connectEventSub(msg.payload.session.reconnect_url);}
+    if(type==='notification'&&msg.payload?.event){
+      const evt=msg.payload.event;
+      const subtype=msg.payload.subscription?.type||'';
+      if(subtype==='channel.channel_points_custom_reward_redemption.add'){
+        handleRedemption(evt.reward.title,evt.user_name||evt.user_login,evt.user_input||'');
+      }else if(subtype==='channel.subscribe'||subtype==='channel.subscription.gift'||subtype==='channel.subscription.message'){
+        celebratePets(evt.user_name||evt.user_login||'','sub');
+      }else if(subtype==='channel.cheer'){
+        celebratePets(evt.user_name||evt.user_login||'','bits');
+      }
+    }
+  };
+  ws.onclose=()=>{
+    if(_broadcasterToken&&_broadcasterId)_eventSubReconnectTimer=setTimeout(()=>_connectEventSub('wss://eventsub.wss.twitch.tv/ws'),10000);
+  };
+}
+
+function connectBroadcaster(broadcasterToken,clientId,broadcasterId){
+  _broadcasterToken=broadcasterToken.replace(/^oauth:/i,'');
+  _botClientId=clientId;
+  _broadcasterId=broadcasterId;
+  _connectEventSub('wss://eventsub.wss.twitch.tv/ws');
+}
+
+function disconnectBroadcaster(){
+  _broadcasterToken='';_botClientId='';_broadcasterId='';
+  clearTimeout(_eventSubReconnectTimer);
+  clearInterval(_tokenExpiryInterval);_tokenExpiryInterval=null;
+  if(_eventSubWS){try{_eventSubWS.onclose=null;_eventSubWS.close();}catch(e){}}_eventSubWS=null;
+  setBroadcasterStatus('Disconnected','rgba(255,255,255,0.35)');
+}
+
+function connectBotChat(user,botToken){
+  _botUser=user.toLowerCase();
+  _botToken=botToken.replace(/^oauth:/i,'');
+  _connectBotIRC();
+}
+
+function disconnectBotChat(){
+  _botToken='';
+  clearTimeout(_botIRCReconnectTimer);
+  if(botWS){try{botWS.onclose=null;botWS.close();}catch(e){}botWS=null;}
+  botConnected=false;
+  setBotStatus('Disconnected','rgba(255,255,255,0.35)');
+}
+
 // ── Twitch settings wiring ────────────────────────────────
 document.getElementById('ignoreListInput').addEventListener('input',function(){ignoreList=new Set(this.value.split('\n').map(s=>s.trim().toLowerCase()).filter(Boolean));saveIgnoreList();});
 (function(){try{const r=localStorage.getItem(LS_IGNORE);if(r)document.getElementById('ignoreListInput').value=JSON.parse(r).join('\n');}catch(e){}})();
@@ -3228,6 +3611,70 @@ document.getElementById('twitchDisconnectBtn').addEventListener('click',()=>{
   localStorage.removeItem(LS_TCHAN);
   setTwitchStatus('Disconnected','rgba(255,255,255,0.35)');
 });
+// ── Bot wiring ────────────────────────────────────────────
+(function(){
+  if(localStorage.getItem(LS_BROADCASTER_TOKEN))setBroadcasterStatus('✓ Credentials saved','rgba(255,198,3,0.7)');
+  if(localStorage.getItem(LS_BOT_TOKEN))setBotStatus('✓ Credentials saved','rgba(255,198,3,0.7)');
+})();
+document.getElementById('broadcasterConnectBtn').addEventListener('click',async function(){
+  let broadcasterToken=document.getElementById('broadcasterToken').value.trim();
+  let clientId=document.getElementById('botClientId').value.trim();
+  if(!broadcasterToken)broadcasterToken=localStorage.getItem(LS_BROADCASTER_TOKEN)||'';
+  if(!clientId)clientId=localStorage.getItem(LS_BOT_CLIENTID)||'';
+  if(!broadcasterToken||!clientId){setBroadcasterStatus('Fill in token and Client ID','rgba(220,80,80,0.8)');return;}
+  if(!twitchChannel){setBroadcasterStatus('Connect to a Twitch channel first','rgba(220,80,80,0.8)');return;}
+  setBroadcasterStatus('Looking up broadcaster…','rgba(255,200,50,0.8)');
+  const cleanToken=broadcasterToken.replace(/^oauth:/i,'');
+  localStorage.setItem(LS_BROADCASTER_TOKEN,cleanToken);
+  localStorage.setItem(LS_BOT_CLIENTID,clientId);
+  document.getElementById('broadcasterToken').value='';
+  document.getElementById('botClientId').value='';
+  let broadcasterId='';
+  try{
+    const d=await fetch('https://api.twitch.tv/helix/users?login='+encodeURIComponent(twitchChannel),{
+      headers:{'Client-Id':clientId,'Authorization':'Bearer '+cleanToken}
+    }).then(r=>r.json());
+    broadcasterId=d?.data?.[0]?.id||'';
+  }catch(e){}
+  if(!broadcasterId){setBroadcasterStatus('Could not look up broadcaster ID — check credentials','rgba(220,80,80,0.8)');return;}
+  connectBroadcaster(cleanToken,clientId,broadcasterId);
+});
+document.getElementById('broadcasterDisconnectBtn').addEventListener('click',()=>{
+  localStorage.removeItem(LS_BROADCASTER_TOKEN);
+  localStorage.removeItem(LS_BOT_CLIENTID);
+  disconnectBroadcaster();
+});
+document.getElementById('botConnectBtn').addEventListener('click',function(){
+  let user=document.getElementById('botUsername').value.trim();
+  let botToken=document.getElementById('botToken').value.trim();
+  if(!user)user=localStorage.getItem(LS_BOT_USER)||'';
+  if(!botToken)botToken=localStorage.getItem(LS_BOT_TOKEN)||'';
+  if(!user||!botToken){setBotStatus('Fill in username and token','rgba(220,80,80,0.8)');return;}
+  if(!twitchChannel){setBotStatus('Connect to a Twitch channel first','rgba(220,80,80,0.8)');return;}
+  const cleanToken=botToken.replace(/^oauth:/i,'');
+  localStorage.setItem(LS_BOT_USER,user);
+  localStorage.setItem(LS_BOT_TOKEN,cleanToken);
+  document.getElementById('botUsername').value='';
+  document.getElementById('botToken').value='';
+  connectBotChat(user,cleanToken);
+});
+document.getElementById('botDisconnectBtn').addEventListener('click',()=>{
+  localStorage.removeItem(LS_BOT_USER);
+  localStorage.removeItem(LS_BOT_TOKEN);
+  disconnectBotChat();
+});
+(function(){
+  function sendTest(){
+    const input=document.getElementById('botTestMsg');
+    const text=input.value.trim();
+    if(!text)return;
+    if(!botConnected){setBotStatus('Bot not connected','rgba(220,80,80,0.8)');return;}
+    sendBotMsg(text);
+    input.value='';
+  }
+  document.getElementById('botTestSendBtn').addEventListener('click',sendTest);
+  document.getElementById('botTestMsg').addEventListener('keydown',e=>{if(e.key==='Enter')sendTest();});
+})();
 document.getElementById('testPetBtn').addEventListener('click',()=>{
   const names=['StreamerFan','CoolViewer','PixelDude','ChatBot42','GamerGal'];
   const name=names[Math.floor(Math.random()*names.length)]+'_'+Math.floor(Math.random()*99);
@@ -3673,6 +4120,7 @@ function saveViewerCostumes(){try{localStorage.setItem(LS_VIEWER_COSTUMES,JSON.s
 let kaijuActive=false, kaijuStompTimer=null;
 let kaijuSize=400, kaijuStompInterval=3000, kaijuFlingForce=18, kaijuHitsToDie=4;
 let kaijuPet=null, kaijuHp=0, kaijuMaxHp=0, kaijuBarEl=null;
+let raidParticipants=[]; // usernames of viewers present when raid started
 const KAIJU_BAR_CSS='position:fixed;top:88px;left:50%;transform:translateX(-50%);width:500px;z-index:50;pointer-events:none;text-align:center;';
 
 // kaijuSpire: the canvas ball that becomes the Kaiju
@@ -3796,13 +4244,22 @@ function kaijuTakeDamage(dmg,username){
     setTimeout(()=>{if(kaijuPet)kaijuPet.el.style.filter='drop-shadow(0 0 16px rgba(255,80,80,0.9))';},200);
   }
   if(kaijuHp<=0){
-    const survivors=pets.filter(p=>p.alive&&p!==kaijuPet);
-    survivors.forEach(p=>{
-      p.say('WE WIN!');
-      addCoins(p.username, 50);
-      setTimeout(()=>getCoins(p.username, c=>p.say('🪙 +50 ('+c+' total)')), 1500);
+    // for raids: reward everyone who was present at raid start; for regular kaiju: survivors only
+    const _isRaidWin=!!kaijuPet;
+    const winnerNames=_isRaidWin ? raidParticipants : pets.filter(p=>p.alive&&p!==kaijuPet).map(p=>p.username);
+    winnerNames.forEach(uname=>{
+      addCoins(uname, 50);
+      const lp=petMap[uname.toLowerCase()];
+      if(lp&&lp.alive){
+        lp.say('WE WIN!');
+        setTimeout(()=>getCoins(uname, c=>lp.say('🪙 +50 ('+c+' total)')), 1500);
+      }
     });
-    ensureAudio();playEventSound(winBuffer,'win');
+    if(winnerNames.length>0){
+      sendBotMsg(_isRaidWin
+        ? 'The viewers defeated the raid boss! '+winnerNames.length+' viewer'+(winnerNames.length===1?'':'s')+' each get 50 coins! 🎉'
+        : 'The viewers defeated the Kaiju! '+winnerNames.length+' survivor'+(winnerNames.length===1?'':'s')+' each get 50 coins! 🎉');
+    }
     if(kaijuSpire){kaijuSpire.vx=(Math.random()-.5)*20;kaijuSpire.vy=-15;}
     if(kaijuPet){kaijuPet.vx=(Math.random()-.5)*10;kaijuPet.vy=-8;kaijuPet.airborne=true;}
     endKaiju();
@@ -3837,6 +4294,32 @@ function endKaiju(){
     });
     if(!kaijuActive){kaijuSpire=null;kaijuPet=null;}
   },2500);
+}
+
+function celebratePets(triggerName, reason){
+  const sayOptions = reason==='sub'
+    ? ['PogChamp!','LET\'S GO!','🎉','GG!','HYPE!','WOOOO!']
+    : ['Pog!','🎉','HYPE!','WOOOO!','let\'s go!'];
+  const alive=pets.filter(p=>p.alive&&!p._hidden);
+  alive.forEach((p,i)=>{
+    setTimeout(()=>{
+      p.vy=-(8+Math.random()*5);
+      p.airborne=true;
+      if(i===0||p.username===triggerName.toLowerCase()){
+        p.say(sayOptions[Math.floor(Math.random()*sayOptions.length)]);
+      }
+    },i*80);
+  });
+  // second bounce wave
+  setTimeout(()=>{
+    alive.forEach((p,i)=>{
+      setTimeout(()=>{
+        if(!p.alive||p._hidden)return;
+        p.vy=-(6+Math.random()*4);
+        p.airborne=true;
+      },i*80);
+    });
+  },600);
 }
 
 // ── RAID KAIJU ────────────────────────────────────────────
@@ -3892,6 +4375,7 @@ function startRaidKaiju(raiderName, raidViewers){
   kaijuPet.hp=kaijuMaxHp; kaijuPet.maxHp=kaijuMaxHp; kaijuPet.alive=true;
   kaijuPet._isRaidBoss=true; // prevents normal BR/war death logic
   kaijuPet.healthBarWrap.style.display='none'; // no health bar on raider
+  raidParticipants=pets.filter(p=>p!==kaijuPet).map(p=>p.username);
 
   const hitHP=kaijuHitsToDie*25;
   pets.forEach(p=>{
@@ -3932,7 +4416,13 @@ function startRaidKaiju(raiderName, raidViewers){
           p.el.style.transition='opacity 0.8s'; p.el.style.opacity='0';
           setTimeout(()=>{if(!p.alive)p.el.style.display='none';},900);
         }
-        if(!pets.some(q=>q!==_raidPetRef&&q.alive)){_raidPetRef.say('RAID WINS!');endKaiju();}
+        if(!pets.some(q=>q!==_raidPetRef&&q.alive)){
+          _raidPetRef.say('RAID WINS!');
+          addCoins(_raidPetRef.username, 50);
+          sendBotMsg('@'+_raidPetRef.username+' and the raiders won! 🏴‍☠️ +50 coins!');
+          setTimeout(()=>getCoins(_raidPetRef.username, c=>_raidPetRef.say('🪙 +50 ('+c+' total)')), 1500);
+          endKaiju();
+        }
       });
     },700);
   }
@@ -3991,9 +4481,10 @@ function triggerBomb(thrower) {
   flash.style.opacity = '0';
   setTimeout(() => flash.remove(), 550);
 
-  // Push all nearby viewers (canvas space)
+  // Push and damage all nearby viewers except thrower
+  ensureAudio();playBomb();
   pets.forEach(p => {
-    if (!p.alive) return;
+    if (!p.alive || p === thrower) return;
     const px = p.x + p.w / 2;
     const py = p.y + p.h / 2;
     const dx = px - cx;
@@ -4004,8 +4495,271 @@ function triggerBomb(thrower) {
       p.vx += (dx / dist) * force;
       p.vy += (dy / dist) * force - 4;
       p.airborne = true;
+      const dmg = Math.round((1 - dist / blastRadius) * 25);
+      p.hp = Math.max(0, p.hp - dmg);
+      p._showHPUntil = Date.now() + 3000;
+      spawnBloodSplatter(p);
+      if (p.hp <= 0) { p.alive = false; p.healthBarWrap.style.display = 'none'; }
     }
   });
+}
+
+// ── FLASHBANG ─────────────────────────────────────────────
+function triggerFlashbang() {
+  ensureAudio();playFlashbang();
+}
+
+// ── NUKE ──────────────────────────────────────────────────
+function triggerNuke(thrower) {
+  const rect = thrower.el.getBoundingClientRect();
+  const vcx = rect.left + rect.width / 2;
+  const vcy = rect.top + rect.height / 2;
+  const cx = thrower.x + thrower.w / 2;
+  const cy = thrower.y + thrower.h / 2;
+  const blastRadius = 700;
+
+  ensureAudio();playNuke();
+  // Screen flash
+  const sflash = document.createElement('div');
+  sflash.style.cssText = 'position:fixed;inset:0;background:rgba(255,220,100,0.85);pointer-events:none;z-index:9998;transition:opacity 0.6s ease-out;opacity:1;';
+  document.body.appendChild(sflash);
+  sflash.getBoundingClientRect();
+  sflash.style.opacity = '0';
+  setTimeout(() => sflash.remove(), 700);
+
+  // Massive shockwave ring
+  const ring = document.createElement('div');
+  ring.style.cssText = 'position:fixed;left:'+vcx+'px;top:'+vcy+'px;width:0;height:0;border-radius:50%;background:radial-gradient(circle,rgba(255,240,100,0.8) 0%,rgba(255,120,0,0.5) 40%,transparent 70%);transform:translate(-50%,-50%);z-index:9997;pointer-events:none;transition:width 0.6s ease-out,height 0.6s ease-out,opacity 0.6s ease-out;';
+  document.body.appendChild(ring);
+  ring.getBoundingClientRect();
+  ring.style.width  = (blastRadius * 2) + 'px';
+  ring.style.height = (blastRadius * 2) + 'px';
+  ring.style.opacity = '0';
+  setTimeout(() => ring.remove(), 700);
+
+  // Outer shockwave border
+  const border = document.createElement('div');
+  border.style.cssText = 'position:fixed;left:'+vcx+'px;top:'+vcy+'px;width:0;height:0;border-radius:50%;border:6px solid rgba(255,200,50,0.95);transform:translate(-50%,-50%);z-index:9997;pointer-events:none;transition:width 0.8s ease-out,height 0.8s ease-out,opacity 0.8s ease-out;opacity:1;';
+  document.body.appendChild(border);
+  border.getBoundingClientRect();
+  border.style.width  = (blastRadius * 2.5) + 'px';
+  border.style.height = (blastRadius * 2.5) + 'px';
+  border.style.opacity = '0';
+  setTimeout(() => border.remove(), 900);
+
+  // Screen shake — prepend shake offset so small-screen scale/translate is preserved
+  const canvasEl = document.getElementById('canvasWrap') || document.body;
+  const baseTransform = canvasEl.style.transform || '';
+  let shakeFrame = 0;
+  const shakeInterval = setInterval(() => {
+    shakeFrame++;
+    const mag = Math.max(0, 14 - shakeFrame * 0.7);
+    if (shakeFrame >= 20) { clearInterval(shakeInterval); canvasEl.style.transform = baseTransform; }
+    else { canvasEl.style.transform = `translate(${(Math.random()-0.5)*mag*2}px,${(Math.random()-0.5)*mag*2}px) ${baseTransform}`; }
+  }, 30);
+
+  // Push and damage EVERYONE except thrower — massive force and damage
+  pets.forEach(p => {
+    if (!p.alive || p === thrower) return;
+    const px = p.x + p.w / 2;
+    const py = p.y + p.h / 2;
+    const dx = px - cx;
+    const dy = py - cy;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < blastRadius && dist > 0) {
+      const force = (1 - dist / blastRadius) * 55;
+      p.vx += (dx / dist) * force;
+      p.vy += (dy / dist) * force - 12;
+      p.airborne = true;
+      const dmg = Math.round((1 - dist / blastRadius) * 90);
+      p.hp = Math.max(0, p.hp - dmg);
+      p._showHPUntil = Date.now() + 3000;
+      spawnBloodSplatter(p);
+      if (p.hp <= 0) { p.alive = false; p.healthBarWrap.style.display = 'none'; }
+    }
+  });
+}
+
+// ── SLOT MACHINE ──────────────────────────────────────────
+const slotQueue=[];
+let slotMachineRunning=false;
+
+function processSlotQueue(){
+  if(slotMachineRunning||slotQueue.length===0)return;
+  const next=slotQueue.shift();
+  slotMachineRunning=true;
+  _runSlotMachine(next.username,next.bet,next.petObj);
+}
+
+function triggerSlotMachine(username, bet, petObj){
+  slotQueue.push({username,bet,petObj});
+  processSlotQueue();
+}
+
+function _runSlotMachine(username, bet, petObj){
+  const rolls=[_slotRoll(),_slotRoll(),_slotRoll()];
+  let multiplier=0, resultMsg='';
+  if(rolls[0].sym===rolls[1].sym&&rolls[1].sym===rolls[2].sym){
+    multiplier=rolls[0].pay;
+    resultMsg=multiplier>=50?'🎉 JACKPOT! '+rolls[0].sym+rolls[0].sym+rolls[0].sym:'🎊 '+rolls[0].sym+rolls[0].sym+rolls[0].sym+' — WIN!';
+  } else if(rolls[0].sym===rolls[1].sym){
+    multiplier=2; resultMsg='✨ '+rolls[0].sym+rolls[1].sym+' Pair!';
+  } else if(rolls[0].sym==='🍒'){
+    multiplier=1; resultMsg='🍒 Cherry — Break Even';
+  } else {
+    multiplier=0; resultMsg='💸 No luck...';
+  }
+  const payout=Math.floor(bet*multiplier);
+
+  const box=document.createElement('div');
+  box.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale('+currentCanvasScale+');transform-origin:50% 50%;background:linear-gradient(160deg,#1a0a5e,#2d1b8e);border:4px solid #ffd700;border-radius:28px;padding:44px 56px;text-align:center;z-index:9995;box-shadow:0 0 80px rgba(255,215,0,0.35),inset 0 0 40px rgba(0,0,0,0.5);min-width:520px;font-family:inherit;pointer-events:none;';
+
+  const titleEl=document.createElement('div');
+  titleEl.textContent='🎰 SLOT MACHINE';
+  titleEl.style.cssText='color:#ffd700;font-size:32px;font-weight:700;letter-spacing:2px;margin-bottom:10px;text-shadow:0 0 18px rgba(255,215,0,0.8);';
+  box.appendChild(titleEl);
+
+  const playerEl=document.createElement('div');
+  playerEl.textContent='@'+username+' · bet: '+bet+' 🪙';
+  playerEl.style.cssText='color:rgba(255,255,255,0.6);font-size:16px;margin-bottom:26px;';
+  box.appendChild(playerEl);
+
+  const reelsRow=document.createElement('div');
+  reelsRow.style.cssText='display:flex;gap:18px;justify-content:center;margin-bottom:28px;';
+  const reelEls=[];
+  for(let i=0;i<3;i++){
+    const cell=document.createElement('div');
+    cell.style.cssText='width:140px;height:140px;background:rgba(0,0,0,0.5);border:3px solid rgba(255,215,0,0.3);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:80px;transition:border-color 0.3s,box-shadow 0.3s;';
+    cell.textContent='🎰';
+    reelsRow.appendChild(cell);
+    reelEls.push(cell);
+  }
+  box.appendChild(reelsRow);
+
+  const resultEl=document.createElement('div');
+  resultEl.style.cssText='color:#fff;font-size:26px;font-weight:700;min-height:36px;';
+  box.appendChild(resultEl);
+  const coinsEl=document.createElement('div');
+  coinsEl.style.cssText='font-size:20px;margin-top:10px;min-height:26px;';
+  box.appendChild(coinsEl);
+
+  document.body.appendChild(box);
+
+  const stopDelays=[1400,2100,2900];
+  let reelsDone=0;
+  reelEls.forEach((el,i)=>{
+    const finalSym=rolls[i].sym;
+    let elapsed=0, spinMs=55;
+    function spin(){
+      el.textContent=SLOT_SYMBOLS[Math.floor(Math.random()*SLOT_SYMBOLS.length)].sym;
+      elapsed+=spinMs;
+      if(elapsed<stopDelays[i]-500){setTimeout(spin,spinMs);}
+      else if(elapsed<stopDelays[i]){spinMs=Math.min(240,spinMs*1.4);setTimeout(spin,spinMs);}
+      else{
+        el.textContent=finalSym;
+        el.style.borderColor='rgba(255,215,0,0.9)';
+        el.style.boxShadow='0 0 12px rgba(255,215,0,0.4)';
+        if(++reelsDone===3)setTimeout(showResult,200);
+      }
+    }
+    setTimeout(spin,50*i+50);
+  });
+
+  function showResult(){
+    resultEl.textContent=resultMsg;
+    if(multiplier>1){
+      const color=multiplier>=50?'#ff4':'#7f7';
+      resultEl.style.color=color;coinsEl.style.color=color;
+      coinsEl.textContent='+'+(payout-bet)+' 🪙 (won '+payout+')';
+      addCoins(username,payout);
+      reelEls.forEach(el=>{el.style.background='rgba(255,215,0,0.12)';el.style.borderColor='#ffd700';});
+      if(multiplier>=50){box.style.boxShadow='0 0 90px rgba(255,215,0,0.9),inset 0 0 30px rgba(255,215,0,0.15)';box.style.borderColor='#ffff00';}
+      setTimeout(()=>getCoins(username,c=>{
+        const msg=multiplier>=50
+          ?'🎰 JACKPOT! @'+username+' hit '+rolls.map(r=>r.sym).join('')+' and won '+payout+' 🪙! ('+c+' total)'
+          :'🎰 @'+username+' spun '+rolls.map(r=>r.sym).join('')+' and won '+payout+' 🪙! ('+c+' total)';
+        sendBotMsg(msg);
+      }),800);
+      if(petObj)petObj.say(multiplier>=50?'🎉 JACKPOT!':'🎊 I WON!');
+    } else if(multiplier===1){
+      resultEl.style.color='#aaa';coinsEl.style.color='#aaa';
+      coinsEl.textContent='Bet returned';
+      addCoins(username,bet);
+      if(petObj)petObj.say('Could be worse...');
+    } else {
+      resultEl.style.color='#f77';coinsEl.style.color='#f77';
+      coinsEl.textContent='-'+bet+' 🪙 lost';
+      if(petObj)petObj.say('😢 Lost it all...');
+    }
+    const dismissDelay=multiplier>=50?6000:4000;
+    setTimeout(()=>{
+      box.style.transition='opacity 0.6s';
+      box.style.opacity='0';
+      setTimeout(()=>{
+        box.remove();
+        slotMachineRunning=false;
+        processSlotQueue();
+      },700);
+    },dismissDelay);
+  }
+}
+
+// ── STEAL / STOCKADE ──────────────────────────────────────
+function stealPin(p){
+  const slotIndex=pets.filter(t=>t.pinned&&t.alive).length;
+  const dir=slotIndex===0?0:(slotIndex%2===1?-1:1);
+  const mag=Math.ceil(slotIndex/2);
+  const spacing=(p.w||60)+10;
+  const centerX=(window.innerWidth-p.w)/2;
+  p.x=Math.max(0,Math.min(window.innerWidth-p.w,centerX+dir*mag*spacing));
+  p.y=window.innerHeight*0.38;
+  p.vx=0;p.vy=0;p.airborne=false;
+  p.pinned=true;
+  p._stonesNeeded=1;
+  p.nameEl.textContent='🪢 '+p.username;
+}
+
+function stealUnpin(p){
+  clearTimeout(p._stealPinTimer);
+  p._stealPinTimer=null;
+  p.pinned=false;
+  p._stonesNeeded=0;
+  p.nameEl.textContent=p.username;
+  p.vy=-4;p.airborne=true;
+  p.say('Finally free!');
+}
+
+function throwStone(thrower,target,onLand){
+  let sx,sy;
+  if(thrower&&thrower.el){
+    const sr=thrower.el.getBoundingClientRect();
+    sx=sr.left+sr.width/2;sy=sr.top+sr.height/2;
+  } else {
+    // no pet on screen — throw from a random edge
+    const edge=Math.floor(Math.random()*4);
+    if(edge===0){sx=Math.random()*window.innerWidth;sy=0;}
+    else if(edge===1){sx=window.innerWidth;sy=Math.random()*window.innerHeight;}
+    else if(edge===2){sx=Math.random()*window.innerWidth;sy=window.innerHeight;}
+    else{sx=0;sy=Math.random()*window.innerHeight;}
+  }
+  const tr=target.el.getBoundingClientRect();
+  const tx=tr.left+tr.width/2,ty=tr.top+tr.height/2;
+  const stone=document.createElement('div');
+  stone.style.cssText='position:fixed;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#bbb,#555);box-shadow:2px 2px 4px rgba(0,0,0,0.6);pointer-events:none;z-index:9999;';
+  document.body.appendChild(stone);
+  const start=performance.now();
+  const dist=Math.hypot(tx-sx,ty-sy);
+  const duration=Math.max(300,dist*0.6);
+  (function tick(ts){
+    const t=Math.min(1,(ts-start)/duration);
+    const ease=t<0.5?2*t*t:(4-2*t)*t-1;
+    const x=sx+(tx-sx)*ease;
+    const y=sy+(ty-sy)*ease-Math.sin(ease*Math.PI)*80;
+    stone.style.left=(x-7)+'px';stone.style.top=(y-7)+'px';
+    stone.style.transform='rotate('+Math.round(t*720)+'deg)';
+    if(t<1){requestAnimationFrame(tick);}
+    else{stone.remove();ensureAudio();playEventSound(hitBuffer,'hit');if(onLand)onLand();}
+  })(performance.now());
 }
 
 // ── BLOOD SPLATTER ────────────────────────────────────────
@@ -4193,26 +4947,41 @@ const CMD_DEFS=[
   // viewer commands
   {id:'attack',       label:'Attack Kaiju',     def:'!attack',       owner:false},
   {id:'jump',         label:'Jump',             def:'!jump',         owner:false},
+  {id:'dance',        label:'Dance',            def:'!dance',        owner:false},
+  {id:'spin',         label:'Spin in place',    def:'!spin',         owner:false},
   {id:'duel',         label:'Duel someone',     def:'!duel',         owner:false},
   {id:'fight',        label:'Fight (alias duel)', def:'!fight',       owner:false},
   {id:'punch',        label:'Punch someone',    def:'!punch',        owner:false},
   {id:'pledge',       label:'Pledge allegiance',def:'!pledge',       owner:false},
-  {id:'spawn',        label:'Spawn a pet ball', def:'!spawn',        owner:false},
+  {id:'spawn',        label:'Spawn a pet ball', def:'!spawn',        owner:true},
+  {id:'tuck',         label:'Tuck a viewer to sleep (owner)', def:'!tuck', owner:true},
   {id:'ballin',       label:'Shoot a hoop',     def:'!ballin',       owner:false},
   {id:'bounce',       label:'Bounce pet ball',  def:'!bounce',       owner:false},
   {id:'float',        label:'Everyone floats',  def:'!float',        owner:false},
+  {id:'unfloat',      label:'Stop floating',    def:'!unfloat',      owner:false},
   {id:'shrink',       label:'Shrink pet ball',  def:'!shrink',       owner:false},
   {id:'grow',         label:'Grow pet ball',    def:'!grow',         owner:false},
-  {id:'despawn',      label:'Despawn a pet ball',def:'!despawn',     owner:false},
+  {id:'despawn',      label:'Despawn a pet ball',def:'!despawn',     owner:true},
   {id:'lurk',         label:'Viewer lurks',       def:'!lurk',         owner:false},
   {id:'vanish',       label:'Vanish (alias lurk)', def:'!vanish',      owner:false},
   {id:'v',            label:'!v (alias lurk)',      def:'!v',           owner:false},
   {id:'hug',          label:'Hug a viewer',       def:'!hug',          owner:false},
+  {id:'kiss',         label:'Kiss a viewer',      def:'!kiss',         owner:false},
   {id:'eat',          label:'Eat a viewer',        def:'!eat',          owner:false},
   {id:'coins',        label:'Check coin balance',  def:'!coins',        owner:false},
   {id:'inventory',    label:'Check inventory',     def:'!inventory',    owner:false},
+  {id:'shop',         label:'View shop',           def:'!shop',         owner:false},
   {id:'buy',          label:'Buy item from shop',  def:'!buy',          owner:false},
   {id:'bomb',         label:'Use a Bomb item',     def:'!bomb',         owner:false},
+  {id:'flashbang',    label:'Use a Flashbang item',def:'!flashbang',    owner:false},
+  {id:'nuke',         label:'Use a Nuke item',     def:'!nuke',         owner:false},
+  {id:'speed',        label:'Use a Speed Potion',  def:'!speed',        owner:false},
+  {id:'growth',       label:'Use a Growth Potion', def:'!growth',       owner:false},
+  {id:'steal',        label:'Steal coins from viewer',def:'!steal',     owner:false},
+  {id:'gift',         label:'Gift coins to another viewer',def:'!gift', owner:false},
+  {id:'stone',        label:'Stone a pinned viewer',def:'!stone',       owner:false},
+  {id:'bet',          label:'Gamble coins (!gamble also works)',def:'!bet',owner:false},
+  {id:'4d',           label:'4D/Toto lottery (!toto also works)',def:'!4d',owner:false},
 ];
 
 // Live command map: id → current trigger string (lowercase, with !)
@@ -4262,6 +5031,7 @@ document.querySelectorAll('.stab[data-tab="commands"]').forEach(btn=>{
 // ── New viewer command implementations ────────────────────
 // active duels: map of pet username → {target, hp, maxHp, oppHp, oppMaxHp, interval}
 const activeDuels=new Map();
+const pendingDuels=new Map(); // target username → {challenger:pet, timer}
 // Queue for duel / punch / hug when one is already in progress for a participant
 const interactionQueue=[];
 let interactionBusy=false;
@@ -4342,7 +5112,6 @@ function startDuel(pet,target){
         const loser=duelState.hpA>0?target:pet;
         winner.say('\uD83C\uDFC6 I WIN!');
         loser.vx=(Math.random()<0.5?-1:1)*8;loser.vy=-6;loser.airborne=true;
-        ensureAudio();playEventSound(winBuffer,'win');
         addCoins(winner.username, COIN_DUEL_WIN);
         addCoins(loser.username, -COIN_DUEL_LOSE);
         setTimeout(() => getCoins(winner.username, c => winner.say('\uD83E\uDE99 +' + COIN_DUEL_WIN + ' (' + c + ' total)')), 1500);
@@ -4379,33 +5148,103 @@ function startPunch(pet,target,done){
       clearInterval(walkInterval);
       pet.vx=0;
       const nx=Math.sign(dx)||1;
-      target.vx=nx*14;target.vy=-7;target.airborne=true;
-      target.say('OW!');
-      ensureAudio();playEventSound(hitBuffer,'hit');spawnBloodSplatter(target);
-      pet.vx=-nx*3;pet.vy=-2;pet.airborne=true;
-      pet._inPunch=false;target._inPunch=false;
-      setTimeout(()=>{if(done)done();},500);
+      // bigger pets hit harder but are less accurate — scales off pet.w/petSize regardless of source (eat or growth potion)
+      const sizeMult=pet.w/petSize;
+      const missChance=Math.min(0.65,0.10+(sizeMult-1)/3.0*0.55); // 10% at default, caps at 65% around 4x size
+      if(Math.random()<missChance){
+        pet.say('💨 WHIFF!');
+        target.say('Too slow!');
+        pet.vx=-nx*2;pet.vy=-1;pet.airborne=true;
+        pet._inPunch=false;target._inPunch=false;
+        setTimeout(()=>{if(done)done();},500);
+      } else {
+        const force=Math.min(2.5,sizeMult); // knockback caps at 2.5x
+        target.vx=nx*14*force;target.vy=-7*Math.min(1.5,force);target.airborne=true;
+        target.say('OW!');
+        ensureAudio();playEventSound(hitBuffer,'hit');spawnBloodSplatter(target);
+        pet.vx=-nx*3;pet.vy=-2;pet.airborne=true;
+        pet._inPunch=false;target._inPunch=false;
+        setTimeout(()=>{if(done)done();},500);
+      }
     }
   },50);
   activePunches.set(pet.username,walkInterval);
 }
 
+function botReply(username,text){if(botConnected)sendBotMsg('@'+username+' '+text);}
+
 function execViewerCmd(cmdId,username,args){
   if(cmdId==='coins'){
     const p=petMap[username.toLowerCase()];
     if(!p||!p.alive)return;
-    getCoins(username, c => p.say('🪙 ' + c + ' coins'));
+    getCoins(username, c => {
+      p.say('🪙 ' + c + ' coins');
+      botReply(username, 'you have 🪙 ' + c + ' coins!');
+    });
     return;
   }
   if(cmdId==='inventory'){
     const p=petMap[username.toLowerCase()];
     if(!p||!p.alive)return;
     getInventory(username, items => {
-      if(!items.length){p.say('Inventory: Empty');return;}
+      if(!items.length){
+        p.say('Inventory: Empty');
+        botReply(username,'your inventory is empty!');
+        return;
+      }
       const counts={};
       items.forEach(i=>{const k=i.trim();counts[k]=(counts[k]||0)+1;});
       const lines=Object.entries(counts).map(([k,v])=>v>1?k+' x'+v:k);
       p.say('Inventory:\n'+lines.join('\n'));
+      botReply(username,'Inventory: '+lines.join(', '));
+    });
+    return;
+  }
+  if(cmdId==='shop'){
+    getShop(items=>{
+      if(!items.length){sendBotMsg('The shop is empty!');return;}
+      const list=items.map(i=>i.item+' - '+i.price+' 🪙').join(' | ');
+      sendBotMsg('🛒 Shop: '+list+' — use !buy [item name] to purchase');
+    });
+    return;
+  }
+  if(cmdId==='leaderboard'){
+    getLeaderboard(entries=>{
+      if(!entries.length){sendBotMsg('No leaderboard data yet!');return;}
+      const medals=['🥇','🥈','🥉'];
+      const list=entries.slice(0,10).map((e,i)=>(medals[i]||'#'+(i+1))+' '+e.user+': '+e.coins+' 🪙').join(' | ');
+      sendBotMsg('💰 Leaderboard: '+list);
+    });
+    return;
+  }
+  if(cmdId==='4d'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    const guess=(args&&args.join('')||'').replace(/\D/g,'').slice(0,4);
+    if(!guess){
+      get4DInfo(info=>{
+        if(!info){p.say('4D offline!');return;}
+        sendBotMsg('🎰 4D Jackpot: '+info.prize+' 🪙 | Entry cost: '+info.entry_cost+' 🪙 | Guess with: !4d [XXXX]');
+      });
+      return;
+    }
+    if(guess.length!==4){p.say('Need exactly 4 digits! e.g. !4d 1234');return;}
+    p.say('🎰 '+guess+'...');
+    play4D(username,guess,result=>{
+      if(!result){p.say('Error, try again!');return;}
+      if(result.error==='not_enough_coins'){
+        p.say('Need '+result.entry_cost+' 🪙 to enter!');
+        botReply(username,'need '+result.entry_cost+' coins to enter the 4D!');
+        return;
+      }
+      if(result.error==='invalid_guess'){p.say('4 digits only!');return;}
+      if(result.result==='win'){
+        p.say('🎉 JACKPOT! +'+result.prize+' 🪙!');
+        setTimeout(()=>sendBotMsg('🎉🎰 @'+username+' STRUCK THE 4D JACKPOT of '+result.prize+' coins! New draw begins now! 🎰🎉'),600);
+      }else{
+        p.say('❌ No match! Jackpot: '+result.prize+' 🪙');
+        botReply(username,'no match! Jackpot is now '+result.prize+' coins. Try again with !4d XXXX');
+      }
     });
     return;
   }
@@ -4413,12 +5252,12 @@ function execViewerCmd(cmdId,username,args){
     const p=petMap[username.toLowerCase()];
     if(!p||!p.alive)return;
     const item=(args&&args.join(' '))||'';
-    if(!item){p.say('Use !buy [item name]');return;}
+    if(!item){p.say('Use !buy [item name]');botReply(username,'use !buy [item name]');return;}
     buyItem(username, item, result => {
-      if(result.error==='not enough coins') p.say('Not enough coins! Need 🪙 ' + result.price + ', have ' + result.coins);
-      else if(result.error==='item not found') p.say('"' + item + '" is not in the shop!');
+      if(result.error==='not enough coins'){p.say('Not enough coins! Need 🪙 ' + result.price + ', have ' + result.coins);botReply(username,'not enough coins! Need 🪙 '+result.price+', you have '+result.coins+'.');}
+      else if(result.error==='item not found'){p.say('"' + item + '" is not in the shop!');botReply(username,'"'+item+'" is not in the shop!');}
       else if(result.error) p.say('Could not buy item.');
-      else p.say('Bought ' + result.item + '! 🪙 ' + result.coins + ' left');
+      else{p.say('Bought ' + result.item + '! 🪙 ' + result.coins + ' left');botReply(username,'you bought '+result.item+'! 🪙 '+result.coins+' coins left.');}
     });
     return;
   }
@@ -4453,6 +5292,212 @@ function execViewerCmd(cmdId,username,args){
     });
     return;
   }
+  if(cmdId==='flashbang'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    getInventory(username, items => {
+      const idx=items.findIndex(i=>i.toLowerCase()==='flashbang');
+      if(idx===-1){p.say("I don't have a flashbang!");return;}
+      removeItem(username,'Flashbang', result => {
+        if(result && result.error){ p.say("Dud..."); return; }
+        p.say('🌟 FLASH OUT!');
+        sendBotMsg('@'+username+' used !flashbang');
+        setTimeout(()=>triggerFlashbang(), 600);
+      });
+    });
+    return;
+  }
+  if(cmdId==='nuke'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    getInventory(username, items => {
+      const idx=items.findIndex(i=>i.toLowerCase()==='nuke');
+      if(idx===-1){p.say("I don't have a nuke!");return;}
+      removeItem(username,'Nuke', result => {
+        if(result && result.error){ p.say("Launch failed..."); return; }
+        p.say('☢️');
+        let blinkOn=false, delay=200, charging=true;
+        function chargeBlink(){
+          if(!charging)return;
+          blinkOn=!blinkOn;
+          p.el.style.filter=blinkOn
+            ?'drop-shadow(0 0 20px rgba(100,255,80,1)) drop-shadow(0 0 10px rgba(0,200,0,0.9))'
+            :'drop-shadow(0 0 4px rgba(0,180,0,0.3))';
+          delay=Math.max(25,delay-14);
+          setTimeout(chargeBlink,delay);
+        }
+        chargeBlink();
+        setTimeout(()=>{
+          charging=false;
+          p.el.style.filter='';
+          p.say('☢️ NUCLEAR LAUNCH DETECTED!');
+          triggerNuke(p);
+        },2400);
+      });
+    });
+    return;
+  }
+  if(cmdId==='speed'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    getInventory(username, items => {
+      const idx=items.findIndex(i=>i.toLowerCase()==='speed potion');
+      if(idx===-1){p.say("No speed potion!");return;}
+      removeItem(username,'Speed Potion', result => {
+        if(result&&result.error){p.say("Potion fizzled...");return;}
+        p._speedMult=30;
+        p.vx=Math.sign(p.vx||1)*petSpeed*30;
+        p.say('⚡ 3000% SPEED!');
+        sendBotMsg('@'+username+' chugged a Speed Potion! ⚡ 3000% speed — permanently!');
+      });
+    });
+    return;
+  }
+  if(cmdId==='growth'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    getInventory(username, items => {
+      const idx=items.findIndex(i=>i.toLowerCase()==='growth potion');
+      if(idx===-1){p.say("No growth potion!");return;}
+      removeItem(username,'Growth Potion', result => {
+        if(result&&result.error){p.say("Potion fizzled...");return;}
+        const newSize=Math.min(p.w+40,300);
+        p.w=newSize;p.h=newSize;
+        p.spriteEl.width=newSize;p.spriteEl.height=newSize;
+        p.el.style.width=newSize+'px';
+        p.y=Math.min(p.y,canvas.height-p.h);
+        p.say('🌱 GROWING!');
+        sendBotMsg('@'+username+' used a Growth Potion! ');
+      });
+    });
+    return;
+  }
+  if(cmdId==='steal'){
+    const p=petMap[username.toLowerCase()];
+    if(!p||!p.alive)return;
+    if(p.pinned){botReply(username,"you're pinned and can't steal right now!");return;}
+    const targetName=(args[0]||'').replace(/^@/,'').toLowerCase();
+    if(!targetName){botReply(username,'use !steal @username');return;}
+    if(targetName===username.toLowerCase()){botReply(username,"you can't steal from yourself!");return;}
+    const target=petMap[targetName];
+    if(!target||!target.alive){botReply(username,"that viewer isn't here!");return;}
+    p.say('👀');
+    const stealWalk=setInterval(()=>{
+      if(!p.alive||!target.alive||p.pinned){clearInterval(stealWalk);return;}
+      const dx=(target.x+target.w/2)-(p.x+p.w/2);
+      if(Math.abs(dx)>p.w*1.2){
+        p.vx=Math.sign(dx)*petSpeed*2.5;
+      } else {
+        clearInterval(stealWalk);
+        p.vx=0;
+        getCoins(targetName,targetCoins=>{
+          if(targetCoins<=0){
+            p.say('💸 Nothing!');
+            botReply(username,'@'+target.username+' has no coins to steal!');
+            return;
+          }
+          const requestedAmount=parseInt(args[1])||0;
+          let amount;
+          let caughtChance;
+          if(requestedAmount>0){
+            amount=Math.min(requestedAmount,targetCoins);
+            const stealPct=amount/targetCoins;
+            if(stealPct<=0.20){
+              // scales from ~10% at tiny amounts to 85% at 20% of target's coins
+              caughtChance=0.10+(stealPct/0.20)*0.75;
+            } else {
+              // exponentially harder beyond 20%
+              const excess=stealPct-0.20;
+              caughtChance=Math.min(0.99,0.85+0.14*(1-Math.exp(-15*excess)));
+            }
+          } else {
+            // random steal: flat 85% catch chance
+            const pct=(1+Math.floor(Math.random()*20))/100;
+            amount=Math.max(1,Math.floor(targetCoins*pct));
+            caughtChance=0.85;
+          }
+          const caught=Math.random()<caughtChance;
+          if(caught){
+            p.say('YOU GOT CAUGHT!');
+            p.vx=-Math.sign(dx)*8;p.vy=-5;p.airborne=true;
+            setTimeout(()=>stealPin(p),400);
+            sendBotMsg('@'+username+' was caught trying to steal from @'+target.username+'! They\'re pinned in the center! Type !stone to throw rocks at them! 🪢');
+          } else {
+            p.say('💰 Got it!');
+            target.say('HEY!');
+            p.vx=-Math.sign(dx)*6;p.vy=-4;p.airborne=true;
+            addCoins(username,amount);
+            addCoins(targetName,-amount);
+            setTimeout(()=>getCoins(username,c=>{
+              sendBotMsg('@'+username+' sneakily stole '+amount+' 🪙 from @'+target.username+'! 💰 ('+c+' total)');
+            }),1200);
+          }
+        });
+      }
+    },50);
+    return;
+  }
+  if(cmdId==='gift'){
+    const targetName=(args[0]||'').replace(/^@/,'').toLowerCase();
+    const amount=parseInt(args[1])||0;
+    if(!targetName||amount<=0){botReply(username,'use !gift @username [amount]');return;}
+    if(targetName===username.toLowerCase()){botReply(username,"you can't gift yourself!");return;}
+    getCoins(username,senderCoins=>{
+      if(senderCoins<amount){botReply(username,"not enough coins! You have "+senderCoins+' 🪙');return;}
+      addCoins(username,-amount);
+      addCoins(targetName,amount);
+      setTimeout(()=>getCoins(targetName,tc=>{
+        sendBotMsg('@'+username+' gifted '+amount+' 🪙 to @'+targetName+'! 🎁 (they now have '+tc+')');
+        const giver=petMap[username.toLowerCase()];
+        const receiver=petMap[targetName];
+        if(giver)giver.say('🎁');
+        if(receiver)receiver.say('Thanks! 🪙');
+      }),1200);
+    });
+    return;
+  }
+  if(cmdId==='stone'){
+    const p=petMap[username.toLowerCase()]||null;
+    const pinned=pets.filter(t=>t.pinned&&t.alive);
+    if(!pinned.length)return;
+    const px=p?(p.x+p.w/2):window.innerWidth/2;
+    const py=p?(p.y+p.h/2):window.innerHeight/2;
+    pinned.sort((a,b)=>Math.hypot(a.x+a.w/2-px,a.y+a.h/2-py)-Math.hypot(b.x+b.w/2-px,b.y+b.h/2-py));
+    const stoneTarget=pinned[0];
+    throwStone(p,stoneTarget,()=>{
+      spawnBloodSplatter(stoneTarget);
+      stoneTarget.say('OW!');
+      if(Math.random()<0.1){
+        stealUnpin(stoneTarget);
+        sendBotMsg('@'+stoneTarget.username+' has been freed from jail!');
+      }
+    });
+    return;
+  }
+  if(cmdId==='bet'){
+    const p=petMap[username.toLowerCase()]||null;
+    const arg0=(args[0]||'').toLowerCase();
+    let bet=0;
+
+    if(arg0==='all'){
+      getCoins(username,coins=>{
+        if(coins<=0){botReply(username,"you don't have any coins to bet!");return;}
+        bet=coins;
+        addCoins(username,-bet);
+        triggerSlotMachine(username,bet,p);
+      });
+      return;
+    }
+
+    bet=parseInt(args[0])||0;
+    if(bet<=0){botReply(username,'use !bet [amount] or !bet all');return;}
+    getCoins(username,coins=>{
+      if(coins<bet){botReply(username,"not enough coins! You have "+coins+' 🪙');return;}
+      addCoins(username,-bet);
+      triggerSlotMachine(username,bet,p);
+    });
+    return;
+  }
   if((battleRoyaleActive||warActive)&&cmdId!=='jump')return;
   // strip @ prefix from target usernames
   if(args&&args[0]&&args[0].startsWith('@'))args[0]=args[0].slice(1);
@@ -4461,20 +5506,120 @@ function execViewerCmd(cmdId,username,args){
     case 'jump':
       if(pet){pet.vy=-(8+Math.random()*4);pet.airborne=true;}
       break;
+    case 'dance':{
+      if(!pet||pet.pinned||pet._dancing)break;
+      pet._dancing=true; pet._danceTilt=0; pet.vx=0;
+      pet.say('💃');
+      const TILT=22, TILT3=15, STEP=210;
+      const _du=pet.username;
+      const go=(delay,fn)=>setTimeout(()=>{const p=petMap[_du];if(p&&p._dancing)fn(p);},delay);
+      let t=150;
+      // phase 1 — look left, 3 wiggles
+      go(t,p=>{p.facingLeft=true;});
+      for(let i=0;i<3;i++){
+        t+=STEP; go(t,p=>{p._danceTilt=-TILT; p.facingLeft=true;});
+        t+=STEP; go(t,p=>{p._danceTilt=0;     p.facingLeft=true;});
+      }
+      t+=160;
+      // phase 2 — look right, 3 wiggles
+      go(t,p=>{p.facingLeft=false;});
+      for(let i=0;i<3;i++){
+        t+=STEP; go(t,p=>{p._danceTilt=TILT;  p.facingLeft=false;});
+        t+=STEP; go(t,p=>{p._danceTilt=0;     p.facingLeft=false;});
+      }
+      t+=160;
+      // phase 3 — 3 in-place left-right rocks
+      for(let i=0;i<3;i++){
+        t+=STEP; go(t,p=>{p._danceTilt=-TILT3; p.facingLeft=true;});
+        t+=STEP; go(t,p=>{p._danceTilt=TILT3;  p.facingLeft=false;});
+      }
+      t+=STEP; go(t,p=>{p._danceTilt=0;});
+      t+=120;
+      // phase 4 — jump
+      go(t,p=>{p.vy=-(9+Math.random()*3); p.airborne=true; p.say('🎉');});
+      // phase 5 — end dance, resume walking
+      t+=650;
+      go(t,p=>{
+        p._dancing=false; p._danceTilt=null;
+        p.el.style.transform='none'; p.el.style.transformOrigin='';
+        p.vx=(Math.random()<0.5?-1:1)*(petSpeed*(p._speedMult||1));
+      });
+      break;
+    }
+    case 'spin':{
+      if(!pet||pet.pinned||pet._dancing)break;
+      pet._dancing=true; pet._spinAngle=0; pet.vx=0;
+      pet.say('🌀');
+      const _su=pet.username;
+      const iv=setInterval(()=>{
+        const p=petMap[_su];
+        if(!p||!p._dancing){clearInterval(iv);return;}
+        p._spinAngle=(p._spinAngle||0)+14; // ~26 steps per rotation at 16ms ≈ 420ms/rotation
+        if(p._spinAngle>=720){ // 2 full rotations then stop
+          clearInterval(iv);
+          p._dancing=false; p._spinAngle=undefined;
+          p.spriteEl.style.transform='none'; p.spriteEl.style.transformOrigin='';
+          p.el.style.transform='none'; p.el.style.transformOrigin='';
+          p.vx=(Math.random()<0.5?-1:1)*(petSpeed*(p._speedMult||1));
+        }
+      },16);
+      break;
+    }
     case 'attack':
       if(pet&&pet.alive===false)break; // dead viewers can't attack
       kaijuTakeDamage(10,username);
       break;
     case 'duel':{
-      const targetName=args&&args[0];
-      const target=targetName
-        ?pets.find(p=>p.username.toLowerCase()===targetName.toLowerCase()&&p!==pet)
-        :pets.find(p=>p!==pet&&!activeDuels.has(p.username));
-      if(pet&&target)queueInteraction(pet,target,(p,t,done)=>{startDuel(p,t);
-        // mark done when duel ends (watch activeDuels)
+      if(battleRoyaleActive||warActive||kaijuActive){
+        if(pet)pet.say('No duels during events!');
+        botReply(username,'duels are disabled while an event is active!');
+        break;
+      }
+      if(!pet)break;
+      if(activeDuels.has(pet.username)){botReply(username,'you are already in a duel!');break;}
+      const rawTarget=(args&&args[0]||'').replace(/^@/,'').toLowerCase();
+      const target=rawTarget
+        ?pets.find(p=>p.username.toLowerCase()===rawTarget&&p!==pet)
+        :null;
+      if(!target){pet.say('Who should I duel? Use !duel @username');break;}
+      if(activeDuels.has(target.username)){botReply(username,target.username+' is already in a duel!');break;}
+      if(pendingDuels.has(target.username.toLowerCase())){botReply(username,target.username+' already has a pending duel request!');break;}
+      const expiryTimer=setTimeout(()=>{
+        if(pendingDuels.has(target.username.toLowerCase())){
+          pendingDuels.delete(target.username.toLowerCase());
+          sendBotMsg('@'+target.username+' the duel request from @'+username+' expired. ⏱');
+        }
+      },30000);
+      pendingDuels.set(target.username.toLowerCase(),{challenger:pet,timer:expiryTimer});
+      sendBotMsg('@'+target.username+' @'+username+' has challenged you to a duel! Type !accept or !decline within 30 seconds ⚔️');
+      pet.say('Waiting for '+target.username+' to accept...');
+      break;
+    }
+    case 'accept':{
+      const pending=pendingDuels.get(username.toLowerCase());
+      if(!pending){botReply(username,'you have no pending duel requests.');break;}
+      clearTimeout(pending.timer);
+      pendingDuels.delete(username.toLowerCase());
+      if(battleRoyaleActive||warActive||kaijuActive){
+        botReply(username,'cannot start duel — an event is active!');
+        break;
+      }
+      const challenger=pending.challenger;
+      const accepter=petMap[username.toLowerCase()];
+      if(!challenger||!accepter){sendBotMsg('Duel cancelled — a participant is no longer present.');break;}
+      sendBotMsg('⚔️ @'+challenger.username+' vs @'+username+' — DUEL ACCEPTED! FIGHT!');
+      queueInteraction(challenger,accepter,(p,t,done)=>{
+        startDuel(p,t);
         const watcher=setInterval(()=>{if(!activeDuels.has(p.username)){clearInterval(watcher);done();}},500);
       });
-      else if(pet)pet.say('Who should I duel?');
+      break;
+    }
+    case 'decline':{
+      const pending=pendingDuels.get(username.toLowerCase());
+      if(!pending)break;
+      clearTimeout(pending.timer);
+      pendingDuels.delete(username.toLowerCase());
+      sendBotMsg('@'+pending.challenger.username+' @'+username+' declined your duel request. 🚫');
       break;
     }
     case 'spawn':{
@@ -4504,17 +5649,17 @@ function execViewerCmd(cmdId,username,args){
       break;
     }
     case 'float':{
-      // toggle zero gravity — permanent until triggered again
-      if(config.gravity===0){
-        setGravity(1);
-        if(pet)pet.say('Back to earth!');
-      } else {
-        setGravity(0);
-        // push all viewers and balls off the ground
-        pets.forEach(p=>{if(!p.pinned){p.vy=-(4+Math.random()*4);p.airborne=true;}});
-        spires.forEach(s=>{s.vy=-(4+Math.random()*4);});
-        if(pet)pet.say('I believe I can fly!');
-      }
+      if(config.gravity===0)break; // already floating
+      setGravity(0);
+      pets.forEach(p=>{if(!p.pinned){p.vy=-(4+Math.random()*4);p.airborne=true;}});
+      spires.forEach(s=>{s.vy=-(4+Math.random()*4);});
+      if(pet)pet.say('I believe I can fly!');
+      break;
+    }
+    case 'unfloat':{
+      if(config.gravity!==0)break; // already grounded
+      setGravity(1);
+      if(pet)pet.say('Back to earth!');
       break;
     }
     case 'shrink':{
@@ -4523,7 +5668,7 @@ function execViewerCmd(cmdId,username,args){
       break;
     }
     case 'grow':{
-      adjustSize(10);
+      adjustSize(10, true);
       if(pet)pet.say('Getting bigger!');
       break;
     }
@@ -4533,6 +5678,7 @@ function execViewerCmd(cmdId,username,args){
     }
     case 'lurk':{
       if(pet){
+        if(pet.pinned){pet.say("Can't lurk while pinned! 🪢");break;}
         pet.say('Going lurk...');
         const _lu=pet.username;
         setTimeout(()=>{
@@ -4546,7 +5692,7 @@ function execViewerCmd(cmdId,username,args){
     case 'hug':{
       const hugTgt=args&&args[0]
         ?pets.find(p=>p.username.toLowerCase()===(args[0]||'').toLowerCase()&&p!==pet)
-        :pets.find(p=>p!==pet);
+        :pets.filter(p=>p!==pet)[Math.floor(Math.random()*pets.filter(p=>p!==pet).length)];
       if(pet&&hugTgt){
         queueInteraction(pet,hugTgt,(p,t,done)=>{
           p._inHug=true;t._inHug=true;
@@ -4555,7 +5701,29 @@ function execViewerCmd(cmdId,username,args){
             const dx=(t.x+t.w/2)-(p.x+p.w/2);
             if(Math.abs(dx)<p.w*1.2){
               clearInterval(hugIv);p.vx=0;
-              p.say('\u2764');t.say('\u2764');
+              sendBotMsg('@'+p.username+' hugged @'+t.username+'! \ud83e\udec2');
+              t.vx=(Math.random()<0.5?-1:1)*3;t.vy=-4;t.airborne=true;
+              p._inHug=false;t._inHug=false;
+              setTimeout(done,500);
+            }else{p.vx=Math.sign(dx)*petSpeed*1.5;}
+          },100);
+        });
+      }
+      break;
+    }
+    case 'kiss':{
+      const kissTgt=args&&args[0]
+        ?pets.find(p=>p.username.toLowerCase()===(args[0]||'').toLowerCase()&&p!==pet)
+        :pets.filter(p=>p!==pet)[Math.floor(Math.random()*pets.filter(p=>p!==pet).length)];
+      if(pet&&kissTgt){
+        queueInteraction(pet,kissTgt,(p,t,done)=>{
+          p._inHug=true;t._inHug=true;
+          const kissIv=setInterval(()=>{
+            if(!pets.includes(p)||!pets.includes(t)){clearInterval(kissIv);p._inHug=false;t._inHug=false;done();return;}
+            const dx=(t.x+t.w/2)-(p.x+p.w/2);
+            if(Math.abs(dx)<p.w*1.2){
+              clearInterval(kissIv);p.vx=0;
+              sendBotMsg('@'+p.username+' gave @'+t.username+' a kiss! <3 \ud83d\udc8b');
               t.vx=(Math.random()<0.5?-1:1)*3;t.vy=-4;t.airborne=true;
               p._inHug=false;t._inHug=false;
               setTimeout(done,500);
@@ -4569,6 +5737,7 @@ function execViewerCmd(cmdId,username,args){
       if(battleRoyaleActive||warActive||kaijuActive||activeDuels.size>0){
         if(pet)pet.say('No eating during events!');break;
       }
+      if(pet&&pet.w>=400){pet.say("I'm full...");break;}
       const eatTgt=args&&args[0]
         ?pets.find(p=>p.username.toLowerCase()===(args[0]||'').toLowerCase()&&p!==pet)
         :null;
@@ -4613,6 +5782,46 @@ function execViewerCmd(cmdId,username,args){
       if(pet&&target2)queueInteraction(pet,target2,(p,t,done)=>{startPunch(p,t,done);});
       break;
     }
+    case 'tuck':{
+      const tuckTargetName=args&&args[0];
+      if(!tuckTargetName){if(pet)pet.say('Who?');break;}
+      const tuckTarget=pets.find(p=>p.username.toLowerCase()===tuckTargetName.toLowerCase()&&p!==pet);
+      if(!pet||!tuckTarget){if(pet)pet.say('They are not here!');break;}
+      queueInteraction(pet,tuckTarget,(p,t,done)=>{
+        p._inPunch=true;t._inPunch=true;
+        const tuckIv=setInterval(()=>{
+          if(!pets.includes(p)||!pets.includes(t)){clearInterval(tuckIv);p._inPunch=false;t._inPunch=false;done();return;}
+          const dx=(t.x+t.w/2)-(p.x+p.w/2);
+          if(Math.abs(dx)>p.w*1.2){
+            p.vx=Math.sign(dx)*petSpeed*2;
+          } else {
+            clearInterval(tuckIv);p.vx=0;
+            const nx=Math.sign(dx)||1;
+            // land the punch
+            t.vx=nx*8;t.vy=-5;t.airborne=true;
+            t.say('😴 zzzz...');
+            ensureAudio();playEventSound(hitBuffer,'hit');spawnBloodSplatter(t);
+            p.vx=-nx*3;p.vy=-2;p.airborne=true;
+            p._inPunch=false;t._inPunch=false;
+            sendBotMsg('@'+p.username+' has tucked @'+t.username+' to sleep PERMANENTLY 😴💤');
+            // fade the target out and remove them
+            setTimeout(()=>{
+              if(!pets.includes(t)){done();return;}
+              t.el.style.transition='opacity 2s';
+              t.el.style.opacity='0';
+              setTimeout(()=>{
+                const tu=t.username;
+                if(petMap[tu])delete petMap[tu];
+                pets=pets.filter(p=>p.username!==tu);
+                t.destroy();
+                done();
+              },2000);
+            },800);
+          }
+        },50);
+      });
+      break;
+    }
   }
 }
 
@@ -4620,10 +5829,10 @@ function playEventSound(buf,key){if(buf&&audioCtx)playSound(buf,pv(key||'collisi
 // named wrappers used throughout
 function playBattleStart(){ensureAudio();playEventSound(battleStartBuffer,'battleStart');}
 function playHit(){ensureAudio();playEventSound(hitBuffer,'hit');}
-function playKO(){ensureAudio();playEventSound(koBuffer,'ko');}
-function playWin(){ensureAudio();playEventSound(winBuffer,'win');}
 function playStomp(){ensureAudio();playEventSound(stompBuffer,'stomp');}
-function playDVDBounce(){ensureAudio();playEventSound(dvdBounceBuffer,'dvd');}
+function playBomb(){ensureAudio();playEventSound(bombBuffer,'bomb');}
+function playNuke(){ensureAudio();playEventSound(nukeBuffer,'nuke');}
+function playFlashbang(){ensureAudio();playEventSound(flashbangBuffer,'flashbang');}
 
 // Hook battle start sound — called when any event starts
 const _origStartBR=startBattleRoyale,_origStartWar=startWar,_origStartKaiju=startKaiju;
@@ -4640,7 +5849,7 @@ updateDvd=function(){
     _origUpdateDvd();
     const nowLeft=dvdSpire.x-r<=1,nowRight=dvdSpire.x+r>=W-1,nowTop=dvdSpire.y-r<=1,nowBot=dvdSpire.y+r>=H-1;
     if((nowLeft&&!wasLeft)||(nowRight&&!wasRight)||(nowTop&&!wasTop)||(nowBot&&!wasBot)){
-      ensureAudio();playEventSound(dvdBounceBuffer,'dvd');
+      ensureAudio();playEventSound(collisionBuffer,'collision');
     }
   } else {_origUpdateDvd();}
 };
@@ -4670,7 +5879,7 @@ document.getElementById('bubbleFontSize').addEventListener('input',function(){bu
 
 
 // directional viewer frame wiring
-const LS_PFL='lpp_pfl5',LS_PFR='lpp_pfr5',LS_PFI='lpp_pfi5';
+const LS_PFR='lpp_pfr5';
 function savePetFramesDir(){
   idbSet(LS_PFR,JSON.stringify(petFramesRight.map(i=>i._dataUrl||i.src))).catch(()=>{});
 }
