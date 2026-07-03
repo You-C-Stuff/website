@@ -241,6 +241,7 @@ function updateFormVisibility() {
     if (commissionType === 'Toontuber') {
         document.getElementById('packageplanfields').classList.remove('hidden');
         document.getElementById('toontuberAddOns').classList.remove('hidden');
+        document.getElementById('toontuberFields').classList.remove('hidden');
 
     } else if (commissionType === 'Animation' || commissionType === 'Illustration') {
         setLevelOfDetailOptions(commissionType);
