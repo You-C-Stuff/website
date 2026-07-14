@@ -132,6 +132,7 @@ body.mode-hallway #hallwayContainer{display:block;}
       <button class="tbbtn" id="kaijuTopBtn" style="border-color:rgba(60,200,120,0.5);color:rgba(80,220,140,0.9);">🦖 Kaiju</button>
       <button class="tbbtn" id="whipTopBtn" style="border-color:rgba(220,160,60,0.5);color:rgba(240,180,60,0.9);">🦯 Whip</button>
       <button class="tbbtn" id="dvdBtn" style="border-color:rgba(80,160,255,0.5);color:rgba(100,180,255,0.9);">💿 DVD</button>
+      <button class="tbbtn" id="wheelBtn" style="border-color:rgba(255,215,0,0.5);color:rgba(255,215,0,0.9);">🎡 Wheel</button>
     </div>
     <div class="tbsep"></div>
     <div class="tbgroup">
@@ -208,6 +209,7 @@ body.mode-hallway #hallwayContainer{display:block;}
       <button class="stab" data-tab="hotkeys">Hotkeys</button>
       <button class="stab" data-tab="fights">Fights</button>
       <button class="stab" data-tab="commands">Commands</button>
+      <button class="stab" data-tab="wheel">Wheel</button>
     </div>
 
     <div class="stabpanel" id="tab-twitch">
@@ -571,6 +573,41 @@ body.mode-hallway #hallwayContainer{display:block;}
 
       <div style="font-size:11px;font-weight:600;color:rgba(127,180,255,0.8);text-transform:uppercase;letter-spacing:0.06em;margin-top:16px;margin-bottom:10px;">Viewer commands</div>
       <div id="viewerCmdsGrid"></div>
+    </div>
+
+    <div class="stabpanel" id="tab-wheel">
+      <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:14px;">Configure the Spin the Wheel game. Owner types <code style="background:rgba(255,255,255,0.08);padding:1px 4px;border-radius:4px;">!spinthewheel</code> to bring it up, then click the wheel or the Spin button to spin.</p>
+      <div class="srow">
+        <label>Wheel items (one per line)</label>
+        <textarea id="wheelItemsInput" rows="10" placeholder="Item one&#10;Item two&#10;Item three" style="width:100%;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:8px 10px;color:#fff;font-size:12px;font-family:monospace;resize:vertical;box-sizing:border-box;"></textarea>
+      </div>
+      <div class="srow">
+        <label>Spin duration (seconds)</label>
+        <input type="number" id="wheelSpinSeconds" value="6" min="1" max="30" step="0.5">
+      </div>
+      <div class="srow">
+        <label>Wheel scale</label>
+        <input type="range" id="wheelScale" min="0.3" max="2" step="0.05" value="1" style="width:100%;">
+        <span id="wheelScaleValue" style="font-size:11px;color:rgba(255,255,255,0.5);margin-left:8px;">1.0x</span>
+      </div>
+      <div class="srow">
+        <label>Wheel X position (%)</label>
+        <input type="range" id="wheelPosX" min="0" max="100" step="1" value="50" style="width:100%;">
+        <span id="wheelPosXValue" style="font-size:11px;color:rgba(255,255,255,0.5);margin-left:8px;">50%</span>
+      </div>
+      <div class="srow">
+        <label>Wheel Y position (%)</label>
+        <input type="range" id="wheelPosY" min="0" max="100" step="1" value="60" style="width:100%;">
+        <span id="wheelPosYValue" style="font-size:11px;color:rgba(255,255,255,0.5);margin-left:8px;">60%</span>
+      </div>
+      <div class="srow">
+        <label>Spin sound effect</label>
+        <input type="file" id="wheelSoundFile" accept="audio/*" style="width:100%;">
+        <div id="wheelSoundStatus" style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:4px;"></div>
+      </div>
+      <div class="sdivider"></div>
+      <div style="font-size:12px;font-weight:500;color:rgba(255,255,255,0.6);margin-bottom:10px;">Per-item weight &amp; colour <span style="color:rgba(255,255,255,0.3);font-weight:400;">(higher weight = more likely to land)</span></div>
+      <div id="wheelItemsGrid"></div>
     </div>
 
     <button class="sclose" id="closeSettings">Done</button>
@@ -1634,6 +1671,10 @@ document.getElementById('brTopBtn').addEventListener('click',startBattleRoyale);
 document.getElementById('warTopBtn').addEventListener('click',startWar);
 document.getElementById('kaijuTopBtn').addEventListener('click',startKaiju);
 document.getElementById('dvdBtn').addEventListener('click',toggleDvd);
+document.getElementById('wheelBtn').addEventListener('click',()=>{
+  if(wheelPopupOpen)closeSpinTheWheel();
+  else openSpinTheWheel();
+});
 
 // ── DVD MODE ─────────────────────────────────────────────
 let dvdActive=false, dvdSpire=null;
@@ -3333,6 +3374,7 @@ function _doConnect(){
           if(cmdTrigger===cmd('battleroyale'))setTimeout(startBattleRoyale,500);
           if(cmdTrigger===cmd('war'))setTimeout(startWar,500);
           if(cmdTrigger===cmd('kaiju'))setTimeout(startKaiju,500);
+          if(cmdTrigger===cmd('spinthewheel')||cmdTrigger==='!wheel')setTimeout(openSpinTheWheel,500);
           if(cmdTrigger===cmd('spawn'))execViewerCmd('spawn',username,cmdArgs);
           if(cmdTrigger===cmd('despawn'))execViewerCmd('despawn',username,cmdArgs);
           if(cmdTrigger===cmd('tuck'))execViewerCmd('tuck',username,cmdArgs);
@@ -4612,7 +4654,7 @@ function _runSlotMachine(username, bet, petObj){
   const payout=Math.floor(bet*multiplier);
 
   const box=document.createElement('div');
-  box.style.cssText='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale('+currentCanvasScale+');transform-origin:50% 50%;background:linear-gradient(160deg,#1a0a5e,#2d1b8e);border:4px solid #ffd700;border-radius:28px;padding:44px 56px;text-align:center;z-index:9995;box-shadow:0 0 80px rgba(255,215,0,0.35),inset 0 0 40px rgba(0,0,0,0.5);min-width:520px;font-family:inherit;pointer-events:none;';
+  box.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);transform-origin:50% 50%;background:linear-gradient(160deg,#1a0a5e,#2d1b8e);border:4px solid #ffd700;border-radius:28px;padding:44px 56px;text-align:center;z-index:9995;box-shadow:0 0 80px rgba(255,215,0,0.35),inset 0 0 40px rgba(0,0,0,0.5);min-width:520px;font-family:inherit;pointer-events:none;';
 
   const titleEl=document.createElement('div');
   titleEl.textContent='🎰 SLOT MACHINE';
@@ -4643,7 +4685,7 @@ function _runSlotMachine(username, bet, petObj){
   coinsEl.style.cssText='font-size:20px;margin-top:10px;min-height:26px;';
   box.appendChild(coinsEl);
 
-  document.body.appendChild(box);
+  canvasWrap.appendChild(box);
 
   const stopDelays=[1400,2100,2900];
   let reelsDone=0;
@@ -4702,6 +4744,324 @@ function _runSlotMachine(username, bet, petObj){
       },700);
     },dismissDelay);
   }
+}
+
+// ── SPIN THE WHEEL ────────────────────────────────────────
+const LS_WHEEL='lpp_wheel5';
+const WHEEL_PALETTE=['#e6194b','#3cb44b','#ffe119','#4363d8','#f58231','#911eb4','#46f0f0','#f032e6','#bcf60c','#fabebe','#008080','#e6beff','#9a6324','#fffac8','#800000','#aaffc3'];
+let wheelItems=[]; // {id,text,weight,color}
+let wheelSpinSeconds=6;
+let wheelScale=1;
+let wheelPosX=50;
+let wheelPosY=60;
+let wheelSoundData=''; // base64 audio data
+let wheelPopupOpen=false, wheelSpinning=false;
+let wheelSpinAudio=null;
+let wheelContainer=null; // reference to the open wheel container
+
+function wheelColorFor(idx){return WHEEL_PALETTE[idx%WHEEL_PALETTE.length];}
+
+function saveWheel(){
+  try{localStorage.setItem(LS_WHEEL,JSON.stringify({items:wheelItems,spinSeconds:wheelSpinSeconds,scale:wheelScale,posX:wheelPosX,posY:wheelPosY,soundData:wheelSoundData}));}catch(e){}
+}
+function loadWheel(){
+  try{
+    const raw=localStorage.getItem(LS_WHEEL);
+    if(raw){
+      const p=JSON.parse(raw);
+      if(Array.isArray(p.items))wheelItems=p.items;
+      if(p.spinSeconds!=null)wheelSpinSeconds=p.spinSeconds;
+      if(p.scale!=null)wheelScale=p.scale;
+      if(p.posX!=null)wheelPosX=p.posX;
+      if(p.posY!=null)wheelPosY=p.posY;
+      if(p.soundData!=null)wheelSoundData=p.soundData;
+    }
+  }catch(e){}
+}
+loadWheel();
+
+// Sync textarea -> wheelItems (preserve weight/color for lines that still match by text)
+function syncWheelItemsFromTextarea(){
+  const ta=document.getElementById('wheelItemsInput');
+  if(!ta)return;
+  const lines=ta.value.split('\n').map(s=>s.trim()).filter(s=>s.length);
+  const prevByText=new Map(wheelItems.map(it=>[it.text,it]));
+  wheelItems=lines.map((text,i)=>{
+    const prev=prevByText.get(text);
+    if(prev){prevByText.delete(text);return prev;}
+    return {id:genId(),text,weight:1,color:wheelColorFor(i)};
+  });
+  saveWheel();
+  buildWheelItemsUI();
+}
+
+function buildWheelItemsUI(){
+  const grid=document.getElementById('wheelItemsGrid');
+  if(!grid)return;
+  grid.innerHTML='';
+  if(!wheelItems.length){
+    grid.innerHTML='<p style="font-size:11px;color:rgba(255,255,255,0.3);">Add items above to configure weight and colour.</p>';
+    return;
+  }
+  wheelItems.forEach(item=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px;';
+    const swatch=document.createElement('input');
+    swatch.type='color';swatch.value=item.color;
+    swatch.style.cssText='width:34px;height:30px;padding:2px;border-radius:6px;border:0.5px solid rgba(255,255,255,0.2);cursor:pointer;background:none;flex-shrink:0;';
+    swatch.addEventListener('input',()=>{item.color=swatch.value;saveWheel();redrawOpenWheel();});
+    const lbl=document.createElement('span');
+    lbl.style.cssText='flex:1;font-size:12px;color:rgba(255,255,255,0.75);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+    lbl.textContent=item.text;
+    const weightInp=document.createElement('input');
+    weightInp.type='number';weightInp.value=item.weight;weightInp.min='0.1';weightInp.step='0.1';
+    weightInp.title='Weight — higher = more likely';
+    weightInp.style.cssText='width:64px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);border-radius:6px;padding:5px 7px;color:#fff;font-size:12px;font-family:inherit;';
+    weightInp.addEventListener('input',()=>{item.weight=Math.max(0.1,parseFloat(weightInp.value)||1);saveWheel();});
+    row.appendChild(swatch);row.appendChild(lbl);row.appendChild(weightInp);
+    grid.appendChild(row);
+  });
+}
+
+function refreshWheelUI(){
+  const ta=document.getElementById('wheelItemsInput');
+  if(ta)ta.value=wheelItems.map(it=>it.text).join('\n');
+  const secInp=document.getElementById('wheelSpinSeconds');
+  if(secInp)secInp.value=wheelSpinSeconds;
+  const scaleInp=document.getElementById('wheelScale');
+  if(scaleInp){scaleInp.value=wheelScale;document.getElementById('wheelScaleValue').textContent=wheelScale.toFixed(2)+'x';}
+  const posXInp=document.getElementById('wheelPosX');
+  if(posXInp){posXInp.value=wheelPosX;document.getElementById('wheelPosXValue').textContent=wheelPosX+'%';}
+  const posYInp=document.getElementById('wheelPosY');
+  if(posYInp){posYInp.value=wheelPosY;document.getElementById('wheelPosYValue').textContent=wheelPosY+'%';}
+  const soundStatus=document.getElementById('wheelSoundStatus');
+  if(soundStatus)soundStatus.textContent=wheelSoundData?'✓ Sound uploaded':'No sound uploaded';
+  buildWheelItemsUI();
+}
+const _wheelItemsInputEl=document.getElementById('wheelItemsInput');
+if(_wheelItemsInputEl)_wheelItemsInputEl.addEventListener('input',syncWheelItemsFromTextarea);
+const _wheelSpinSecondsEl=document.getElementById('wheelSpinSeconds');
+if(_wheelSpinSecondsEl)_wheelSpinSecondsEl.addEventListener('input',function(){
+  wheelSpinSeconds=Math.max(1,parseFloat(this.value)||6);
+  saveWheel();
+});
+const _wheelScaleEl=document.getElementById('wheelScale');
+if(_wheelScaleEl)_wheelScaleEl.addEventListener('input',function(){
+  wheelScale=parseFloat(this.value)||1;
+  document.getElementById('wheelScaleValue').textContent=wheelScale.toFixed(2)+'x';
+  saveWheel();
+  updateWheelPosition();
+});
+const _wheelPosXEl=document.getElementById('wheelPosX');
+if(_wheelPosXEl)_wheelPosXEl.addEventListener('input',function(){
+  wheelPosX=parseInt(this.value)||50;
+  document.getElementById('wheelPosXValue').textContent=wheelPosX+'%';
+  saveWheel();
+  updateWheelPosition();
+});
+const _wheelPosYEl=document.getElementById('wheelPosY');
+if(_wheelPosYEl)_wheelPosYEl.addEventListener('input',function(){
+  wheelPosY=parseInt(this.value)||60;
+  document.getElementById('wheelPosYValue').textContent=wheelPosY+'%';
+  saveWheel();
+  updateWheelPosition();
+});
+const _wheelSoundFileEl=document.getElementById('wheelSoundFile');
+if(_wheelSoundFileEl)_wheelSoundFileEl.addEventListener('change',function(){
+  const file=this.files[0];
+  if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    wheelSoundData=e.target.result;
+    saveWheel();
+    refreshWheelUI();
+  };
+  reader.readAsDataURL(file);
+});
+document.querySelectorAll('.stab[data-tab="wheel"]').forEach(btn=>btn.addEventListener('click',refreshWheelUI));
+refreshWheelUI();
+
+function _wheelWeightedPick(items){
+  const total=items.reduce((s,x)=>s+(x.weight||1),0);
+  let r=Math.random()*total;
+  for(const it of items){r-=(it.weight||1);if(r<=0)return it;}
+  return items[items.length-1];
+}
+function _wheelReadableTextColor(hex){
+  const c=hex.replace('#','');
+  const r=parseInt(c.substr(0,2),16),g=parseInt(c.substr(2,2),16),b=parseInt(c.substr(4,2),16);
+  const lum=(0.299*r+0.587*g+0.114*b)/255;
+  return lum>0.6?'#000':'#fff';
+}
+
+let wheelDrawFn=null;
+function redrawOpenWheel(){
+  if(wheelDrawFn)wheelDrawFn();
+}
+function updateWheelPosition(){
+  if(wheelContainer){
+    wheelContainer.style.top=wheelPosY+'%';
+    wheelContainer.style.left=wheelPosX+'%';
+    wheelContainer.style.transform='translate(-50%,-50%) scale('+wheelScale+')';
+  }
+}
+
+function closeSpinTheWheel(){
+  if(!wheelPopupOpen)return;
+  const containers=canvasWrap.querySelectorAll('div');
+  containers.forEach(el=>{
+    if(el.style.zIndex==='9994'||el.style.zIndex==='9995')el.remove();
+  });
+  wheelPopupOpen=false;
+  wheelDrawFn=null;
+  wheelContainer=null;
+  if(wheelSpinAudio){wheelSpinAudio.pause();wheelSpinAudio=null;}
+}
+
+function openSpinTheWheel(){
+  if(wheelPopupOpen)return;
+  if(!wheelItems.length){sendBotMsg('🎡 Wheel has no items configured yet!');return;}
+  wheelPopupOpen=true;
+
+  const SIZE=600;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;z-index:9994;pointer-events:all;';
+  overlay.addEventListener('click',()=>{
+    container.remove();
+    wheelPopupOpen=false;
+    wheelDrawFn=null;
+    wheelContainer=null;
+    if(wheelSpinAudio){wheelSpinAudio.pause();wheelSpinAudio=null;}
+  });
+
+  const container=document.createElement('div');
+  container.style.cssText='position:absolute;top:'+wheelPosY+'%;left:'+wheelPosX+'%;transform:translate(-50%,-50%) scale('+wheelScale+');transform-origin:50% 50%;z-index:9995;pointer-events:none;';
+  wheelContainer=container;
+
+  const wheelWrap=document.createElement('div');
+  wheelWrap.style.cssText='position:relative;width:'+SIZE+'px;height:'+SIZE+'px;pointer-events:all;';
+
+  const wcanvas=document.createElement('canvas');
+  wcanvas.width=SIZE;wcanvas.height=SIZE;
+  wcanvas.style.cssText='display:block;border-radius:50%;';
+  wcanvas.addEventListener('click',e=>e.stopPropagation());
+  wheelWrap.appendChild(wcanvas);
+
+  const pointer=document.createElement('div');
+  pointer.style.cssText='position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:22px solid transparent;border-right:22px solid transparent;border-top:40px solid #ffd700;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.6));z-index:2;pointer-events:none;';
+  wheelWrap.appendChild(pointer);
+
+  const spinBtn=document.createElement('button');
+  spinBtn.textContent='SPIN';
+  spinBtn.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(160deg,#ffd700,#e6b800);border:none;border-radius:50%;color:#1a0a5e;font-size:24px;font-weight:700;letter-spacing:1.5px;width:110px;height:110px;cursor:pointer;box-shadow:0 6px 18px rgba(255,215,0,0.7);z-index:3;';
+  wheelWrap.appendChild(spinBtn);
+
+  const resultPopup=document.createElement('div');
+  resultPopup.style.cssText='position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,0.95);border:4px solid #000;border-radius:16px;padding:24px 36px;color:#000;font-size:28px;font-weight:700;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,0.8);z-index:4;display:none;max-width:400px;word-wrap:break-word;';
+  wheelWrap.appendChild(resultPopup);
+
+  container.appendChild(wheelWrap);
+  canvasWrap.appendChild(overlay);
+  canvasWrap.appendChild(container);
+
+  const wctx=wcanvas.getContext('2d');
+  let rotation=0; // radians, current visual rotation of wheel
+
+  function drawWheel(rot){
+    const cx=SIZE/2, cy=SIZE/2, r=SIZE/2-6;
+    wctx.clearRect(0,0,SIZE,SIZE);
+    const total=wheelItems.reduce((s,x)=>s+(x.weight||1),0);
+    let ang=rot-Math.PI/2; // top of circle = -90°, offset by current rotation
+    wheelItems.forEach(item=>{
+      const slice=(item.weight||1)/total*Math.PI*2;
+      wctx.beginPath();
+      wctx.moveTo(cx,cy);
+      wctx.arc(cx,cy,r,ang,ang+slice);
+      wctx.closePath();
+      let col=item.color;
+      // ensure color doesn't match background
+      if(col.toLowerCase()===bgColor.toLowerCase()){
+        const hsl=col.match(/#(..)(..)(..)/).slice(1).map(h=>parseInt(h,16));
+        col='#'+hsl.map(v=>{const n=(v+128)%256;return(n<16?'0':'')+n.toString(16);}).join('');
+      }
+      wctx.fillStyle=col;
+      wctx.fill();
+
+      wctx.save();
+      wctx.translate(cx,cy);
+      wctx.rotate(ang+slice/2);
+      wctx.textAlign='right';
+      wctx.textBaseline='middle';
+      wctx.fillStyle=_wheelReadableTextColor(col);
+      wctx.font='700 18px system-ui,sans-serif';
+      const maxLabelW=r-36;
+      let label=item.text;
+      while(wctx.measureText(label).width>maxLabelW&&label.length>1){label=label.slice(0,-1);}
+      if(label!==item.text)label=label.replace(/.$/,'')+'…';
+      wctx.fillText(label,r-20,0);
+      wctx.restore();
+
+      ang+=slice;
+    });
+    // Draw outer black circle outline
+    wctx.beginPath();
+    wctx.arc(cx,cy,r,0,Math.PI*2);
+    wctx.strokeStyle='#000';
+    wctx.lineWidth=5;
+    wctx.stroke();
+  }
+  wheelDrawFn=()=>drawWheel(rotation);
+  drawWheel(rotation);
+
+  function doSpin(){
+    if(wheelSpinning)return;
+    wheelSpinning=true;
+    resultPopup.style.display='none';
+    spinBtn.style.display='none';
+
+    // Play spin sound once
+    if(wheelSoundData&&wheelSoundData.length>0){
+      try{
+        wheelSpinAudio=new Audio(wheelSoundData);
+        wheelSpinAudio.play().catch(e=>console.warn('Wheel sound failed:',e));
+      }catch(e){console.warn('Wheel sound error:',e);}
+    }
+
+    const chosen=_wheelWeightedPick(wheelItems);
+    const total=wheelItems.reduce((s,x)=>s+(x.weight||1),0);
+    let ang=-Math.PI/2, midAngle=0;
+    for(const item of wheelItems){
+      const slice=(item.weight||1)/total*Math.PI*2;
+      if(item===chosen){midAngle=ang+slice/2;break;}
+      ang+=slice;
+    }
+    const spins=6+Math.floor(Math.random()*3);
+    let targetRot=(-Math.PI/2-midAngle);
+    targetRot=((targetRot%(Math.PI*2))+Math.PI*2)%(Math.PI*2);
+    targetRot+=spins*Math.PI*2;
+
+    const startRot=rotation;
+    const duration=wheelSpinSeconds*1000;
+    const startTime=performance.now();
+
+    function tick(now){
+      const t=Math.min(1,(now-startTime)/duration);
+      const ease=1-Math.pow(1-t,3);
+      rotation=startRot+(targetRot-startRot)*ease;
+      drawWheel(rotation);
+      if(t<1){requestAnimationFrame(tick);}
+      else{
+        resultPopup.textContent='🎉 '+chosen.text;
+        resultPopup.style.display='block';
+        spinBtn.style.display='';
+        wheelSpinning=false;
+        sendBotMsg('🎡 The wheel landed on: '+chosen.text+'!');
+      }
+    }
+    requestAnimationFrame(tick);
+  }
+
+  spinBtn.addEventListener('click',doSpin);
 }
 
 // ── STEAL / STOCKADE ──────────────────────────────────────
@@ -4944,6 +5304,7 @@ const CMD_DEFS=[
   {id:'battleroyale', label:'Battle Royale',    def:'!battleroyale', owner:true},
   {id:'war',          label:'Start War',        def:'!war',          owner:true},
   {id:'kaiju',        label:'Kaiju Battle',     def:'!kaiju',        owner:true},
+  {id:'spinthewheel', label:'Spin the Wheel',   def:'!spinthewheel', owner:true},
   // viewer commands
   {id:'attack',       label:'Attack Kaiju',     def:'!attack',       owner:false},
   {id:'jump',         label:'Jump',             def:'!jump',         owner:false},
